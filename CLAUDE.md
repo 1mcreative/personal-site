@@ -20,6 +20,8 @@ Whenever a skill, MCP server, or Claude Code plugin gets used on this repo, log 
 | 2026-08-26 | Homebrew (`brew install git`) | Replaced the system `git`/Xcode Command Line Tools toolchain after it broke mid-session; bottled binary needed no compilation |
 | 2026-08-26 | `ui-ux-pro-max` skill | Design-system and landing-pattern guidance for the homepage hero (v3-transition phase) — used its Minimal Single Column landing pattern and its explicit warning against scroll-jacking/forced parallax; deliberately overrode its Brutalism/handwritten-font suggestion as a mismatch for a recruiter-facing resume site |
 | 2026-08-26 | `humanize-ai-writing` skill | Rewrote the hero headline/subhead/button copy before finalizing (see project memory) |
+| 2026-08-26 | `ui-ux-pro-max` skill (again) | Sanity-checked secondary-CTA sizing/hierarchy before adding the isometric "keycap" button for the personal-side link |
+| 2026-08-26 | local Jekyll preview (`bundle exec jekyll serve`) + Browser pane | Visually verified the hero, both CTA buttons' hover states, and the scroll-to-resume behavior before pushing |
 
 ## Known environment quirk (resolved)
 
