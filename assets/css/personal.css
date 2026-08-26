@@ -1,0 +1,90 @@
+/* Personal theme — dark, relaxed, life-and-Instagram-first. */
+.theme-personal {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --text: #e8eef7;
+  --muted: #9aa8b8;
+  --accent: #6ec1ff;
+  --border: #263041;
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+.theme-personal a {
+  color: var(--accent);
+}
+
+.theme-personal .site-header {
+  border-bottom: 1px solid var(--border);
+}
+
+.theme-personal .site-header nav a {
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.theme-personal .site-header nav a:hover,
+.theme-personal .site-header nav a[aria-current="page"] {
+  color: var(--text);
+}
+
+.theme-personal .switch-side {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.theme-personal .site-footer {
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.theme-personal .site-footer a {
+  color: var(--muted);
+}
+
+.life-intro {
+  max-width: 60ch;
+}
+
+.social-grid {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+@media (min-width: 560px) {
+  .social-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.social-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+}
+
+.social-card h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.social-card p {
+  color: var(--muted);
+  margin-bottom: var(--space-2);
+}
+
+.social-card a.handle {
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.coming-later {
+  margin-top: var(--space-4);
+  color: var(--muted);
+  font-size: 0.9rem;
+}

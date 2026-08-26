@@ -1,0 +1,92 @@
+/* Homepage — neutral ground between the two themes; the split itself carries the color. */
+.theme-home {
+  --bg: #12161c;
+  --text: #f2f4f7;
+  --muted: #98a2b3;
+
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.theme-home main#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 900px;
+  padding-top: var(--space-5);
+  padding-bottom: var(--space-5);
+}
+
+.home-intro {
+  text-align: center;
+  margin-bottom: var(--space-5);
+}
+
+.home-intro h1 {
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  margin-bottom: var(--space-1);
+}
+
+.home-intro p {
+  color: var(--muted);
+  max-width: 55ch;
+  margin: 0 auto;
+}
+
+.side-picker {
+  display: grid;
+  gap: var(--space-3);
+}
+
+@media (min-width: 640px) {
+  .side-picker {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.side-card {
+  display: block;
+  text-decoration: none;
+  border-radius: 16px;
+  padding: var(--space-4) var(--space-3);
+  transition: transform 0.15s ease;
+}
+
+.side-card:hover {
+  transform: translateY(-2px);
+}
+
+.side-card.professional {
+  background: #ffffff;
+  color: #1b1f24;
+}
+
+.side-card.personal {
+  background: #1a2332;
+  color: #e8eef7;
+  border: 1px solid #263041;
+}
+
+.side-card h2 {
+  font-size: 1.3rem;
+  margin: 0 0 0.4rem;
+}
+
+.side-card p {
+  margin: 0;
+  opacity: 0.75;
+}
+
+.theme-home .home-footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.theme-home .home-footer a {
+  color: var(--muted);
+}

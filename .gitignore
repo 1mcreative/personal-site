@@ -1,7 +1,6 @@
-.DS_Store
-node_modules/
-.env
-.env.*
-dist/
-.vscode/
-*.log
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.sass-cache/
+.bundle/
+vendor/
