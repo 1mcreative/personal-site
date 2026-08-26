@@ -4,10 +4,10 @@
 
 ## Branches, not tags
 
-Each version of the site lives on its own branch until it's reviewed and ready:
+Each version of the site lives on its own branch, named after the phase it represents (`v1-structure`, `v2-theming`, `v3-transition`, `v4-expansion`, ...), until it's reviewed and ready:
 
-- Build and iterate on a version branch (e.g. this rebuild started on `claude/personal-website-resume-9c4dc3`).
-- Preview locally (`bundle exec jekyll serve`, or push the branch and check the Pages deploy preview) before merging.
+- Build and iterate on `origin/vN-<phase>`. Local work may happen on a differently-named working branch (e.g. a Claude Code session branch) — what matters is that the *published* branch on GitHub carries the version name, so anyone looking at the repo can tell what state it's in.
+- Preview locally (`bundle exec jekyll serve`) or push the branch and check the Pages build logs before merging.
 - Merge into `main` only once it's approved — that merge is the release.
 - To roll back, check out the previous version's branch rather than reverting individual commits on `main`. Keeping each version's branch around after merge (don't delete it) is what makes that possible.
 
