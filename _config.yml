@@ -1,0 +1,24 @@
+title: "Bhavesh Nakum"
+description: "Senior software engineer in Bengaluru — backend architecture, cloud data platforms, and resume. Also: the personal side, Instagram and hobbies."
+url: "https://bhaveshnakum.com"
+lang: en
+author: "Bhavesh Nakum"
+email: "bhaveshnakum485@gmail.com"
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+exclude:
+  - README.md
+  - CLAUDE.md
+  - DESIGN.md
+  - VERSIONING.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules

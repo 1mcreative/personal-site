@@ -1,0 +1,107 @@
+/* Shared design tokens — see DESIGN.md for the rationale behind each value. */
+:root {
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
+
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 4rem;
+
+  --radius: 10px;
+  --radius-lg: 16px;
+  --max-width: 780px;
+
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --speed: 0.18s;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg {
+  max-width: 100%;
+  display: block;
+}
+
+.site-header .header-inner,
+main#main,
+.site-footer {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding-left: var(--space-3);
+  padding-right: var(--space-3);
+}
+
+.site-header .header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+}
+
+.site-header nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.15rem;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.site-header nav a,
+a.switch-side {
+  transition: color var(--speed) var(--ease), background-color var(--speed) var(--ease), border-color var(--speed) var(--ease);
+}
+
+main#main {
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-5);
+}
+
+.site-footer {
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-4);
+  font-size: 0.85rem;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+p {
+  max-width: 68ch;
+}
+
+@media (max-width: 480px) {
+  :root {
+    --space-5: 2.5rem;
+  }
+}

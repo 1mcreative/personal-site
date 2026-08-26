@@ -1,0 +1,18 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% case page.layout %}
+  {% when 'professional' %}{% assign theme-color = '#ffffff' %}
+  {% when 'personal' %}{% assign theme-color = '#0f1419' %}
+  {% else %}{% assign theme-color = '#12161c' %}
+{% endcase %}
+<meta name="theme-color" content="{{ theme-color }}">
+{% seo %}
+<link rel="canonical" href="{{ page.url | absolute_url }}">
+<link rel="icon" href="{{ '/assets/img/favicon.svg' | relative_url }}" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/sitemap.xml' | absolute_url }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ '/assets/css/tokens.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/' | append: page.layout | append: '.css' | relative_url }}">
+{% if page.extra-css %}<link rel="stylesheet" href="{{ page.extra-css | relative_url }}">{% endif %}

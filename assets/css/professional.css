@@ -1,0 +1,187 @@
+/* Professional theme — bright, calm, resume-first. */
+.theme-professional {
+  --bg: #ffffff;
+  --surface: #f5f6f8;
+  --text: #1b1f24;
+  --muted: #5b6572;
+  --accent: #1d4ed8;
+  --border: #e3e6ea;
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+.theme-professional a {
+  color: var(--accent);
+}
+
+.theme-professional .site-header {
+  border-bottom: 1px solid var(--border);
+}
+
+.theme-professional .site-header nav a {
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.theme-professional .site-header nav a:hover,
+.theme-professional .site-header nav a[aria-current="page"] {
+  color: var(--text);
+}
+
+.theme-professional .switch-side {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.theme-professional .switch-side:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.theme-professional .site-footer {
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.theme-professional .site-footer a {
+  color: var(--muted);
+}
+
+/* Resume-specific structure */
+.resume-header {
+  padding-top: var(--space-2);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--space-3);
+}
+
+.resume-header h1 {
+  margin-bottom: 0.3rem;
+  font-size: clamp(1.9rem, 4vw, 2.5rem);
+}
+
+.resume-header .title-line {
+  color: var(--accent);
+  font-weight: 500;
+  margin-top: 0;
+  font-size: 1.05rem;
+}
+
+.resume-header .contact-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: var(--space-2);
+}
+
+.resume-header .contact-line a {
+  color: var(--muted);
+}
+
+.resume-header .contact-line a:hover {
+  color: var(--accent);
+}
+
+.resume-section {
+  margin-top: var(--space-4);
+}
+
+.resume-section h2 {
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.4rem;
+  margin-bottom: var(--space-2);
+}
+
+.resume-entry {
+  margin-bottom: var(--space-3);
+  padding-left: var(--space-2);
+  border-left: 2px solid var(--border);
+}
+
+.resume-entry .entry-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  font-weight: 600;
+  font-size: 1.02rem;
+}
+
+.resume-entry .entry-meta {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.9rem;
+}
+
+.resume-entry ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.resume-entry li {
+  margin-bottom: 0.3rem;
+}
+
+.skills-grid {
+  display: grid;
+  gap: var(--space-2) var(--space-3);
+}
+
+@media (min-width: 560px) {
+  .skills-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.skills-grid dt {
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.skills-grid dd {
+  margin: 0.15rem 0 0;
+}
+
+.resume-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: var(--space-3);
+}
+
+.resume-actions a {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.55rem 1.1rem;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color var(--speed) var(--ease), border-color var(--speed) var(--ease), color var(--speed) var(--ease);
+}
+
+.resume-actions a:first-child {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.resume-actions a:first-child:hover {
+  background: #1a3fb0;
+  border-color: #1a3fb0;
+}
+
+.resume-actions a:not(:first-child):hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

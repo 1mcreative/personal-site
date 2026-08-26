@@ -1,0 +1,16 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% include head.html %}
+</head>
+<body class="theme-home">
+  <main id="main">
+    {{ content }}
+  </main>
+  <footer class="site-footer home-footer">
+    <p>&copy; {{ 'now' | date: "%Y" }} Bhavesh Nakum. <a href="mailto:{{ site.email }}">{{ site.email }}</a></p>
+  </footer>
+</body>
+</html>
