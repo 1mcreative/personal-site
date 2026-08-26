@@ -1,22 +1,38 @@
 ---
 layout: home
 title: "Bhavesh Nakum"
-description: "Senior software engineer by day, Instagram and hobby projects by night. Pick a side."
+description: "Backend engineer, Instagram enthusiast, and the internet's most reluctant career page. Scroll down for the resume, or skip straight to the chaos."
 permalink: /
 ---
 
-<div class="home-intro">
-  <h1>Hi, I'm Bhavesh.</h1>
-  <p>I build backend systems for a living and mess around with cameras and side projects when I'm not. This site is split the same way — pick whichever side you're here for.</p>
-</div>
+<section class="hero">
+  <div class="hero-blobs" aria-hidden="true">
+    <div class="blob blob-a"></div>
+    <div class="blob blob-b"></div>
+    <div class="blob blob-c"></div>
+  </div>
 
-<div class="side-picker">
-  <a class="side-card professional" href="/resume/">
-    <h2>Professional</h2>
-    <p>Resume, work history, and how to reach me.</p>
-  </a>
-  <a class="side-card personal" href="/life/">
-    <h2>Personal</h2>
-    <p>Instagram, photos, and everything outside of work.</p>
-  </a>
-</div>
+  <div class="hero-inner">
+    <h1>Hi, I'm Bhavesh.</h1>
+    <p class="hero-sub">I write backend systems for a living, and I'm a lot less organized about everything else. Scroll down for the tidy version &mdash; or skip straight to the chaos.</p>
+
+    <div class="hero-ctas">
+      <a class="offset-btn" href="/resume/">
+        Enter Production
+        <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <a class="secondary-link" href="/life/">or peek at Localhost</a>
+    </div>
+  </div>
+
+  <div class="scroll-cue">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 4v14M6 13l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span>or just keep scrolling</span>
+  </div>
+</section>
+
+<div id="hero-sentinel" class="hero-sentinel" aria-hidden="true"></div>

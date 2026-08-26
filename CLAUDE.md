@@ -18,7 +18,9 @@ Whenever a skill, MCP server, or Claude Code plugin gets used on this repo, log 
 | --- | --- | --- |
 | 2026-08-26 | Read / Write / Edit / Bash (no skill or plugin) | Initial Jekyll scaffold: layouts, includes, CSS themes, resume and life pages transcribed from the user's resume PDF |
 | 2026-08-26 | Homebrew (`brew install git`) | Replaced the system `git`/Xcode Command Line Tools toolchain after it broke mid-session; bottled binary needed no compilation |
+| 2026-08-26 | `ui-ux-pro-max` skill | Design-system and landing-pattern guidance for the homepage hero (v3-transition phase) — used its Minimal Single Column landing pattern and its explicit warning against scroll-jacking/forced parallax; deliberately overrode its Brutalism/handwritten-font suggestion as a mismatch for a recruiter-facing resume site |
+| 2026-08-26 | `humanize-ai-writing` skill | Rewrote the hero headline/subhead/button copy before finalizing (see project memory) |
 
-## Known environment quirk
+## Known environment quirk (resolved)
 
-This Mac's Xcode Command Line Tools are broken/uninstalled (a CLT reinstall was attempted and didn't complete — disk space reported as insufficient despite `df` showing room, possibly a sandboxing quirk). `git` was fixed via `brew install git` (precompiled, no CLT needed). Local Jekyll preview (`bundle exec jekyll serve`) still needs a working C toolchain to compile native gem extensions (nokogiri, etc.) and has not been gotten working locally — treat GitHub's own Pages build as the real verification until this is resolved.
+Xcode Command Line Tools broke mid-session (a `sudo rm -rf` + reinstall attempt stalled on reported low disk space) and `git` was fixed via `brew install git` in the meantime. CLT later finished installing on its own and local Jekyll preview now works normally (`bundle install && bundle exec jekyll serve`, using Homebrew's Ruby at `/opt/homebrew/opt/ruby/bin`, not the system Ruby). If a future session hits the same native-extension build failure, check `xcode-select -p` and disk space first before assuming the Gemfile is at fault.
