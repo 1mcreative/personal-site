@@ -18,7 +18,7 @@ permalink: /
 
     <div class="hero-ctas">
       <a class="offset-btn" href="/resume/">
-        Enter Production
+        See the Résumé
         <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -27,7 +27,7 @@ permalink: /
         <span class="keycap-scene">
           <span class="keycap-glow" aria-hidden="true"></span>
           <span class="keycap-wall" aria-hidden="true"></span>
-          <span class="keycap-top">or peek at Localhost</span>
+          <span class="keycap-top">Off the Clock</span>
         </span>
       </a>
     </div>

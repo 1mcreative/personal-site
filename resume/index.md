@@ -14,9 +14,26 @@ permalink: /resume/
     <a href="https://www.linkedin.com/in/bhaveshnakum7" rel="me noopener" target="_blank">linkedin.com/in/bhaveshnakum7</a>
   </p>
   <div class="resume-actions">
-    <a href="mailto:bhaveshnakum485@gmail.com">Email me</a>
-    <a href="https://www.linkedin.com/in/bhaveshnakum7" rel="me noopener" target="_blank">Connect on LinkedIn</a>
+    <a class="offset-btn" href="mailto:bhaveshnakum485@gmail.com">
+      Email me
+      <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <a class="offset-btn" href="https://www.linkedin.com/in/bhaveshnakum7" rel="me noopener" target="_blank">
+      Connect on LinkedIn
+      <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
   </div>
+  <a class="keycap-btn" href="/life/">
+    <span class="keycap-scene">
+      <span class="keycap-glow" aria-hidden="true"></span>
+      <span class="keycap-wall" aria-hidden="true"></span>
+      <span class="keycap-top">Off the Clock</span>
+    </span>
+  </a>
 </header>
 
 <section class="resume-section">

@@ -117,3 +117,199 @@ p {
     --space-5: 2.5rem;
   }
 }
+
+/* ---------------------------------------------------------------------
+   Shared components — used on any page, not tied to one theme's CSS file.
+   Each carries its own fixed color identity (see DESIGN.md): the offset
+   button is "the professional button" wherever it appears (resume actions,
+   the personal page's link back to the résumé); the keycap button is "the
+   personal button" (the homepage's and résumé's links into /life/). Same
+   component + same colors everywhere it's used, regardless of which
+   page's background it sits on.
+   --------------------------------------------------------------------- */
+
+/* Offset button — dashed pill, lifts up-left on hover with a hard offset
+   shadow. Shape never changes (always a full pill) — only position and
+   shadow animate, so hover reads as "lifting," not "turning into a
+   different control." */
+.offset-btn {
+  --offset-accent: #1d4ed8;
+  --offset-shadow: #ff6b4a;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.95rem 1.85rem;
+  border-radius: 999px;
+  border: 2px dashed rgba(255, 255, 255, 0.55);
+  background: var(--offset-accent);
+  /* !important: this is a fixed brand color for the component, not page
+     text — without it, professional.css/personal.css's ambient `a { color:
+     var(--accent) }` (class+type, higher specificity than a bare class)
+     wins and the label renders in accent-on-accent, invisible. */
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 1.05rem;
+  text-decoration: none;
+  transition:
+    transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.offset-btn .btn-arrow {
+  transition: transform 0.25s ease;
+}
+
+.offset-btn:hover,
+.offset-btn:focus-visible {
+  transform: translate(-8px, -8px);
+  box-shadow: 8px 8px 0 var(--offset-shadow);
+}
+
+.offset-btn:hover .btn-arrow,
+.offset-btn:focus-visible .btn-arrow {
+  transform: translateX(4px);
+}
+
+.offset-btn:active {
+  transform: translate(0, 0);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  transition-duration: 0.08s;
+}
+
+.offset-btn:focus-visible {
+  outline: 3px solid var(--offset-accent);
+  outline-offset: 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offset-btn,
+  .offset-btn .btn-arrow {
+    transition-duration: 0.01ms;
+  }
+
+  .offset-btn:hover,
+  .offset-btn:focus-visible {
+    transform: none;
+  }
+}
+
+/* Keycap button — isometric floating panel, dark fill + sky-blue glow.
+   Driven entirely by CSS custom-property transitions (@property below) —
+   no JS. Unsupported browsers just skip the smooth interpolation and snap
+   between states instead; nothing breaks. */
+@property --keycap-float {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 5px;
+}
+
+@property --keycap-glow-bright {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.4;
+}
+
+@property --keycap-text-glow {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+.keycap-btn {
+  --keycap-fill: #12181f;
+  --keycap-glow: #6ec1ff;
+  --keycap-text: #a9c9e8;
+  --keycap-text-hover: #ffffff;
+  --keycap-thickness: 6px;
+
+  display: inline-block;
+  text-decoration: none;
+  margin-top: 1.75rem;
+  outline-offset: 8px;
+}
+
+.keycap-scene {
+  --keycap-float: 5px;
+  --keycap-glow-bright: 0.4;
+  --keycap-text-glow: 0px;
+
+  position: relative;
+  display: inline-block;
+  transform-style: preserve-3d;
+  transform: rotateX(46deg) rotateZ(-34deg);
+  transition:
+    --keycap-float 0.3s cubic-bezier(0.34, 1.2, 0.64, 1),
+    --keycap-glow-bright 0.3s ease,
+    --keycap-text-glow 0.3s ease;
+}
+
+.keycap-glow,
+.keycap-wall {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+}
+
+.keycap-glow {
+  background: var(--keycap-glow);
+  transform: translateZ(calc(-1 * var(--keycap-float))) scaleZ(-1);
+  filter: blur(9px) brightness(var(--keycap-glow-bright));
+  opacity: 0.55;
+}
+
+.keycap-wall {
+  background: color-mix(in srgb, var(--keycap-fill) 55%, black);
+  transform: translateZ(var(--keycap-float));
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--keycap-fill) 55%, black),
+    0 2px 0 color-mix(in srgb, var(--keycap-fill) 50%, black),
+    0 3px 0 color-mix(in srgb, var(--keycap-fill) 45%, black),
+    0 4px 0 color-mix(in srgb, var(--keycap-fill) 40%, black),
+    0 5px 0 color-mix(in srgb, var(--keycap-fill) 35%, black),
+    0 6px 0 color-mix(in srgb, var(--keycap-fill) 30%, black);
+}
+
+.keycap-top {
+  position: relative;
+  display: block;
+  padding: 0.6rem 1.3rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--keycap-fill) 90%, white), var(--keycap-fill));
+  color: var(--keycap-text);
+  font-size: 0.88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transform: translateZ(calc(var(--keycap-float) + var(--keycap-thickness)));
+  text-shadow: 0 0 var(--keycap-text-glow) var(--keycap-glow);
+  transition: color 0.3s ease;
+}
+
+.keycap-btn:hover .keycap-scene,
+.keycap-btn:focus-visible .keycap-scene {
+  --keycap-float: 11px;
+  --keycap-glow-bright: 1.25;
+  --keycap-text-glow: 7px;
+}
+
+.keycap-btn:hover .keycap-top,
+.keycap-btn:focus-visible .keycap-top {
+  color: var(--keycap-text-hover);
+}
+
+.keycap-btn:active .keycap-scene {
+  --keycap-float: 1px;
+  transition-duration: 0.1s;
+}
+
+.keycap-btn:focus-visible {
+  outline: 2px solid var(--keycap-glow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .keycap-scene {
+    transition: none;
+  }
+}
