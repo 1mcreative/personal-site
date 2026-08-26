@@ -10,7 +10,11 @@
   --space-5: 4rem;
 
   --radius: 10px;
+  --radius-lg: 16px;
   --max-width: 780px;
+
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --speed: 0.18s;
 }
 
 * {
@@ -24,8 +28,10 @@ html {
 body {
   margin: 0;
   font-family: var(--font-body);
-  line-height: 1.6;
+  font-size: 16px;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 img,
@@ -63,8 +69,14 @@ main#main,
 .brand {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.site-header nav a,
+a.switch-side {
+  transition: color var(--speed) var(--ease), background-color var(--speed) var(--ease), border-color var(--speed) var(--ease);
 }
 
 main#main {
@@ -80,7 +92,12 @@ main#main {
 
 h1, h2, h3 {
   font-family: var(--font-display);
-  line-height: 1.25;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+p {
+  max-width: 68ch;
 }
 
 @media (max-width: 480px) {

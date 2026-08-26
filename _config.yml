@@ -14,15 +14,9 @@ plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
 
-defaults:
-  - scope:
-      path: ""
-      type: "pages"
-    values:
-      image: /assets/img/social-card.png
-
 exclude:
   - README.md
+  - CLAUDE.md
   - DESIGN.md
   - VERSIONING.md
   - Gemfile

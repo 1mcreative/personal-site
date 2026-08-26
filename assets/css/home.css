@@ -51,18 +51,23 @@
 .side-card {
   display: block;
   text-decoration: none;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: var(--space-4) var(--space-3);
-  transition: transform 0.15s ease;
+  transition: transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
 }
 
 .side-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
 .side-card.professional {
   background: #ffffff;
   color: #1b1f24;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.side-card.professional:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
 }
 
 .side-card.personal {
@@ -71,8 +76,12 @@
   border: 1px solid #263041;
 }
 
+.side-card.personal:hover {
+  box-shadow: 0 12px 24px rgba(110, 193, 255, 0.15);
+}
+
 .side-card h2 {
-  font-size: 1.3rem;
+  font-size: 1.35rem;
   margin: 0 0 0.4rem;
 }
 
