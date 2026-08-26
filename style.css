@@ -1,0 +1,74 @@
+:root {
+  --bg: #0f1419;
+  --card: #1a2332;
+  --text: #e8eef7;
+  --muted: #9aa8b8;
+  --accent: #6ec1ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+header,
+main,
+footer {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
+nav a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+nav a:hover,
+nav a[aria-current="page"] {
+  text-decoration: underline;
+}
+
+.cards {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .cards {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+article {
+  background: var(--card);
+  padding: 1.25rem;
+  border-radius: 12px;
+}
+
+h1,
+h2 {
+  font-weight: 600;
+}
+
+p,
+li {
+  color: var(--muted);
+}
+
+a {
+  color: var(--accent);
+}
