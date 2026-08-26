@@ -13,13 +13,13 @@ permalink: /life/
 <div class="social-grid">
   <div class="social-card">
     <h2>Instagram</h2>
-    <p>TODO: add handle and description</p>
-    <a class="handle" href="#">@handle</a>
+    <p>Main account.</p>
+    <a class="handle" href="https://www.instagram.com/1mcreative" rel="me noopener" target="_blank">@1mcreative</a>
   </div>
   <div class="social-card">
     <h2>Instagram (second account)</h2>
-    <p>TODO: add handle and description</p>
-    <a class="handle" href="#">@handle</a>
+    <p>Second account.</p>
+    <a class="handle" href="https://www.instagram.com/straightforkward" rel="me noopener" target="_blank">@straightforkward</a>
   </div>
 </div>
 
