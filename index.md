@@ -23,13 +23,7 @@ permalink: /
           <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
-      <a class="keycap-btn" href="/life/">
-        <span class="keycap-scene">
-          <span class="keycap-glow" aria-hidden="true"></span>
-          <span class="keycap-wall" aria-hidden="true"></span>
-          <span class="keycap-top">Off the Clock</span>
-        </span>
-      </a>
+      <a class="keycap-btn" href="/life/">Off the Clock</a>
     </div>
   </div>
 

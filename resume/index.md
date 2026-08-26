@@ -27,13 +27,6 @@ permalink: /resume/
       </svg>
     </a>
   </div>
-  <a class="keycap-btn" href="/life/">
-    <span class="keycap-scene">
-      <span class="keycap-glow" aria-hidden="true"></span>
-      <span class="keycap-wall" aria-hidden="true"></span>
-      <span class="keycap-top">Off the Clock</span>
-    </span>
-  </a>
 </header>
 
 <section class="resume-section">

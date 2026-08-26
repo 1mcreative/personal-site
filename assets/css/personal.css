@@ -30,15 +30,12 @@
   color: var(--text);
 }
 
-.theme-personal .switch-side {
-  padding: 0.35rem 0.85rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-}
-
-.theme-personal .switch-side:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+/* The nav's offset-btn is "the professional button" everywhere it appears
+   (see tokens.css) — on this dark page its edge (border + hover shadow)
+   swaps from the default black to white, so it still reads as a shadow/
+   outline rather than disappearing against the dark background. */
+.theme-personal .offset-btn {
+  --offset-edge: #ffffff;
 }
 
 .theme-personal .site-footer {
@@ -58,10 +55,6 @@
 
 .life-intro h1 {
   font-size: clamp(1.9rem, 4vw, 2.5rem);
-}
-
-.life-intro .offset-btn {
-  margin-top: var(--space-2);
 }
 
 .social-grid {

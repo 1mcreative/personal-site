@@ -24,6 +24,10 @@ Whenever a skill, MCP server, or Claude Code plugin gets used on this repo, log 
 | 2026-08-26 | local Jekyll preview (`bundle exec jekyll serve`) + Browser pane | Visually verified the hero, both CTA buttons' hover states, and the scroll-to-resume behavior before pushing |
 | 2026-08-27 | local Jekyll preview + Browser pane | Caught a real bug pre-push: `.offset-btn`'s white text was invisible on `/resume/` and `/life/` (ambient theme `a{color}` rule outranked it on specificity) — fixed with a documented `!important` in `tokens.css`. Would not have been visible from code review alone |
 | 2026-08-27 | (no skill — direct edit) | Reworked hero/résumé copy off jargon ("Enter Production"/"Localhost") to plain idiom ("See the Résumé"/"Off the Clock") per user feedback that non-engineers didn't get the original names |
+| 2026-08-27 | `ui-ux-pro-max` skill (again) | Nav-bar CTA touch-target sizing before moving both buttons into the header nav |
+| 2026-08-27 | local Jekyll preview + Browser pane | Verified the reworked two-color offset button, the flattened keycap button's glow visibility, and both nav placements across desktop and mobile before pushing |
+
+**Reverted:** a separate "See the Résumé" button in the `/life/` page body and a separate "Off the Clock" button in the `/resume/` header — the user asked for exactly one cross-side link per page (the nav one), not a body button duplicating it. If you're tempted to add a body CTA "for visibility," check with the user first — this was already tried and explicitly undone.
 
 ## Known environment quirk (resolved)
 

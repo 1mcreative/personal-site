@@ -30,17 +30,6 @@
   color: var(--text);
 }
 
-.theme-professional .switch-side {
-  padding: 0.35rem 0.85rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-}
-
-.theme-professional .switch-side:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
 .theme-professional .site-footer {
   border-top: 1px solid var(--border);
   color: var(--muted);
@@ -165,8 +154,4 @@
 .resume-actions .offset-btn {
   padding: 0.6rem 1.3rem;
   font-size: 0.9rem;
-}
-
-.resume-header .keycap-btn {
-  margin-top: 2.25rem;
 }

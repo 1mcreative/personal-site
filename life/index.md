@@ -8,12 +8,6 @@ permalink: /life/
 <div class="life-intro">
   <h1>Outside of work</h1>
   <p>This is the other half of the site &mdash; photos, Instagram, and whatever I'm into that has nothing to do with backend systems.</p>
-  <a class="offset-btn" href="/resume/">
-    See the Résumé
-    <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </a>
 </div>
 
 <div class="social-grid">
