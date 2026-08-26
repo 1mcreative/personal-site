@@ -26,6 +26,8 @@ Whenever a skill, MCP server, or Claude Code plugin gets used on this repo, log 
 | 2026-08-27 | (no skill — direct edit) | Reworked hero/résumé copy off jargon ("Enter Production"/"Localhost") to plain idiom ("See the Résumé"/"Off the Clock") per user feedback that non-engineers didn't get the original names |
 | 2026-08-27 | `ui-ux-pro-max` skill (again) | Nav-bar CTA touch-target sizing before moving both buttons into the header nav |
 | 2026-08-27 | local Jekyll preview + Browser pane | Verified the reworked two-color offset button, the flattened keycap button's glow visibility, and both nav placements across desktop and mobile before pushing |
+| 2026-08-27 | `ponytail` skill | Reviewed the button CSS for bloat before this round's edits — found none worth trimming; used the "reuse existing tokens" reflex when redesigning `.offset-btn` to reference `var(--bg)`/`var(--text)` instead of inventing new per-theme color variables |
+| 2026-08-27 | local Jekyll preview + Browser pane | Verified offset-btn's ghost-style theme-matching (white/black-dashed on light pages, dark/white-dashed on personal) and confirmed keycap-btn's glow renders correctly at every viewport tested — the user reported it showing as bare text with no effect, which did not reproduce locally; likely a raw-file or unrendered view rather than a real CSS bug (see fallback fix below either way) |
 
 **Reverted:** a separate "See the Résumé" button in the `/life/` page body and a separate "Off the Clock" button in the `/resume/` header — the user asked for exactly one cross-side link per page (the nav one), not a body button duplicating it. If you're tempted to add a body CTA "for visibility," check with the user first — this was already tried and explicitly undone.
 

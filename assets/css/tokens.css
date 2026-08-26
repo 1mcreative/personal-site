@@ -129,31 +129,32 @@ p {
    --------------------------------------------------------------------- */
 
 /* Offset button — dashed pill, lifts up-left on hover with a hard offset
-   shadow. Exactly two colors: blue fill (constant) and one edge color for
-   border + shadow that each theme sets to match its own contrast — black on
-   light pages, white on dark ones — instead of a third fixed hue. Text stays
-   white regardless: it has to read against the blue fill itself, not
-   against the page, so it can't follow the same light/dark swap. Shape
-   never changes (always a full pill) — only position and shadow animate, so
-   hover reads as "lifting," not "turning into a different control." */
+   shadow. The button body matches its own page — background: var(--bg),
+   text/dashed border: var(--text) — so it reads as native to whichever
+   theme it's on (white body/black text/black dashes on the light pages,
+   dark body/white text/white dashes on the personal page). Blue is the one
+   constant: the hover shadow is always the same accent blue, in both
+   themes, so that's the button's fixed "professional" signal regardless of
+   background. Shape never changes (always a full pill) — only position and
+   shadow animate, so hover reads as "lifting," not "turning into a
+   different control." */
 .offset-btn {
-  --offset-accent: #1d4ed8;
-  --offset-edge: #14171c;
+  --offset-shadow: #1d4ed8;
 
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.95rem 1.85rem;
+  gap: clamp(0.4rem, 1vw, 0.6rem);
+  padding: clamp(0.6rem, 1.2vw + 0.3rem, 0.95rem) clamp(1.1rem, 2.5vw + 0.4rem, 1.85rem);
   border-radius: 999px;
-  border: 2px dashed color-mix(in srgb, var(--offset-edge) 55%, transparent);
-  background: var(--offset-accent);
-  /* !important: this is a fixed brand color for the component, not page
-     text — without it, professional.css/personal.css's ambient `a { color:
-     var(--accent) }` (class+type, higher specificity than a bare class)
-     wins and the label renders in accent-on-accent, invisible. */
-  color: #ffffff !important;
+  border: 2px dashed var(--text);
+  background: var(--bg);
+  /* !important: professional.css/personal.css set a blanket `a { color:
+     var(--accent) }` for prose links, which outranks a bare `.offset-btn`
+     class on specificity (class+type beats class alone) — without this the
+     label silently renders in the wrong color. */
+  color: var(--text) !important;
   font-weight: 600;
-  font-size: 1.05rem;
+  font-size: clamp(0.9rem, 0.6vw + 0.75rem, 1.05rem);
   text-decoration: none;
   transition:
     transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -168,7 +169,7 @@ p {
 .offset-btn:hover,
 .offset-btn:focus-visible {
   transform: translate(-8px, -8px);
-  box-shadow: 8px 8px 0 var(--offset-edge);
+  box-shadow: 8px 8px 0 var(--offset-shadow);
 }
 
 .offset-btn:hover .btn-arrow,
@@ -183,7 +184,7 @@ p {
 }
 
 .offset-btn:focus-visible {
-  outline: 3px solid var(--offset-accent);
+  outline: 3px solid var(--offset-shadow);
   outline-offset: 5px;
 }
 
@@ -218,15 +219,25 @@ p {
 
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.85rem 1.7rem;
+  gap: clamp(0.4rem, 1vw, 0.5rem);
+  padding: clamp(0.55rem, 1.1vw + 0.3rem, 0.85rem) clamp(1rem, 2.2vw + 0.4rem, 1.7rem);
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--keycap-glow) 35%, transparent);
   background: var(--keycap-fill);
   color: var(--keycap-text) !important;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: clamp(0.85rem, 0.6vw + 0.7rem, 1rem);
   text-decoration: none;
+  /* Plain-rgba fallbacks first, color-mix() versions second: a browser that
+     can't parse color-mix() drops only that later declaration and keeps the
+     fallback, instead of the whole border/box-shadow list going invalid and
+     silently vanishing (which reads as "just text, no effect at all"). */
+  border: 1px solid rgba(110, 193, 255, 0.35);
+  border: 1px solid color-mix(in srgb, var(--keycap-glow) 35%, transparent);
+  box-shadow:
+    0 0 0 1px rgba(110, 193, 255, 0.4),
+    0 4px 16px 0 var(--keycap-glow),
+    0 10px 34px 2px rgba(110, 193, 255, 0.65),
+    0 2px 8px rgba(0, 0, 0, 0.4);
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--keycap-glow) 40%, transparent),
     0 4px 16px 0 var(--keycap-glow),
@@ -242,6 +253,11 @@ p {
 .keycap-btn:focus-visible {
   transform: translateY(-4px);
   color: var(--keycap-text-hover) !important;
+  box-shadow:
+    0 0 0 1px rgba(110, 193, 255, 0.6),
+    0 6px 22px 2px var(--keycap-glow),
+    0 20px 46px 4px rgba(110, 193, 255, 0.8),
+    0 4px 14px rgba(0, 0, 0, 0.45);
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--keycap-glow) 60%, transparent),
     0 6px 22px 2px var(--keycap-glow),
