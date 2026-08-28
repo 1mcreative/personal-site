@@ -32,6 +32,30 @@
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  /* --mx/--my: set by hero.js on mousemove, a subtle parallax shift. */
+  transform: translate(var(--mx, 0px), var(--my, 0px));
+  transition: transform 0.4s ease-out;
+}
+
+/* Builds up as the user scrolls toward the sentinel (--scroll-progress,
+   0 to 1, set on <html> by hero.js) — a hint that something's about to
+   happen, well before the actual navigation fires at the bottom. Fixed to
+   the viewport, not .hero, so it's still visible once the hero itself has
+   scrolled out of view. */
+.scroll-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  background: radial-gradient(circle at 50% 100%, rgba(29, 78, 216, 0.4), transparent 70%);
+  opacity: var(--scroll-progress, 0);
+  pointer-events: none;
+}
+
+/* Pure scroll distance for the veil to build up over — the hero itself is
+   ~one viewport tall, leaving almost no room to scroll "within" it before
+   hitting the sentinel. */
+.scroll-runway {
+  height: 60vh;
 }
 
 .blob {
@@ -94,13 +118,77 @@
   margin: 0 auto var(--space-4);
 }
 
-.hero-ctas {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
+/* Portal orb — the only way into /life/ from the homepage, deliberately not
+   a button. A small glowing dot among the blobs; its label only appears on
+   hover/focus, but it's a real, keyboard-focusable link the whole time, not
+   a hidden easter egg — screen readers and keyboard users reach it exactly
+   like any other link. */
+.portal-orb {
+  position: absolute;
+  z-index: 2;
+  left: 12%;
+  bottom: 26%;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #12181f;
+  box-shadow: 0 0 0 4px rgba(18, 24, 31, 0.06), 0 0 22px 6px rgba(110, 193, 255, 0.55);
+  text-decoration: none;
+  cursor: pointer;
+  animation: orb-pulse 3.5s ease-in-out infinite;
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
 }
 
+/* The dot stays small on purpose; the tap target doesn't — 44px minimum. */
+.portal-orb::before {
+  content: "";
+  position: absolute;
+  inset: -14px;
+}
+
+.portal-orb:hover,
+.portal-orb:focus-visible {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 6px rgba(18, 24, 31, 0.08), 0 0 32px 10px rgba(110, 193, 255, 0.8);
+}
+
+.portal-orb:focus-visible {
+  outline: 2px solid #6ec1ff;
+  outline-offset: 6px;
+}
+
+@keyframes orb-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(18, 24, 31, 0.06), 0 0 22px 6px rgba(110, 193, 255, 0.55); }
+  50% { box-shadow: 0 0 0 4px rgba(18, 24, 31, 0.06), 0 0 28px 9px rgba(110, 193, 255, 0.75); }
+}
+
+.portal-orb-label {
+  position: absolute;
+  left: 50%;
+  bottom: 140%;
+  transform: translate(-50%, 6px);
+  white-space: nowrap;
+  background: #12181f;
+  color: #cfe6ff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.portal-orb:hover .portal-orb-label,
+.portal-orb:focus-visible .portal-orb-label {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* A real link, not just a hint — the only way into /resume/ that doesn't
+   depend on scrolling or motion (hero.js skips the whole scroll mechanic
+   under prefers-reduced-motion, so this has to work standing alone). Styled
+   quietly on purpose; it's still a full link underneath. */
 .scroll-cue {
   position: absolute;
   bottom: var(--space-3);
@@ -113,6 +201,18 @@
   gap: 0.35rem;
   color: var(--muted);
   font-size: 0.8rem;
+  text-decoration: none;
+}
+
+.scroll-cue:hover,
+.scroll-cue:focus-visible {
+  color: var(--text);
+}
+
+.scroll-cue:focus-visible {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
 .scroll-cue svg {
@@ -149,5 +249,18 @@
 
   .scroll-cue svg {
     animation: none;
+  }
+
+  .hero-blobs {
+    transition: none;
+  }
+
+  .portal-orb {
+    animation: none;
+  }
+
+  .portal-orb:hover,
+  .portal-orb:focus-visible {
+    transform: none;
   }
 }

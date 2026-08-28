@@ -1,7 +1,7 @@
 ---
 layout: home
 title: "Bhavesh Nakum"
-description: "Backend engineer, Instagram enthusiast, and the internet's most reluctant career page. Scroll down for the resume, or skip straight to the chaos."
+description: "Backend engineer by day, Instagram enthusiast by night. Poke around."
 permalink: /
 ---
 
@@ -12,27 +12,24 @@ permalink: /
     <div class="blob blob-c"></div>
   </div>
 
+  <div class="scroll-veil" aria-hidden="true"></div>
+
   <div class="hero-inner">
     <h1>Hi, I'm Bhavesh.</h1>
-    <p class="hero-sub">I write backend systems for a living, and I'm a lot less organized about everything else. Scroll down for the tidy version &mdash; or skip straight to the chaos.</p>
-
-    <div class="hero-ctas">
-      <a class="offset-btn" href="/resume/">
-        See the Résumé
-        <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
-      <a class="keycap-btn" href="/life/">Off the Clock</a>
-    </div>
+    <p class="hero-sub">I write backend systems for a living, and I'm a lot less organized about everything else. Poke around &mdash; there's more here than it looks.</p>
   </div>
 
-  <div class="scroll-cue">
+  <a class="portal-orb" href="/life/">
+    <span class="portal-orb-label">The Chaos</span>
+  </a>
+
+  <a class="scroll-cue" href="/resume/">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M12 4v14M6 13l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <span>or just keep scrolling</span>
-  </div>
+    <span>keep going</span>
+  </a>
 </section>
 
+<div class="scroll-runway" aria-hidden="true"></div>
 <div id="hero-sentinel" class="hero-sentinel" aria-hidden="true"></div>

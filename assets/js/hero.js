@@ -1,12 +1,43 @@
 // Scrolling all the way past the hero opens the resume page. Deliberately not
 // scroll-jacking: native scroll is never intercepted, this only reacts once
-// the user reaches the natural bottom of the page. The button above works
-// identically without any of this, so nothing here is load-bearing.
+// the user reaches the natural bottom of the page. The portal orb reaches
+// /life/ identically without any of this, so nothing here is load-bearing.
 (function () {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Blobs drift a few px toward the cursor — purely decorative, skipped
+  // entirely under reduced motion.
+  if (!reduceMotion) {
+    var blobs = document.querySelector(".hero-blobs");
+    if (blobs) {
+      window.addEventListener(
+        "mousemove",
+        function (e) {
+          var mx = ((e.clientX / window.innerWidth) - 0.5) * 24;
+          var my = ((e.clientY / window.innerHeight) - 0.5) * 24;
+          blobs.style.setProperty("--mx", mx.toFixed(1) + "px");
+          blobs.style.setProperty("--my", my.toFixed(1) + "px");
+        },
+        { passive: true }
+      );
+    }
+  }
+
+  if (reduceMotion) return;
 
   var sentinel = document.getElementById("hero-sentinel");
   if (!sentinel || !("IntersectionObserver" in window)) return;
+
+  // The color wash builds up as the user scrolls toward the sentinel, well
+  // before it actually fires the navigation below.
+  var root = document.documentElement;
+  var updateVeil = function () {
+    var target = sentinel.getBoundingClientRect().top + window.scrollY;
+    var progress = Math.min(1, Math.max(0, window.scrollY / Math.max(1, target - window.innerHeight)));
+    root.style.setProperty("--scroll-progress", progress.toFixed(3));
+  };
+  window.addEventListener("scroll", updateVeil, { passive: true });
+  updateVeil();
 
   var hasScrolled = false;
   window.addEventListener(

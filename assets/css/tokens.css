@@ -1,13 +1,36 @@
 /* Opt every page into cross-document view transitions. Browsers that support
    it animate same-origin navigations between opted-in pages automatically —
-   no JS needed; unsupported browsers just navigate normally. */
+   no JS needed; unsupported browsers just navigate normally. The new page
+   wipes up into view rather than a plain cross-fade — it "stops and reveals"
+   the destination, echoing the scroll-down gesture that got you there. A
+   literal particle-dissolve would need canvas/WebGL; this is the CSS-only
+   approximation. */
 @view-transition {
   navigation: auto;
 }
 
-::view-transition-group(root) {
-  animation-duration: 0.42s;
-  animation-timing-function: cubic-bezier(0.2, 0.6, 0.2, 1);
+@keyframes reveal-old {
+  to { opacity: 0.3; }
+}
+
+@keyframes reveal-new {
+  from { clip-path: inset(100% 0 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+::view-transition-old(root) {
+  animation: reveal-old 0.45s var(--ease) forwards;
+}
+
+::view-transition-new(root) {
+  animation: reveal-new 0.5s var(--ease) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
 }
 
 /* Shared design tokens — see DESIGN.md for the rationale behind each value. */
