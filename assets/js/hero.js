@@ -3,6 +3,33 @@
 // the user reaches the natural bottom of the page. The portal orb reaches
 // /life/ identically without any of this, so nothing here is load-bearing.
 (function () {
+  console.log(
+    "%cLooking under the hood?",
+    "font-size: 15px; font-weight: 600;"
+  );
+  console.log(
+    "Plain Jekyll, no framework, no build step. Source: https://github.com/1mcreative/personal-site"
+  );
+
+  // Konami code — unlocks a direct portal to /life/. Not a substitute for
+  // the real links (portal orb, spotlight text); just a bonus for whoever
+  // still remembers the sequence. Works regardless of motion preference —
+  // it's a keyboard shortcut, not an animation.
+  var konami = [
+    "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown",
+    "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight",
+    "b", "a"
+  ];
+  var konamiProgress = 0;
+  window.addEventListener("keydown", function (e) {
+    var expected = konami[konamiProgress];
+    var key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    konamiProgress = key === expected ? konamiProgress + 1 : 0;
+    if (konamiProgress === konami.length) {
+      window.location.href = "/life/";
+    }
+  });
+
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // Blobs drift a few px toward the cursor — purely decorative, skipped
