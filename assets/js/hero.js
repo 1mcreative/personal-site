@@ -23,6 +23,26 @@
     }
   }
 
+  // Spotlight text: only worth the cursor-tracking flashlight effect on a
+  // real hover-capable pointer with motion allowed. Everything else just
+  // gets the plain readable link underneath (see home.css) — never
+  // actually hidden, only ever enhanced.
+  if (!reduceMotion && window.matchMedia("(hover: hover)").matches) {
+    var spotlight = document.querySelector(".spotlight-text");
+    if (spotlight) {
+      spotlight.classList.add("spotlight-ready");
+      spotlight.addEventListener(
+        "pointermove",
+        function (e) {
+          var rect = spotlight.getBoundingClientRect();
+          spotlight.style.setProperty("--spot-x", (e.clientX - rect.left) + "px");
+          spotlight.style.setProperty("--spot-y", (e.clientY - rect.top) + "px");
+        },
+        { passive: true }
+      );
+    }
+  }
+
   if (reduceMotion) return;
 
   var sentinel = document.getElementById("hero-sentinel");

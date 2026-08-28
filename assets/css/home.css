@@ -185,6 +185,86 @@
   transform: translate(-50%, 0);
 }
 
+/* Spotlight text — a second, quieter hint at /life/, à la a flashlight
+   sweeping dim text into brightness. Base state (no JS, reduced motion, or
+   no real hover) is just plain readable muted text — a real link either
+   way, never actually hidden. Only once hero.js confirms hover + motion are
+   both available does it add .spotlight-ready, which dims the text almost
+   to nothing and switches on the cursor-following reveal. */
+@property --spot-size {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+.spotlight-text {
+  position: absolute;
+  z-index: 2;
+  top: 16%;
+  right: 8%;
+  max-width: 15rem;
+  text-align: right;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.spotlight-dim,
+.spotlight-bright {
+  display: block;
+  margin: 0;
+}
+
+.spotlight-dim {
+  color: var(--muted);
+}
+
+.spotlight-bright {
+  display: none;
+}
+
+.spotlight-text.spotlight-ready {
+  cursor: none;
+}
+
+.spotlight-text.spotlight-ready .spotlight-dim {
+  color: rgba(20, 23, 28, 0.08);
+}
+
+.spotlight-text.spotlight-ready .spotlight-bright {
+  display: block;
+  position: absolute;
+  inset: 0;
+  color: #12181f;
+  font-weight: 600;
+  pointer-events: none;
+  --spot-size: 0px;
+  transition: --spot-size 0.3s ease;
+  -webkit-mask-image: radial-gradient(circle var(--spot-size) at var(--spot-x, 50%) var(--spot-y, 50%), black, black 55%, transparent 100%);
+  mask-image: radial-gradient(circle var(--spot-size) at var(--spot-x, 50%) var(--spot-y, 50%), black, black 55%, transparent 100%);
+}
+
+.spotlight-text.spotlight-ready:hover .spotlight-bright,
+.spotlight-text.spotlight-ready:focus-visible .spotlight-bright {
+  --spot-size: 140px;
+}
+
+.spotlight-text:focus-visible {
+  outline: 2px solid #6ec1ff;
+  outline-offset: 6px;
+}
+
+@media (max-width: 640px) {
+  .spotlight-text {
+    top: auto;
+    bottom: 8%;
+    right: 8%;
+    max-width: 10rem;
+    font-size: 0.9rem;
+  }
+}
+
 /* A real link, not just a hint — the only way into /resume/ that doesn't
    depend on scrolling or motion (hero.js skips the whole scroll mechanic
    under prefers-reduced-motion, so this has to work standing alone). Styled

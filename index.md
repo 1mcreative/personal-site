@@ -23,6 +23,11 @@ permalink: /
     <span class="portal-orb-label">The Chaos</span>
   </a>
 
+  <a class="spotlight-text" href="/life/">
+    <span class="spotlight-dim">Not all of me fits in a résumé.</span>
+    <span class="spotlight-bright" aria-hidden="true">Not all of me fits in a résumé.</span>
+  </a>
+
   <a class="scroll-cue" href="/resume/">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M12 4v14M6 13l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
