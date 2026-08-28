@@ -206,14 +206,23 @@
   text-align: right;
   text-decoration: none;
   font-family: var(--font-display);
-  font-size: 1.05rem;
-  line-height: 1.45;
+  font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1.5;
 }
 
+/* Both layers must share every metric that affects glyph width/wrapping
+   (weight, style, size) — the two layers are drawn from the same text flow
+   and have to break onto the same lines, or the mask reveals bright glyphs
+   sitting in a different spot than the dim ones underneath them. That
+   mismatch is what "misaligned" was: an earlier version only bolded the
+   bright layer, which widened its glyphs enough to reflow differently at
+   some widths. */
 .spotlight-dim,
 .spotlight-bright {
   display: block;
   margin: 0;
+  font: inherit;
 }
 
 .spotlight-dim {
@@ -237,7 +246,6 @@
   position: absolute;
   inset: 0;
   color: #12181f;
-  font-weight: 600;
   pointer-events: none;
   --spot-size: 0px;
   transition: --spot-size 0.3s ease;

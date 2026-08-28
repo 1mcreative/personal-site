@@ -24,8 +24,8 @@ permalink: /
   </a>
 
   <a class="spotlight-text" href="/life/">
-    <span class="spotlight-dim">Not all of me fits in a résumé.</span>
-    <span class="spotlight-bright" aria-hidden="true">Not all of me fits in a résumé.</span>
+    <span class="spotlight-dim">I left the interesting parts out of the résumé.</span>
+    <span class="spotlight-bright" aria-hidden="true">I left the interesting parts out of the résumé.</span>
   </a>
 
   <a class="scroll-cue" href="/resume/">
