@@ -19,8 +19,9 @@ permalink: /
     <p class="hero-sub">I write backend systems for a living, and I'm a lot less organized about everything else. Poke around &mdash; there's more here than it looks.</p>
   </div>
 
-  <a class="portal-orb" href="/life/">
-    <span class="portal-orb-label">The Chaos</span>
+  <a class="page-corner" href="/life/" aria-label="The Chaos — the personal side">
+    <span class="page-corner-back" aria-hidden="true"></span>
+    <span class="page-corner-front" aria-hidden="true"></span>
   </a>
 
   <a class="spotlight-text" href="/life/">

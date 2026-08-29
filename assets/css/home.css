@@ -118,71 +118,72 @@
   margin: 0 auto var(--space-4);
 }
 
-/* Portal orb — the only way into /life/ from the homepage, deliberately not
-   a button. A small glowing dot among the blobs; its label only appears on
-   hover/focus, but it's a real, keyboard-focusable link the whole time, not
-   a hidden easter egg — screen readers and keyboard users reach it exactly
-   like any other link. */
-.portal-orb {
+/* Page corner — the only way into /life/ from the homepage. Reads as the
+   top-right corner of this (light) page lifting slightly, like a sheet of
+   paper in a breeze, with a dark underside hinting at what's behind it. No
+   dot, no pill — replaced .portal-orb after the user didn't like a floating
+   orb on desktop. Idle flutter is decorative; hover/focus peels it back
+   further as the click affordance. Clicking navigates to /life/ with the
+   sitewide wipe transition — a fuller "the page tears away" effect is a
+   separate, later phase (would need canvas for real particles). */
+.page-corner {
   position: absolute;
-  z-index: 2;
-  left: 12%;
-  bottom: 26%;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #12181f;
-  box-shadow: 0 0 0 4px rgba(18, 24, 31, 0.06), 0 0 22px 6px rgba(110, 193, 255, 0.55);
+  top: 0;
+  right: 0;
+  z-index: 3;
+  width: 96px;
+  height: 96px;
   text-decoration: none;
   cursor: pointer;
-  animation: orb-pulse 3.5s ease-in-out infinite;
-  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
 }
 
-/* The dot stays small on purpose; the tap target doesn't — 44px minimum. */
-.portal-orb::before {
-  content: "";
+.page-corner-back,
+.page-corner-front {
   position: absolute;
-  inset: -14px;
+  inset: 0;
+  clip-path: polygon(100% 0, 100% 100%, 0 0);
+  transform-origin: 100% 0;
 }
 
-.portal-orb:hover,
-.portal-orb:focus-visible {
-  transform: scale(1.2);
-  box-shadow: 0 0 0 6px rgba(18, 24, 31, 0.08), 0 0 32px 10px rgba(110, 193, 255, 0.8);
+.page-corner-back {
+  background: #0f1419;
+  box-shadow: 0 0 24px 6px rgba(110, 193, 255, 0.35);
 }
 
-.portal-orb:focus-visible {
+.page-corner-front {
+  background: #ffffff;
+  box-shadow: -6px 6px 16px rgba(20, 23, 28, 0.12);
+  animation: corner-flutter 5s ease-in-out infinite;
+  transition: transform 0.4s var(--ease);
+}
+
+.page-corner:hover .page-corner-front,
+.page-corner:focus-visible .page-corner-front {
+  transform: scale(0.82) rotate(-8deg);
+}
+
+.page-corner:focus-visible {
   outline: 2px solid #6ec1ff;
-  outline-offset: 6px;
+  outline-offset: 4px;
 }
 
-@keyframes orb-pulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(18, 24, 31, 0.06), 0 0 22px 6px rgba(110, 193, 255, 0.55); }
-  50% { box-shadow: 0 0 0 4px rgba(18, 24, 31, 0.06), 0 0 28px 9px rgba(110, 193, 255, 0.75); }
+@keyframes corner-flutter {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(-3deg) scale(0.97); }
 }
 
-.portal-orb-label {
-  position: absolute;
-  left: 50%;
-  bottom: 140%;
-  transform: translate(-50%, 6px);
-  white-space: nowrap;
-  background: #12181f;
-  color: #cfe6ff;
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.3rem 0.7rem;
-  border-radius: 999px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
+@media (prefers-reduced-motion: reduce) {
+  .page-corner-front {
+    animation: none;
+    transform: rotate(-3deg) scale(0.94);
+  }
 }
 
-.portal-orb:hover .portal-orb-label,
-.portal-orb:focus-visible .portal-orb-label {
-  opacity: 1;
-  transform: translate(-50%, 0);
+@media (max-width: 640px) {
+  .page-corner {
+    width: 64px;
+    height: 64px;
+  }
 }
 
 /* Spotlight text — a second, quieter hint at /life/, à la a flashlight
