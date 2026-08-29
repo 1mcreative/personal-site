@@ -99,6 +99,75 @@
   66% { transform: translate(-1.5rem, 1.5rem) scale(0.95); }
 }
 
+/* Hero glitter — canvas warp-tunnel background (assets/js/glitter.js),
+   ported from a React/canvas component the user supplied. Sits between the
+   blobs and the text content. Fully skipped (script returns early, canvas
+   stays empty/transparent) under prefers-reduced-motion. */
+.hero-glitter {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Hero stars — the galaxy button's star motif, carried into the background.
+   A plain white-on-black starfield doesn't work on this light page, so
+   these are small saturated dots (richer siblings of the blob palette)
+   with a soft glow, twinkling gently. Reuses .galaxy__container's
+   star-twinkle keyframe (defined below) rather than a second one that
+   does the same thing. Positions are hand-placed via a Liquid loop in
+   index.md, not random — random would need JS or would be unstable
+   between builds, and a fixed scattered layout looks just as natural. */
+.hero-stars {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* DEPRECATED (not deleted): .hero-stars is superseded by .hero-glitter
+   above, which covers the same "twinkling star field" role with actual
+   motion. Everything above is untouched and fully working — re-enabling
+   is deleting this one rule, nothing to rebuild. */
+.hero-stars {
+  display: none;
+}
+
+.hero-star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #60a5fa;
+  box-shadow: 0 0 6px 1px rgba(96, 165, 250, 0.6);
+  animation: star-twinkle 3.2s ease-in-out infinite;
+}
+
+.hero-star:nth-child(3n) {
+  background: #f59e0b;
+  box-shadow: 0 0 6px 1px rgba(245, 158, 11, 0.55);
+}
+
+.hero-star:nth-child(3n + 1) {
+  background: #34d399;
+  box-shadow: 0 0 6px 1px rgba(52, 211, 153, 0.5);
+}
+
+.hero-star:nth-child(4n) {
+  width: 2px;
+  height: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-star {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
 .hero-inner {
   position: relative;
   z-index: 1;

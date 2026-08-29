@@ -12,6 +12,13 @@ permalink: /
     <div class="blob blob-c"></div>
   </div>
 
+  <canvas class="hero-glitter" aria-hidden="true"></canvas>
+
+  <div class="hero-stars" aria-hidden="true">
+    {% assign star_positions = "8,14|18,58|24,32|31,76|37,20|44,64|52,10|58,45|64,84|70,26|76,60|82,18|88,70|93,40|14,88|46,90" | split: "|" %}
+    {% for pos in star_positions %}{% assign coords = pos | split: "," %}<span class="hero-star" style="left: {{ coords[0] }}%; top: {{ coords[1] }}%; animation-delay: {{ forloop.index0 | times: 0.35 }}s;"></span>{% endfor %}
+  </div>
+
   <div class="scroll-veil" aria-hidden="true"></div>
 
   <div class="hero-inner">
