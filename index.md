@@ -38,7 +38,7 @@ permalink: /
         <span class="galaxy" aria-hidden="true">
           <span class="galaxy__ring">
             {% assign star_count = 20 %}
-            {% for i in (1..star_count) %}<span class="star" style="--i: {{ i | minus: 1 }};"></span>{% endfor %}
+            {% for i in (1..star_count) %}<span class="star"></span>{% endfor %}
           </span>
         </span>
         <span class="text">Explore</span>

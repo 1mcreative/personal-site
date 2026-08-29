@@ -136,6 +136,11 @@
   display: none;
 }
 
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
 .hero-star {
   position: absolute;
   width: 3px;
@@ -187,14 +192,30 @@
   margin: 0 auto var(--space-4);
 }
 
-/* Galaxy button — the one overt, undisguised "Explore" CTA into /life/,
-   deliberately more theatrical than the quiet hints (page corner/orb,
-   spotlight text). At rest it's a plain dark pill with a few faint static
-   stars; on hover a spinning conic-gradient rim ("spark") lights up and a
-   ring of 20 stars orbits around it. The 20 stars share one rule via a
-   --i custom property per star (set inline in index.md) rather than 20
-   nth-child blocks. */
+/* Galaxy button — a structural port of a CodePen "galaxy button" the user
+   supplied (HTML/CSS/JS, no framework attached). The one overt, undisguised
+   "Explore" CTA into /life/, more theatrical than the quiet hints (page
+   corner/orb, spotlight text). At rest it's a plain dark pill; hovering
+   (or focusing) drives --active from 0 to 1, which every child reads via
+   var(--active) — background gradient, glow, the spark rim, the star ring —
+   so the whole "galaxy" wakes up together, same mechanism as the reference.
+   --hue is tuned to the personal theme's accent (#6ec1ff ~ hue 205) instead
+   of the reference's default purple (245); everything else — the dual
+   radial-gradient background, the real 3D-tilted star ring (not a flat
+   circle), the masked spinning spark, the drifting "static" stars — is
+   ported structurally, not re-imagined. Per-star orbit distance/size/alpha/
+   duration/delay come from assets/js/galaxy-button.js, a near-verbatim port
+   of the reference's own randomizing script.
+   Skipped: the reference also dims the ENTIRE page on hover via
+   `body:has(button:hover)` — fine for a CodePen where the button IS the
+   page, but it would fight the hero's own glitter/blob background here, so
+   that part isn't ported. Also tuned the static-star drift distance and the
+   galaxy disc's inset down from the reference's values, which were sized
+   for a much bigger (font-size: 2rem) standalone demo button. */
 .galaxy-button {
+  --transition: 0.25s;
+  --spark: 1.8s;
+  --hue: 205;
   position: relative;
   display: inline-block;
   margin-top: var(--space-2);
@@ -202,122 +223,186 @@
 }
 
 .galaxy-btn-face {
+  --cut: 0.1em;
+  --active: 0;
+  --bg:
+    radial-gradient(
+      120% 120% at 126% 126%,
+      hsl(var(--hue) calc(var(--active) * 97%) 98% / calc(var(--active) * 0.9)) 40%,
+      transparent 50%
+    ) calc(100px - (var(--active) * 100px)) 0 / 100% 100% no-repeat,
+    radial-gradient(
+      120% 120% at 120% 120%,
+      hsl(var(--hue) calc(var(--active) * 97%) 70% / var(--active)) 30%,
+      transparent 70%
+    ) calc(100px - (var(--active) * 100px)) 0 / 100% 100% no-repeat,
+    hsl(var(--hue) calc(var(--active) * 100%) calc(12% - (var(--active) * 8%)));
+  background: var(--bg);
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.25em;
   isolation: isolate;
-  padding: 0.9rem 2.4rem;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0.9em 1.5em;
   border-radius: 999px;
-  background: #0b0e14;
-  color: #e8eef7;
+  font-size: clamp(1rem, 0.85rem + 0.6vw, 1.3rem);
   font-weight: 600;
-  font-size: 1rem;
   letter-spacing: 0.01em;
-  transition: transform 0.2s var(--ease);
+  transform-style: preserve-3d;
+  perspective: 100vmin;
+  scale: calc(1 + (var(--active) * 0.06));
+  box-shadow:
+    0 0 calc(var(--active) * 4em) calc(var(--active) * 2em) hsl(var(--hue) 97% 61% / 0.5),
+    0 0.05em 0 0 hsl(var(--hue) calc(var(--active) * 97%) calc((var(--active) * 50%) + 30%)) inset,
+    0 -0.05em 0 0 hsl(var(--hue) calc(var(--active) * 97%) calc(var(--active) * 10%)) inset;
+  transition: box-shadow var(--transition), scale var(--transition), background var(--transition);
+}
+
+.galaxy-button:hover .galaxy-btn-face,
+.galaxy-button:focus-visible .galaxy-btn-face {
+  --active: 1;
 }
 
 .galaxy-button:active .galaxy-btn-face {
-  transform: scale(0.97);
-}
-
-/* Spinning colored rim, hidden until hover — the backdrop (below) covers
-   its inner two-thirds, leaving only a thin glowing edge visible. */
-.galaxy-btn-face .spark {
-  position: absolute;
-  inset: -2px;
-  z-index: -2;
-  border-radius: inherit;
-  background: conic-gradient(from 0deg, transparent 0 75%, #6ec1ff 95%, transparent 100%);
-  opacity: 0;
-  animation: spark-spin 2.2s linear infinite;
-  transition: opacity 0.3s ease;
-}
-
-.galaxy-btn-face .backdrop {
-  position: absolute;
-  inset: 2px;
-  z-index: -1;
-  border-radius: inherit;
-  background: #0b0e14;
-}
-
-.galaxy-button:hover .spark,
-.galaxy-button:focus-visible .spark {
-  opacity: 1;
-}
-
-@keyframes spark-spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Four always-on static stars — a faint twinkle so the button reads as
-   "space-themed" even before anyone hovers it. */
-.galaxy__container {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.galaxy__container .star--static {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  border-radius: 50%;
-  background: rgba(207, 230, 255, 0.7);
-  animation: star-twinkle 2.6s ease-in-out infinite;
-}
-
-.galaxy__container .star--static:nth-child(1) { top: 22%; left: 10%; animation-delay: 0s; }
-.galaxy__container .star--static:nth-child(2) { top: 68%; left: 18%; animation-delay: 0.6s; }
-.galaxy__container .star--static:nth-child(3) { top: 30%; left: 88%; animation-delay: 1.2s; }
-.galaxy__container .star--static:nth-child(4) { top: 72%; left: 82%; animation-delay: 1.8s; }
-
-@keyframes star-twinkle {
-  0%, 100% { opacity: 0.25; }
-  50% { opacity: 1; }
-}
-
-/* The orbiting ring — 20 stars distributed via --i, hidden until hover. */
-.galaxy {
-  position: absolute;
-  inset: -60px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.galaxy-button:hover .galaxy,
-.galaxy-button:focus-visible .galaxy {
-  opacity: 1;
-}
-
-.galaxy__ring {
-  position: absolute;
-  inset: 0;
-  animation: galaxy-spin 7s linear infinite;
-}
-
-.galaxy__ring .star {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 3px;
-  height: 3px;
-  margin: -1.5px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 4px 1px rgba(110, 193, 255, 0.85);
-  transform: rotate(calc(var(--i) * 18deg)) translateX(64px);
-}
-
-@keyframes galaxy-spin {
-  to { transform: rotate(360deg); }
+  scale: 1;
 }
 
 .galaxy-btn-face .text {
   position: relative;
-  z-index: 1;
+  translate: 2% -6%;
+  color: hsl(0 0% calc(60% + (var(--active) * 26%)));
+}
+
+/* Real per-star orbit: rotate + translateY, tilted into 3D by .galaxy__ring
+   below. --duration/--delay/--alpha/--size/--distance are set inline by
+   galaxy-button.js, same as the reference. */
+.galaxy-btn-face .star {
+  height: calc(var(--size, 3) * 1px);
+  aspect-ratio: 1;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  opacity: var(--alpha, 0.6);
+  transform: translate(-50%, -50%) rotate(10deg) translateY(calc(var(--distance, 60) * 1px));
+  animation: galaxy-orbit calc(var(--duration, 12) * 1s) calc(var(--delay, 0) * -1s) infinite linear;
+}
+
+@keyframes galaxy-orbit {
+  to { transform: translate(-50%, -50%) rotate(370deg) translateY(calc(var(--distance, 60) * 1px)); }
+}
+
+/* Four drifting "static" stars — hidden until hover, same as the ring. */
+.galaxy__container {
+  position: absolute;
+  inset: 0;
+  opacity: var(--active);
+  transition: opacity var(--transition);
+  mask: radial-gradient(#fff, transparent);
+  pointer-events: none;
+}
+
+.galaxy-btn-face .star--static {
+  top: 50%;
+  left: 50%;
+  max-height: 4px;
+  filter: brightness(4);
+  transform: translate(0, 0);
+  animation:
+    galaxy-drift-x calc(var(--duration, 12) * 0.1s) calc(var(--delay, 0) * -0.1s) infinite linear,
+    galaxy-drift-y calc(var(--duration, 12) * 0.2s) calc(var(--delay, 0) * -0.2s) infinite linear;
+}
+
+.galaxy-button:hover .star--static,
+.galaxy-button:focus-visible .star--static {
+  animation-play-state: paused;
+}
+
+@keyframes galaxy-drift-x {
+  from { translate: -24px 0; }
+  to { translate: 24px 0; }
+}
+
+@keyframes galaxy-drift-y {
+  from { transform: translate(0, -14px); }
+  to { transform: translate(0, 14px); }
+}
+
+/* The galaxy disc: a square region the width of the button, tilted in 3D
+   (rotateX/rotateY) so the orbiting ring reads as a disc seen edge-on, not
+   a flat circle — this tilt is the visual signature of the reference. */
+.galaxy {
+  position: absolute;
+  width: 100%;
+  aspect-ratio: 1;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  overflow: hidden;
+  opacity: var(--active);
+  transition: opacity var(--transition);
+  pointer-events: none;
+}
+
+.galaxy__ring {
+  position: absolute;
+  height: 200%;
+  width: 200%;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate(-28%, -40%) rotateX(-24deg) rotateY(-30deg) rotateX(90deg);
+  transform-style: preserve-3d;
+}
+
+/* The spinning "spark" rim: a masked wrapper that flips between its top and
+   bottom half every beat (steps(2, end)), containing a conic-gradient
+   pseudo-element that spins continuously underneath — two layers combining
+   into the sweeping-highlight look, same trick as the reference. */
+.galaxy-btn-face .spark {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  border-radius: inherit;
+  overflow: hidden;
+  mask: linear-gradient(#fff, transparent 50%);
+  animation: galaxy-flip calc(var(--spark) * 2) infinite steps(2, end);
+}
+
+@keyframes galaxy-flip {
+  to { rotate: 360deg; }
+}
+
+.galaxy-btn-face .spark::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  aspect-ratio: 1;
+  top: 0;
+  left: 50%;
+  translate: -50% -15%;
+  transform: rotate(-90deg);
+  opacity: calc(var(--active) + 0.4);
+  background: conic-gradient(from 0deg, transparent 0 340deg, hsl(var(--hue) 90% 70%) 360deg);
+  transition: opacity var(--transition);
+  animation: galaxy-rotate var(--spark) linear infinite both;
+}
+
+@keyframes galaxy-rotate {
+  to { transform: rotate(90deg); }
+}
+
+.galaxy-btn-face .backdrop {
+  position: absolute;
+  inset: var(--cut);
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--bg);
+  transition: background var(--transition);
 }
 
 .galaxy-button:focus-visible .galaxy-btn-face {
@@ -326,9 +411,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .spark,
-  .galaxy__ring,
-  .galaxy__container .star--static {
+  .galaxy-btn-face .star,
+  .galaxy-btn-face .star--static,
+  .galaxy-btn-face .spark,
+  .galaxy-btn-face .spark::before {
     animation: none;
   }
 }
