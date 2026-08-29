@@ -17,11 +17,35 @@ permalink: /
   <div class="hero-inner">
     <h1>Hi, I'm Bhavesh.</h1>
     <p class="hero-sub">I write backend systems for a living, and I'm a lot less organized about everything else. Poke around &mdash; there's more here than it looks.</p>
+
+    <a class="galaxy-button" href="/life/">
+      <span class="galaxy-btn-face">
+        <span class="spark" aria-hidden="true"></span>
+        <span class="backdrop" aria-hidden="true"></span>
+        <span class="galaxy__container" aria-hidden="true">
+          <span class="star star--static"></span>
+          <span class="star star--static"></span>
+          <span class="star star--static"></span>
+          <span class="star star--static"></span>
+        </span>
+        <span class="galaxy" aria-hidden="true">
+          <span class="galaxy__ring">
+            {% assign star_count = 20 %}
+            {% for i in (1..star_count) %}<span class="star" style="--i: {{ i | minus: 1 }};"></span>{% endfor %}
+          </span>
+        </span>
+        <span class="text">Explore</span>
+      </span>
+    </a>
   </div>
 
   <a class="page-corner" href="/life/" aria-label="The Chaos — the personal side">
     <span class="page-corner-back" aria-hidden="true"></span>
     <span class="page-corner-front" aria-hidden="true"></span>
+  </a>
+
+  <a class="portal-orb" href="/life/">
+    <span class="portal-orb-label">The Chaos</span>
   </a>
 
   <a class="spotlight-text" href="/life/">

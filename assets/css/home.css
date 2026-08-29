@@ -118,14 +118,156 @@
   margin: 0 auto var(--space-4);
 }
 
-/* Page corner — the only way into /life/ from the homepage. Reads as the
-   top-right corner of this (light) page lifting slightly, like a sheet of
-   paper in a breeze, with a dark underside hinting at what's behind it. No
-   dot, no pill — replaced .portal-orb after the user didn't like a floating
-   orb on desktop. Idle flutter is decorative; hover/focus peels it back
-   further as the click affordance. Clicking navigates to /life/ with the
-   sitewide wipe transition — a fuller "the page tears away" effect is a
-   separate, later phase (would need canvas for real particles). */
+/* Galaxy button — the one overt, undisguised "Explore" CTA into /life/,
+   deliberately more theatrical than the quiet hints (page corner/orb,
+   spotlight text). At rest it's a plain dark pill with a few faint static
+   stars; on hover a spinning conic-gradient rim ("spark") lights up and a
+   ring of 20 stars orbits around it. The 20 stars share one rule via a
+   --i custom property per star (set inline in index.md) rather than 20
+   nth-child blocks. */
+.galaxy-button {
+  position: relative;
+  display: inline-block;
+  margin-top: var(--space-2);
+  text-decoration: none;
+}
+
+.galaxy-btn-face {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+  padding: 0.9rem 2.4rem;
+  border-radius: 999px;
+  background: #0b0e14;
+  color: #e8eef7;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  transition: transform 0.2s var(--ease);
+}
+
+.galaxy-button:active .galaxy-btn-face {
+  transform: scale(0.97);
+}
+
+/* Spinning colored rim, hidden until hover — the backdrop (below) covers
+   its inner two-thirds, leaving only a thin glowing edge visible. */
+.galaxy-btn-face .spark {
+  position: absolute;
+  inset: -2px;
+  z-index: -2;
+  border-radius: inherit;
+  background: conic-gradient(from 0deg, transparent 0 75%, #6ec1ff 95%, transparent 100%);
+  opacity: 0;
+  animation: spark-spin 2.2s linear infinite;
+  transition: opacity 0.3s ease;
+}
+
+.galaxy-btn-face .backdrop {
+  position: absolute;
+  inset: 2px;
+  z-index: -1;
+  border-radius: inherit;
+  background: #0b0e14;
+}
+
+.galaxy-button:hover .spark,
+.galaxy-button:focus-visible .spark {
+  opacity: 1;
+}
+
+@keyframes spark-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Four always-on static stars — a faint twinkle so the button reads as
+   "space-themed" even before anyone hovers it. */
+.galaxy__container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.galaxy__container .star--static {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(207, 230, 255, 0.7);
+  animation: star-twinkle 2.6s ease-in-out infinite;
+}
+
+.galaxy__container .star--static:nth-child(1) { top: 22%; left: 10%; animation-delay: 0s; }
+.galaxy__container .star--static:nth-child(2) { top: 68%; left: 18%; animation-delay: 0.6s; }
+.galaxy__container .star--static:nth-child(3) { top: 30%; left: 88%; animation-delay: 1.2s; }
+.galaxy__container .star--static:nth-child(4) { top: 72%; left: 82%; animation-delay: 1.8s; }
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
+/* The orbiting ring — 20 stars distributed via --i, hidden until hover. */
+.galaxy {
+  position: absolute;
+  inset: -60px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.galaxy-button:hover .galaxy,
+.galaxy-button:focus-visible .galaxy {
+  opacity: 1;
+}
+
+.galaxy__ring {
+  position: absolute;
+  inset: 0;
+  animation: galaxy-spin 7s linear infinite;
+}
+
+.galaxy__ring .star {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  margin: -1.5px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 4px 1px rgba(110, 193, 255, 0.85);
+  transform: rotate(calc(var(--i) * 18deg)) translateX(64px);
+}
+
+@keyframes galaxy-spin {
+  to { transform: rotate(360deg); }
+}
+
+.galaxy-btn-face .text {
+  position: relative;
+  z-index: 1;
+}
+
+.galaxy-button:focus-visible .galaxy-btn-face {
+  outline: 2px solid #6ec1ff;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spark,
+  .galaxy__ring,
+  .galaxy__container .star--static {
+    animation: none;
+  }
+}
+
+/* Page corner (desktop) vs. portal orb (mobile) — two takes on the same
+   quiet hint at /life/, shown one at a time by viewport width, not both at
+   once. The orb didn't read well on desktop; it comes back for mobile,
+   where the corner-peel effect is fiddlier to notice/tap. */
 .page-corner {
   position: absolute;
   top: 0;
@@ -181,8 +323,86 @@
 
 @media (max-width: 640px) {
   .page-corner {
-    width: 64px;
-    height: 64px;
+    display: none;
+  }
+}
+
+/* Portal orb — mobile only (see .page-corner above). A small glowing dot,
+   real <a href="/life/">, whose label only appears on hover/focus; the
+   label text is always in the DOM so screen readers announce it regardless
+   of the opacity trick. Visual dot is 16px but the tap target is 44px via
+   an invisible ::before overlay. */
+.portal-orb {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .portal-orb {
+    display: block;
+    position: absolute;
+    z-index: 3;
+    left: 8%;
+    bottom: 8%;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #12181f;
+    box-shadow: 0 0 0 4px rgba(18, 24, 31, 0.06), 0 0 22px 6px rgba(110, 193, 255, 0.55);
+    text-decoration: none;
+    cursor: pointer;
+    animation: orb-pulse 3.5s ease-in-out infinite;
+    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  }
+
+  .portal-orb::before {
+    content: "";
+    position: absolute;
+    inset: -14px;
+  }
+
+  .portal-orb:hover,
+  .portal-orb:focus-visible {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 6px rgba(18, 24, 31, 0.08), 0 0 32px 10px rgba(110, 193, 255, 0.8);
+  }
+
+  .portal-orb:focus-visible {
+    outline: 2px solid #6ec1ff;
+    outline-offset: 6px;
+  }
+
+  .portal-orb-label {
+    position: absolute;
+    right: 50%;
+    bottom: 140%;
+    transform: translate(50%, 6px);
+    white-space: nowrap;
+    background: #12181f;
+    color: #cfe6ff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .portal-orb:hover .portal-orb-label,
+  .portal-orb:focus-visible .portal-orb-label {
+    opacity: 1;
+    transform: translate(50%, 0);
+  }
+}
+
+@keyframes orb-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(18, 24, 31, 0.06), 0 0 22px 6px rgba(110, 193, 255, 0.55); }
+  50% { box-shadow: 0 0 0 4px rgba(18, 24, 31, 0.06), 0 0 28px 9px rgba(110, 193, 255, 0.75); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-orb {
+    animation: none;
   }
 }
 
@@ -267,7 +487,7 @@
 @media (max-width: 640px) {
   .spotlight-text {
     top: auto;
-    bottom: 8%;
+    bottom: 16%;
     right: 8%;
     max-width: 10rem;
     font-size: 0.9rem;
