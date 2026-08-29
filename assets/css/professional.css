@@ -51,6 +51,45 @@
   font-size: clamp(1.9rem, 4vw, 2.5rem);
 }
 
+/* Text Fall — a canvas particle title (assets/js/text-fall.js), ported from
+   a React/canvas component the user supplied. .text-fall-plain is the real
+   heading text and stays visible by default; only once the script confirms
+   it actually set up (adding .text-fall-ready) does CSS swap to the canvas
+   and visually hide the plain text — off-screen via clip, not display:none,
+   so it's still the h1's accessible name for screen readers/SEO either way.
+   No JS, reduced-motion, or a script error all just leave the plain heading
+   showing, same as it always did. */
+.text-fall-root {
+  display: none;
+}
+
+.text-fall-heading.text-fall-ready .text-fall-plain {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.text-fall-heading.text-fall-ready .text-fall-root {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: clamp(70px, 10vw, 110px);
+}
+
+.text-fall-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
 .resume-header .title-line {
   color: var(--accent);
   font-weight: 500;

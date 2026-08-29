@@ -6,7 +6,12 @@ permalink: /resume/
 ---
 
 <header class="resume-header">
-  <h1>Bhavesh Nakum</h1>
+  <h1 class="text-fall-heading">
+    <span class="text-fall-plain">Bhavesh Nakum</span>
+    <span class="text-fall-root" aria-hidden="true">
+      <canvas class="text-fall-canvas"></canvas>
+    </span>
+  </h1>
   <p class="title-line">Senior Software Engineer &middot; Backend Architect &middot; Cloud Data Specialist</p>
   <p class="contact-line">
     <span>Bengaluru, India</span>
