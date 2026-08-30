@@ -410,6 +410,30 @@
   outline-offset: 4px;
 }
 
+/* Hero-wide dim on galaxy-button hover/focus — a scoped stand-in for the
+   reference's `body:has(button:hover)` full-page black-out. A literal
+   whole-page dim would fight the hero's own blob/glitter background, so
+   this darkens just the hero backdrop instead: same "the scene reacts to
+   the button" idea, without breaking what's already there. z-index 0 keeps
+   it behind the text/button (both z-index 1+), so nothing loses contrast.
+   Progressive enhancement via :has() — browsers without it just don't get
+   the extra flourish; the button itself is unaffected either way. */
+.hero-dim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(120% 90% at 50% 65%, rgba(11, 14, 20, 0.55), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+@supports selector(:has(a)) {
+  .hero:has(.galaxy-button:hover, .galaxy-button:focus-visible) .hero-dim {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .galaxy-btn-face .star,
   .galaxy-btn-face .star--static,
