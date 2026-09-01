@@ -58,17 +58,14 @@
   display: block;
 }
 
-/* DEPRECATED (not deleted): .hero-blobs and .hero-glitter (below) are
-   superseded by .hero-glow above. Their independently-invented colors
-   (blue/amber/green blobs; blue/amber/green glitter particles) were the
-   actual source of the "doesn't blend in" problem — Beyond Horizon's own
-   single-accent (violet) palette is the new color story instead. Both are
-   left fully intact; re-enabling either is deleting its one display:none
-   rule, nothing to rebuild. Only one of the three should ever run at once —
-   three animated backgrounds stacked is exactly the visual noise this was
-   meant to fix. */
-.hero-blobs,
-.hero-glitter {
+/* DEPRECATED (not deleted): .hero-blobs. .hero-glitter runs again below,
+   layered on top of .hero-glow per explicit request ("i want both effect in
+   landing page") — its canvas background stays transparent between star
+   draws (see glitter.js), so .hero-glow shows through everywhere except the
+   star pixels themselves. .hero-blobs is still off; three animated
+   backgrounds at once is more than two. Re-enabling is deleting this one
+   display:none rule, nothing to rebuild. */
+.hero-blobs {
   display: none;
 }
 

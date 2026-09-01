@@ -24,17 +24,21 @@
   // Tuned modest on purpose - this sits behind readable text on a personal
   // site, not a full-bleed hero on a marketing landing page. The original's
   // presets (particleCount 1000, glitterIntensity 10) are built for a canvas
-  // that IS the whole visual; here it's one layer among several.
+  // that IS the whole visual; here it's one layer among several. brightness/
+  // starSize bumped up from the first pass per explicit feedback that it
+  // wasn't clearly visible against white — the colors themselves already
+  // read fine at these sizes, they just weren't opaque/large enough to
+  // register as more than a faint dust.
   var CONFIG = {
-    particleCount: 70,
+    particleCount: 160,
     colors: ["#1d4ed8", "#f59e0b", "#34d399"],
     speed: 2,
     density: 60,
-    starSize: 2.2,
+    starSize: 4,
     focalDepth: 0.12,
     turbulence: 0.6,
-    brightness: 0.55,
-    glitterIntensity: 3,
+    brightness: 1,
+    glitterIntensity: 4,
     trailAmount: 88,
     reverse: false,
   };

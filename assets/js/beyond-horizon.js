@@ -36,14 +36,14 @@
     coreColor: "#1d4ed8",
     midColor: "#93c5fd",
     deepColor: "#3A2A78",
-    brightness: 1.7,
+    brightness: 1.4,
     coreSize: 0.02,
     coreHover: 0.028,
-    haze: 3,
+    haze: 1.6,
     speed: 1,
     parallax: 3,
     fit: 0.5, // 0 = width-locked, 1 = height-locked; 0.5 = geometric mean
-    horizonY: 0.7055,
+    horizonY: 0.8,
     horizonRadius: 1.867,
     rimSpread: 0.035,
   };
