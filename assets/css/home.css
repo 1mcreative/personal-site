@@ -752,3 +752,28 @@
     transform: none;
   }
 }
+
+/* The "Thanos snap" transition into /life/ (assets/js/dissolve.js) — the
+   deferred fuller version of the page-corner/orb hint, built once the
+   landing page itself felt done. JS adds .dissolving to <html> on click,
+   fades the hero to black underneath a canvas of particles blown apart to
+   the left, then navigates once the animation finishes. No JS or
+   prefers-reduced-motion: the click just falls through to the plain
+   <a href="/life/"> underneath, same as every other decorative effect on
+   this page. */
+.dissolve-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+html.dissolving,
+html.dissolving body {
+  background: #05070a;
+}
+
+html.dissolving .hero > * {
+  transition: opacity 0.45s ease;
+  opacity: 0;
+}
