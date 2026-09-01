@@ -6,6 +6,10 @@ permalink: /
 ---
 
 <section class="hero">
+  <div class="hero-glow" aria-hidden="true">
+    <canvas class="hero-glow-canvas"></canvas>
+  </div>
+
   <div class="hero-blobs" aria-hidden="true">
     <div class="blob blob-a"></div>
     <div class="blob blob-b"></div>
@@ -21,7 +25,7 @@ permalink: /
 
   <div class="scroll-veil" aria-hidden="true"></div>
 
-  <div class="hero-dim" aria-hidden="true"></div>
+  <div class="hero-hover-glow" aria-hidden="true"></div>
 
   <div class="hero-inner">
     <h1>Hi, I'm Bhavesh.</h1>

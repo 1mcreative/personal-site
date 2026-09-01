@@ -13,7 +13,11 @@
     <p>&copy; {{ 'now' | date: "%Y" }} Bhavesh Nakum. <a href="mailto:{{ site.email }}">{{ site.email }}</a></p>
   </footer>
   <script src="{{ '/assets/js/hero.js' | relative_url }}" defer></script>
-  <script src="{{ '/assets/js/glitter.js' | relative_url }}" defer></script>
+  <!-- glitter.js: deprecated in favor of beyond-horizon.js (see home.css) —
+       file kept intact, just not invoked, since a hidden canvas that's still
+       running its own RAF draw loop would waste CPU/battery for nothing
+       visible. Re-enabling is re-adding this one script tag. -->
+  <script src="{{ '/assets/js/beyond-horizon.js' | relative_url }}" defer></script>
   <script src="{{ '/assets/js/galaxy-button.js' | relative_url }}" defer></script>
   <script src="{{ '/assets/js/dissolve.js' | relative_url }}" defer></script>
 </body>

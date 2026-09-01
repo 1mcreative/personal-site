@@ -1,8 +1,20 @@
-/* Home hero — bright, playful, the front door to both sides of the site. */
+/* Home hero — the front door to both sides of the site. Was a bright/white
+   page with independently-colored decorations (blue/amber/green blobs, a
+   blue+amber+green glitter canvas, a blue galaxy button); reworked around
+   assets/js/beyond-horizon.js, an ambient WebGL glow, whose own near-black +
+   white + lavender/indigo palette is now the single color story for the
+   whole homepage — every other decorative element pulls from this same
+   family instead of inventing its own. Lavender/indigo (~hue 260) sits
+   analogous to the site's existing blues (Grind #1d4ed8 ~hue 225, Chaos
+   #6ec1ff ~hue 205) rather than clashing with them, so the "into /life/"
+   and "into /resume/" hint colors elsewhere on this page didn't need to
+   change — they were never the problem; the warm amber/green blob and
+   glitter tones were, and those are deprecated below. */
 .theme-home {
-  --bg: #ffffff;
-  --text: #14171c;
-  --muted: #5b6572;
+  --bg: #08080a;
+  --text: #f3f1f7;
+  --muted: #a89fc2;
+  --accent: #b79bfa;
 
   background: var(--bg);
   color: var(--text);
@@ -24,6 +36,41 @@
   justify-content: center;
   overflow: hidden;
   padding: var(--space-4) var(--space-3);
+}
+
+/* Beyond Horizon — the WebGL ambient background (assets/js/beyond-horizon.js),
+   now the homepage's primary backdrop. background-color here is the fallback
+   for a failed/missing WebGL context — the canvas itself is transparent
+   until JS draws into it, so without this the page would flash pure white
+   for a frame, or stay white forever if WebGL is unsupported. */
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #08080a;
+  overflow: hidden;
+}
+
+.hero-glow-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* DEPRECATED (not deleted): .hero-blobs and .hero-glitter (below) are
+   superseded by .hero-glow above. Their independently-invented colors
+   (blue/amber/green blobs; blue/amber/green glitter particles) were the
+   actual source of the "doesn't blend in" problem — Beyond Horizon's own
+   near-black/white/lavender palette is the new single background. Both are
+   left fully intact; re-enabling either is deleting its one display:none
+   rule, nothing to rebuild. Only one of the three should ever run at once —
+   three animated backgrounds stacked is exactly the visual noise this was
+   meant to fix. */
+.hero-blobs,
+.hero-glitter {
+  display: none;
 }
 
 .hero-blobs {
@@ -199,23 +246,26 @@
    (or focusing) drives --active from 0 to 1, which every child reads via
    var(--active) — background gradient, glow, the spark rim, the star ring —
    so the whole "galaxy" wakes up together, same mechanism as the reference.
-   --hue is tuned to the personal theme's accent (#6ec1ff ~ hue 205) instead
-   of the reference's default purple (245); everything else — the dual
-   radial-gradient background, the real 3D-tilted star ring (not a flat
-   circle), the masked spinning spark, the drifting "static" stars — is
-   ported structurally, not re-imagined. Per-star orbit distance/size/alpha/
-   duration/delay come from assets/js/galaxy-button.js, a near-verbatim port
-   of the reference's own randomizing script.
+   --hue was originally tuned to the personal theme's accent (#6ec1ff ~ hue
+   205); moved to ~262 (the Beyond Horizon background's own lavender,
+   #B79BFA) once that became the homepage's single background color story —
+   still in the same blue-violet analogous family as the site's other
+   accents, just matched to what's now directly behind it. Everything else —
+   the dual radial-gradient background, the real 3D-tilted star ring (not a
+   flat circle), the masked spinning spark, the drifting "static" stars — is
+   ported structurally from the reference CodePen, not re-imagined.
+   Per-star orbit distance/size/alpha/duration/delay come from
+   assets/js/galaxy-button.js, a near-verbatim port of the reference's own
+   randomizing script.
    Skipped: the reference also dims the ENTIRE page on hover via
-   `body:has(button:hover)` — fine for a CodePen where the button IS the
-   page, but it would fight the hero's own glitter/blob background here, so
-   that part isn't ported. Also tuned the static-star drift distance and the
+   `body:has(button:hover)` — see .hero-hover-glow below for the scoped
+   version actually used. Also tuned the static-star drift distance and the
    galaxy disc's inset down from the reference's values, which were sized
    for a much bigger (font-size: 2rem) standalone demo button. */
 .galaxy-button {
   --transition: 0.25s;
   --spark: 1.8s;
-  --hue: 205;
+  --hue: 262;
   position: relative;
   display: inline-block;
   margin-top: var(--space-2);
@@ -410,26 +460,28 @@
   outline-offset: 4px;
 }
 
-/* Hero-wide dim on galaxy-button hover/focus — a scoped stand-in for the
-   reference's `body:has(button:hover)` full-page black-out. A literal
-   whole-page dim would fight the hero's own blob/glitter background, so
-   this darkens just the hero backdrop instead: same "the scene reacts to
-   the button" idea, without breaking what's already there. z-index 0 keeps
-   it behind the text/button (both z-index 1+), so nothing loses contrast.
-   Progressive enhancement via :has() — browsers without it just don't get
-   the extra flourish; the button itself is unaffected either way. */
-.hero-dim {
+/* Hero-wide glow bloom on galaxy-button hover/focus — a scoped stand-in for
+   the reference galaxy-button's `body:has(button:hover)` full-page black-out
+   (see galaxy-button's own comment above). Originally a literal *dim*: dark
+   radial gradient, meant to darken a light page. Now that Beyond Horizon
+   made the whole homepage background near-black, darkening it further read
+   as nothing — inverted into a lavender bloom instead, so hovering Explore
+   reads as the button lighting up its own small patch of the same night sky,
+   rather than fighting the ambient glow behind it. z-index 0 keeps it behind
+   the text/button (both z-index 1+). Progressive enhancement via :has() —
+   browsers without it just don't get the extra flourish. */
+.hero-hover-glow {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: radial-gradient(120% 90% at 50% 65%, rgba(11, 14, 20, 0.55), transparent 70%);
+  background: radial-gradient(120% 90% at 50% 65%, rgba(183, 155, 250, 0.28), transparent 70%);
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;
 }
 
 @supports selector(:has(a)) {
-  .hero:has(.galaxy-button:hover, .galaxy-button:focus-visible) .hero-dim {
+  .hero:has(.galaxy-button:hover, .galaxy-button:focus-visible) .hero-hover-glow {
     opacity: 1;
   }
 }
@@ -446,7 +498,12 @@
 /* Page corner (desktop) vs. portal orb (mobile) — two takes on the same
    quiet hint at /life/, shown one at a time by viewport width, not both at
    once. The orb didn't read well on desktop; it comes back for mobile,
-   where the corner-peel effect is fiddlier to notice/tap. */
+   where the corner-peel effect is fiddlier to notice/tap. The white front
+   stays white — it already popped against the old light page and pops even
+   more against the new near-black one, like a torn page against open space.
+   The underside was a near-black that's since become nearly indistinguishable
+   from the homepage's own background (#0f1419 vs. #08080a) — deepened toward
+   indigo so peeling it back on hover still reveals something. */
 .page-corner {
   position: absolute;
   top: 0;
@@ -467,7 +524,7 @@
 }
 
 .page-corner-back {
-  background: #0f1419;
+  background: #1c1430;
   box-shadow: 0 0 24px 6px rgba(110, 193, 255, 0.35);
 }
 
@@ -515,6 +572,10 @@
   display: none;
 }
 
+/* Was a dark dot on a light page; the homepage background is dark now too,
+   so it flips to a small bright star instead — same idea (a point of light
+   hinting at the Chaos side), same blue glow, just visible against its new
+   backdrop. */
 @media (max-width: 640px) {
   .portal-orb {
     display: block;
@@ -525,8 +586,8 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #12181f;
-    box-shadow: 0 0 0 4px rgba(18, 24, 31, 0.06), 0 0 22px 6px rgba(110, 193, 255, 0.55);
+    background: #eaf4ff;
+    box-shadow: 0 0 0 4px rgba(234, 244, 255, 0.08), 0 0 22px 6px rgba(110, 193, 255, 0.65);
     text-decoration: none;
     cursor: pointer;
     animation: orb-pulse 3.5s ease-in-out infinite;
@@ -542,7 +603,7 @@
   .portal-orb:hover,
   .portal-orb:focus-visible {
     transform: scale(1.2);
-    box-shadow: 0 0 0 6px rgba(18, 24, 31, 0.08), 0 0 32px 10px rgba(110, 193, 255, 0.8);
+    box-shadow: 0 0 0 6px rgba(234, 244, 255, 0.1), 0 0 32px 10px rgba(110, 193, 255, 0.9);
   }
 
   .portal-orb:focus-visible {
@@ -556,8 +617,9 @@
     bottom: 140%;
     transform: translate(50%, 6px);
     white-space: nowrap;
-    background: #12181f;
-    color: #cfe6ff;
+    background: #1c1430;
+    border: 1px solid rgba(183, 155, 250, 0.35);
+    color: #eaf4ff;
     font-size: 0.8rem;
     font-weight: 600;
     padding: 0.3rem 0.7rem;
@@ -575,8 +637,8 @@
 }
 
 @keyframes orb-pulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(18, 24, 31, 0.06), 0 0 22px 6px rgba(110, 193, 255, 0.55); }
-  50% { box-shadow: 0 0 0 4px rgba(18, 24, 31, 0.06), 0 0 28px 9px rgba(110, 193, 255, 0.75); }
+  0%, 100% { box-shadow: 0 0 0 4px rgba(234, 244, 255, 0.08), 0 0 22px 6px rgba(110, 193, 255, 0.65); }
+  50% { box-shadow: 0 0 0 4px rgba(234, 244, 255, 0.08), 0 0 28px 9px rgba(110, 193, 255, 0.85); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -638,14 +700,14 @@
 }
 
 .spotlight-text.spotlight-ready .spotlight-dim {
-  color: rgba(20, 23, 28, 0.08);
+  color: rgba(243, 241, 247, 0.08);
 }
 
 .spotlight-text.spotlight-ready .spotlight-bright {
   display: block;
   position: absolute;
   inset: 0;
-  color: #12181f;
+  color: #f3f1f7;
   pointer-events: none;
   --spot-size: 0px;
   transition: --spot-size 0.3s ease;
