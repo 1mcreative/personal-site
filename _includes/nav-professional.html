@@ -3,7 +3,25 @@
     <a class="brand" href="/">Bhavesh Nakum</a>
     <nav aria-label="Professional">
       <a href="/resume/" {% if page.url == '/resume/' %}aria-current="page"{% endif %}>The Grind</a>
-      <a class="keycap-btn" href="/life/">The Chaos</a>
+      <a class="galaxy-button" href="/life/">
+        <span class="galaxy-btn-face">
+          <span class="spark" aria-hidden="true"></span>
+          <span class="backdrop" aria-hidden="true"></span>
+          <span class="galaxy__container" aria-hidden="true">
+            <span class="star star--static"></span>
+            <span class="star star--static"></span>
+            <span class="star star--static"></span>
+            <span class="star star--static"></span>
+          </span>
+          <span class="galaxy" aria-hidden="true">
+            <span class="galaxy__ring">
+              {% assign star_count = 20 %}
+              {% for i in (1..star_count) %}<span class="star"></span>{% endfor %}
+            </span>
+          </span>
+          <span class="text">The Chaos</span>
+        </span>
+      </a>
     </nav>
   </div>
 </header>

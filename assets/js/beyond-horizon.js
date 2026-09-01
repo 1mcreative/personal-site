@@ -19,18 +19,26 @@
 // physics, the shader's ORIGINAL dark-theme composite is still computed in
 // full (noise, haze, horizon disc, rim — untouched), then its luminance is
 // used as a mix factor between white (where the original render was near-
-// black) and a chosen violet (where it was brightest) — see the FRAG tail.
+// black) and a chosen blue (where it was brightest) — see the FRAG tail.
 // This keeps 100% of the shape/motion/parallax/hover behavior and only
 // changes what color represents "more light" vs. "no light."
+//
+// Colors match the site's existing blue accent (Grind #1d4ed8) instead of
+// an invented violet — one real fix, not a recolor for its own sake: dark
+// text over the saturated "core" color only has ~2.5:1 contrast regardless
+// of hue, and the hover state's haze amplification (see hazeGain below) was
+// spreading that low-contrast zone up toward the hero text on any mouse
+// move — tuned down so hovering brightens the scene without reaching that
+// far into the text-occupied area above the horizon.
 (function () {
   var CONFIG = {
     background: "#ffffff",
-    coreColor: "#6d28d9",
-    midColor: "#b79bfa",
+    coreColor: "#1d4ed8",
+    midColor: "#93c5fd",
     deepColor: "#3A2A78",
-    brightness: 2,
+    brightness: 1.7,
     coreSize: 0.02,
-    coreHover: 0.04,
+    coreHover: 0.028,
     haze: 3,
     speed: 1,
     parallax: 3,
@@ -145,8 +153,8 @@
     "  vec2 m = uMouse * hv * uParallax * inv;",
     "  float coreSize  = mix(uCoreSize, uCoreHover, hv);",
     "  float rimSpread = mix(uRimSpread, 0.220, hv);",
-    "  float rimGain   = mix(0.55, 1.9, hv);",
-    "  float hazeGain  = mix(1.15, 9.00, hv);",
+    "  float rimGain   = mix(0.55, 1.3, hv);",
+    "  float hazeGain  = mix(1.15, 3.00, hv);",
     "  float hazeK     = mix(20.0, 19.0, hv);",
     "  float hazeCut0  = mix(0.21, 0.40, hv);",
     "  float hazeCut1  = mix(0.13, 0.28, hv);",
@@ -205,7 +213,7 @@
     "  col = tonemapTanh(col);",
     "  float lum = clamp(dot(col, vec3(0.2126, 0.7152, 0.0722)), 0.0, 1.0);",
     "  vec3 light = mix(uBg, uMid, smoothstep(0.0, 0.55, lum));",
-    "  light = mix(light, uCore, smoothstep(0.45, 1.0, lum));",
+    "  light = mix(light, uCore, smoothstep(0.62, 1.0, lum));",
     "  light = mix(mix(uBg, uMid, 0.05), light, above);",
     "  light += (hash21(gl_FragCoord.xy) - 0.5) / 255.0;",
     "  gl_FragColor = vec4(light, 1.0);",
