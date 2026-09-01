@@ -6,8 +6,8 @@ permalink: /
 ---
 
 <section class="hero">
-  <div class="hero-glow" aria-hidden="true">
-    <canvas class="hero-glow-canvas"></canvas>
+  <div class="hero-globe" aria-hidden="true">
+    <canvas class="hero-globe-canvas"></canvas>
   </div>
 
   <div class="hero-blobs" aria-hidden="true">

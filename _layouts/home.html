@@ -13,7 +13,11 @@
     <p>&copy; {{ 'now' | date: "%Y" }} Bhavesh Nakum. <a href="mailto:{{ site.email }}">{{ site.email }}</a></p>
   </footer>
   <script src="{{ '/assets/js/hero.js' | relative_url }}" defer></script>
-  <script src="{{ '/assets/js/beyond-horizon.js' | relative_url }}" defer></script>
+  <!-- beyond-horizon.js: deprecated in favor of globe.js, per explicit
+       request ("instade of horaizon add this glob animation"). File kept
+       intact, .hero-glow markup removed from index.md. Re-enabling needs
+       both restored. -->
+  <script src="{{ '/assets/js/globe.js' | relative_url }}" defer></script>
   <script src="{{ '/assets/js/glitter.js' | relative_url }}" defer></script>
   <!-- galaxy-button.js: moved to /resume/'s nav (see professional.html) —
        the button itself moved there too, nothing left on this page to run

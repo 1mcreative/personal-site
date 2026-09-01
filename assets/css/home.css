@@ -1,14 +1,12 @@
 /* Home hero — the front door to both sides of the site. Went through a
    near-black phase (see git history / CLAUDE.md tooling log) built around
-   assets/js/beyond-horizon.js, an ambient WebGL glow; the user then asked
-   for the page back on the light/white side, keeping the glow but recolored
-   to blend with white instead of black — see beyond-horizon.js's own
-   "LIGHT-THEME REMAP" comment for how that recolor works without touching
-   the shader's physics. --accent (#1d4ed8) is the site's existing Grind
-   blue, not an invented color — matches the glow's own "peak" color, so the
-   background effect and the site's own established accent are one swatch,
-   not two independently-chosen ones (an earlier violet version worked the
-   same way but picked a hue nothing else on the site used). */
+   assets/js/beyond-horizon.js, an ambient WebGL glow, then back to light —
+   see beyond-horizon.js's own "LIGHT-THEME REMAP" comment. That effect is
+   itself now deprecated in favor of assets/js/globe.js (a rotating dot
+   sphere), per explicit request. --accent (#1d4ed8) is the site's existing
+   Grind blue, not an invented color — the globe's dots use it directly, so
+   the background effect and the site's own established accent are one
+   swatch, not two independently-chosen ones. */
 .theme-home {
   --bg: #ffffff;
   --text: #14171c;
@@ -37,11 +35,11 @@
   padding: var(--space-4) var(--space-3);
 }
 
-/* Beyond Horizon — the WebGL ambient background (assets/js/beyond-horizon.js),
-   now the homepage's primary backdrop. background-color here is the fallback
-   for a failed/missing WebGL context — the canvas itself is transparent
-   until JS draws into it, so without this the page would flash pure white
-   for a frame, or stay white forever if WebGL is unsupported. */
+/* DEPRECATED (not deleted): .hero-glow (Beyond Horizon's WebGL canvas),
+   superseded by .hero-globe below per explicit request ("instade of
+   horaizon add this glob animation"). Markup removed from index.md; CSS and
+   assets/js/beyond-horizon.js both left fully intact. Re-enabling: restore
+   the markup in index.md and swap the script tag in home.html back. */
 .hero-glow {
   position: absolute;
   inset: 0;
@@ -58,13 +56,53 @@
   display: block;
 }
 
+/* Globe — a rotating dot-sphere WebGL background (assets/js/globe.js). A
+   fixed-size square container, not full-bleed: sized and positioned so a
+   circle (the sphere's silhouette) reads clearly rather than filling the
+   whole hero. On desktop it's shifted down by exactly half its own height
+   (translate 50%, not a bottom% offset — bottom/top percentages resolve
+   against the *containing block*'s height for an absolutely positioned
+   element, not the element's own, which would make this depend on the
+   hero's height instead of the globe's own size) so its vertical center
+   lands on .hero's bottom edge — combined with .hero's own overflow:hidden,
+   exactly the top half is visible, like a planet's curve rising into frame,
+   per explicit request ("in desktop i want globe to be visible half only
+   like cut from center"). Mobile drops that offset entirely so the whole
+   circle shows, per the same request's mobile carve-out. */
+.hero-globe {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  bottom: 0;
+  width: min(50vw, 480px);
+  aspect-ratio: 1;
+  transform: translate(-50%, 50%);
+  pointer-events: none;
+}
+
+.hero-globe-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .hero-globe {
+    width: min(72vw, 320px);
+    bottom: 6%;
+    transform: translateX(-50%);
+  }
+}
+
 /* DEPRECATED (not deleted): .hero-blobs. .hero-glitter runs again below,
-   layered on top of .hero-glow per explicit request ("i want both effect in
-   landing page") — its canvas background stays transparent between star
-   draws (see glitter.js), so .hero-glow shows through everywhere except the
-   star pixels themselves. .hero-blobs is still off; three animated
-   backgrounds at once is more than two. Re-enabling is deleting this one
-   display:none rule, nothing to rebuild. */
+   layered on top of the current background per explicit request ("i want
+   both effect in landing page") — its canvas background stays transparent
+   between star draws (see glitter.js), so whatever's behind it shows
+   through everywhere except the star pixels themselves. .hero-blobs is
+   still off; three animated backgrounds at once is more than two.
+   Re-enabling is deleting this one display:none rule, nothing to rebuild. */
 .hero-blobs {
   display: none;
 }
