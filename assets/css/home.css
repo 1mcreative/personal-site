@@ -1,20 +1,19 @@
-/* Home hero — the front door to both sides of the site. Was a bright/white
-   page with independently-colored decorations (blue/amber/green blobs, a
-   blue+amber+green glitter canvas, a blue galaxy button); reworked around
-   assets/js/beyond-horizon.js, an ambient WebGL glow, whose own near-black +
-   white + lavender/indigo palette is now the single color story for the
-   whole homepage — every other decorative element pulls from this same
-   family instead of inventing its own. Lavender/indigo (~hue 260) sits
-   analogous to the site's existing blues (Grind #1d4ed8 ~hue 225, Chaos
-   #6ec1ff ~hue 205) rather than clashing with them, so the "into /life/"
-   and "into /resume/" hint colors elsewhere on this page didn't need to
-   change — they were never the problem; the warm amber/green blob and
-   glitter tones were, and those are deprecated below. */
+/* Home hero — the front door to both sides of the site. Went through a
+   near-black phase (see git history / CLAUDE.md tooling log) built around
+   assets/js/beyond-horizon.js, an ambient WebGL glow; the user then asked
+   for the page back on the light/white side, keeping the glow but recolored
+   to blend with white instead of black — see beyond-horizon.js's own
+   "LIGHT-THEME REMAP" comment for how that recolor works without touching
+   the shader's physics. --accent (#6d28d9, a saturated violet) matches the
+   glow's own "peak" color exactly, so the button/link accents and the
+   background effect are drawn from the same swatch, not independently
+   chosen — that consistency, not any specific light-vs-dark choice, is
+   what actually fixed the original "doesn't blend in" complaint. */
 .theme-home {
-  --bg: #08080a;
-  --text: #f3f1f7;
-  --muted: #a89fc2;
-  --accent: #b79bfa;
+  --bg: #ffffff;
+  --text: #14171c;
+  --muted: #5b6572;
+  --accent: #6d28d9;
 
   background: var(--bg);
   color: var(--text);
@@ -47,7 +46,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: #08080a;
+  background: #ffffff;
   overflow: hidden;
 }
 
@@ -63,7 +62,7 @@
    superseded by .hero-glow above. Their independently-invented colors
    (blue/amber/green blobs; blue/amber/green glitter particles) were the
    actual source of the "doesn't blend in" problem — Beyond Horizon's own
-   near-black/white/lavender palette is the new single background. Both are
+   single-accent (violet) palette is the new color story instead. Both are
    left fully intact; re-enabling either is deleting its one display:none
    rule, nothing to rebuild. Only one of the three should ever run at once —
    three animated backgrounds stacked is exactly the visual noise this was
@@ -500,15 +499,20 @@
   }
 }
 
-/* Page corner (desktop) vs. portal orb (mobile) — two takes on the same
-   quiet hint at /life/, shown one at a time by viewport width, not both at
-   once. The orb didn't read well on desktop; it comes back for mobile,
-   where the corner-peel effect is fiddlier to notice/tap. The white front
-   stays white — it already popped against the old light page and pops even
-   more against the new near-black one, like a torn page against open space.
-   The underside was a near-black that's since become nearly indistinguishable
-   from the homepage's own background (#0f1419 vs. #08080a) — deepened toward
-   indigo so peeling it back on hover still reveals something. */
+/* DEPRECATED (not deleted): the page-corner (desktop) / portal-orb (mobile)
+   hint at /life/, and the .dissolving "Thanos snap" transition it triggered
+   (assets/js/dissolve.js), per explicit user feedback ("remove that page and
+   thanos effect for now it not what i am looking for"). The galaxy button
+   remains the one path into /life/ from the homepage. Both are fully intact
+   below — markup still in index.md, JS files untouched, dissolve.js just no
+   longer loaded (see home.html) since its only triggers are now hidden.
+   Re-enabling: delete the one display:none rule below and restore
+   dissolve.js's <script> tag. */
+.page-corner,
+.portal-orb {
+  display: none !important;
+}
+
 .page-corner {
   position: absolute;
   top: 0;
@@ -705,14 +709,14 @@
 }
 
 .spotlight-text.spotlight-ready .spotlight-dim {
-  color: rgba(243, 241, 247, 0.08);
+  color: rgba(20, 23, 28, 0.08);
 }
 
 .spotlight-text.spotlight-ready .spotlight-bright {
   display: block;
   position: absolute;
   inset: 0;
-  color: #f3f1f7;
+  color: #12181f;
   pointer-events: none;
   --spot-size: 0px;
   transition: --spot-size 0.3s ease;

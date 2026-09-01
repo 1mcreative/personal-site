@@ -9,11 +9,24 @@
 // one hardcoded CONFIG object and plain DOM APIs, matching every other canvas
 // effect on this page (glitter.js, text-fall.js) — this runs exactly once,
 // so a reusable multi-instance component would be unused abstraction.
+//
+// LIGHT-THEME REMAP: the reference renders on a near-black canvas and works
+// by ADDING light — brightness only ever goes up from a dark base, and the
+// "glow" reads as a light source because everything around it stays near
+// zero. That model breaks on a white canvas: white is already maximum
+// brightness, so adding more light per the original math just clips to
+// white everywhere and the glow disappears. Instead of re-deriving the
+// physics, the shader's ORIGINAL dark-theme composite is still computed in
+// full (noise, haze, horizon disc, rim — untouched), then its luminance is
+// used as a mix factor between white (where the original render was near-
+// black) and a chosen violet (where it was brightest) — see the FRAG tail.
+// This keeps 100% of the shape/motion/parallax/hover behavior and only
+// changes what color represents "more light" vs. "no light."
 (function () {
   var CONFIG = {
-    background: "#08080A",
-    coreColor: "#FFFFFF",
-    midColor: "#B79BFA",
+    background: "#ffffff",
+    coreColor: "#6d28d9",
+    midColor: "#b79bfa",
     deepColor: "#3A2A78",
     brightness: 2,
     coreSize: 0.02,
@@ -71,6 +84,13 @@
     "uniform vec3  uDeep;",
     "const int STEPS = 26;",
     "const float REF_ASPECT = 0.459441;",
+    // The additive light physics below (col starts here and only ever gains
+    // brightness) needs a dark baseline to mean anything — a light uBg would
+    // make col start near-white and saturate almost everywhere once light is
+    // added. uBg is reserved for the light-theme remap at the very end;
+    // this constant is the physics-only "canvas" the reference was designed
+    // against, independent of whatever final background color is configured.
+    "const vec3 PHYS_BG = vec3(0.03, 0.03, 0.035);",
     "float hash31(vec3 p) {",
     "  p = fract(p * 0.1031);",
     "  p += dot(p, p.yzx + 33.33);",
@@ -130,7 +150,7 @@
     "  float hazeK     = mix(20.0, 19.0, hv);",
     "  float hazeCut0  = mix(0.21, 0.40, hv);",
     "  float hazeCut1  = mix(0.13, 0.28, hv);",
-    "  vec3 col = uBg;",
+    "  vec3 col = PHYS_BG;",
     "  vec2 corePos = vec2(m.x * 0.015, m.y * 0.007);",
     "  float d = length(P - corePos);",
     "  float g = coreSize / max(d, 0.0009);",
@@ -176,15 +196,19 @@
     "  float kMax = 0.7 / max(pxUnit, 1e-7);",
     "  float shade = exp(min(discD, 0.0) * min(340.0, kMax));",
     "  float bleed = exp(min(discD, 0.0) * min(95.0, kMax)) * rimBase * hv * 0.85;",
-    "  vec3 ground = uBg * (1.0 - 0.85 * clamp(shade, 0.0, 1.0)) + uMid * bleed;",
+    "  vec3 ground = PHYS_BG * (1.0 - 0.85 * clamp(shade, 0.0, 1.0)) + uMid * bleed;",
     "  col = mix(ground, col, above);",
     "  float rimThin  = exp(-abs(discD) * min(mix(620.0, 150.0, hv), kMax));",
     "  float rimBroad = exp(-abs(discD) * min(mix(620.0, 22.0, hv), kMax));",
     "  float rimBand  = rimThin + mix(0.0, 0.26, hv) * rimBroad;",
     "  col += uMid * rimBand * rimFall * rimGain * above * uBright;",
     "  col = tonemapTanh(col);",
-    "  col += (hash21(gl_FragCoord.xy) - 0.5) / 255.0;",
-    "  gl_FragColor = vec4(col, 1.0);",
+    "  float lum = clamp(dot(col, vec3(0.2126, 0.7152, 0.0722)), 0.0, 1.0);",
+    "  vec3 light = mix(uBg, uMid, smoothstep(0.0, 0.55, lum));",
+    "  light = mix(light, uCore, smoothstep(0.45, 1.0, lum));",
+    "  light = mix(mix(uBg, uMid, 0.05), light, above);",
+    "  light += (hash21(gl_FragCoord.xy) - 0.5) / 255.0;",
+    "  gl_FragColor = vec4(light, 1.0);",
     "}",
   ].join("\n");
 
