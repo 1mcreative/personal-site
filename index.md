@@ -23,8 +23,6 @@ permalink: /
     {% for pos in star_positions %}{% assign coords = pos | split: "," %}<span class="hero-star" style="left: {{ coords[0] }}%; top: {{ coords[1] }}%; animation-delay: {{ forloop.index0 | times: 0.35 }}s;"></span>{% endfor %}
   </div>
 
-  <div class="scroll-veil" aria-hidden="true"></div>
-
   <div class="hero-hover-glow" aria-hidden="true"></div>
 
   <div class="hero-inner">
@@ -53,6 +51,3 @@ permalink: /
     <span>keep going</span>
   </a>
 </section>
-
-<div class="scroll-runway" aria-hidden="true"></div>
-<div id="hero-sentinel" class="hero-sentinel" aria-hidden="true"></div>

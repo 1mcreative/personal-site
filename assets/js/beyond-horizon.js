@@ -43,7 +43,7 @@
     speed: 1,
     parallax: 3,
     fit: 0.5, // 0 = width-locked, 1 = height-locked; 0.5 = geometric mean
-    horizonY: 0.8,
+    horizonY: 0.9,
     horizonRadius: 1.867,
     rimSpread: 0.035,
   };

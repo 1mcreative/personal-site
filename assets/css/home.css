@@ -478,8 +478,13 @@
   cursor: none;
 }
 
+/* Fully transparent, not just faint — per explicit request ("make it
+   complitly hidden only if cursor is on top of text than it should be
+   visible"). Combined with .spotlight-bright's --spot-size:0px default
+   (below), nothing here is visible at all until the cursor's flashlight
+   circle reveals it. */
 .spotlight-text.spotlight-ready .spotlight-dim {
-  color: rgba(20, 23, 28, 0.08);
+  color: transparent;
 }
 
 .spotlight-text.spotlight-ready .spotlight-bright {

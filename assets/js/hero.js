@@ -51,7 +51,19 @@
     }
   }
 
-  if (reduceMotion) return;
+  // DEPRECATED (not deleted): auto-navigating to /resume/ once the user
+  // scrolled past a sentinel. Explicit feedback: real visitors don't commit
+  // to a long deliberate scroll, they either bail after a small scroll
+  // attempt or use the "keep going" button — and this mechanic meant the
+  // footer (right after the sentinel in home.html) was never reachable,
+  // since navigation fired the moment the sentinel came into view. The
+  // scroll-cue link (a real <a href="/resume/">) is now the only path from
+  // the homepage into /resume/ via scrolling intent — simpler than before,
+  // since it no longer needs to double as "the reduced-motion fallback for
+  // the mechanic below" now that there's only one mechanism for everyone.
+  // Re-enabling: restore .scroll-veil/.scroll-runway/#hero-sentinel in
+  // index.md and remove this return.
+  return;
 
   var sentinel = document.getElementById("hero-sentinel");
   if (!sentinel || !("IntersectionObserver" in window)) return;
