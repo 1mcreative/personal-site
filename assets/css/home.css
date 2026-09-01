@@ -230,6 +230,11 @@
 .hero-inner h1 {
   font-size: clamp(2.2rem, 6vw, 3.2rem);
   margin-bottom: var(--space-2);
+  /* A touch of negative tracking at display size — every dark-canvas
+     reference checked (Linear -3px @80px, Vercel -2.4px @48px, Raycast's
+     ss03 tightening) does this on display type; kept modest here since
+     Fraunces is a serif, not the geometric sans those systems tighten. */
+  letter-spacing: -0.01em;
 }
 
 .hero-inner .hero-sub {
