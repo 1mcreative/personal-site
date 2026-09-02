@@ -11,11 +11,12 @@
 // build time instead of fetching it live: same Natural Earth land dataset
 // the reference uses, rasterized once into a packed bitmask (see
 // LAND_MASK_HEX below) with a plain Python ray-casting script, not shipped
-// as a runtime dependency for site visitors.
+// as a runtime dependency for site visitors. Drag-to-rotate added per
+// explicit follow-up request — see the pointer handlers further down.
 (function () {
   var COLOR = [0x1d / 0xff, 0x4e / 0xff, 0xd8 / 0xff]; // site's blue accent, #1d4ed8
-  var SPEED = 0.15; // radians/sec, auto-rotate only — no drag interaction
-  var TILT = (23 * Math.PI) / 180;
+  var SPEED = 0.15; // radians/sec — auto-rotate resumes once drag momentum settles
+  var TILT = (23 * Math.PI) / 180; // initial tilt; draggable afterward
 
   var host = document.querySelector(".hero-globe");
   var canvas = document.querySelector(".hero-globe-canvas");
@@ -140,7 +141,23 @@
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
   var aPos = gl.getAttribLocation(prog, "aPos");
   gl.enableVertexAttribArray(aPos);
-  gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+
+  // One marker dot, Bangalore — where this site's owner actually is —
+  // in an accent color (amber, reused from glitter.js's own palette rather
+  // than inventing a new one) so it stands out from the plain land dots.
+  // Same buffer/attribute setup as the main cloud, just one point and its
+  // own draw call with a different color/size.
+  function toXYZ(lat, lng) {
+    var latRad = (lat * Math.PI) / 180;
+    var lngRad = (lng * Math.PI) / 180;
+    var cosLat = Math.cos(latRad);
+    return [cosLat * Math.sin(lngRad), Math.sin(latRad), cosLat * Math.cos(lngRad)];
+  }
+  var MARKER_COLOR = [0xf5 / 0xff, 0x9e / 0xff, 0x0b / 0xff]; // #f59e0b
+  var markerPos = toXYZ(12.9716, 77.5946); // Bengaluru
+  var markerBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, markerBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(markerPos), gl.STATIC_DRAW);
 
   var uAngleY = gl.getUniformLocation(prog, "uAngleY");
   var uTiltX = gl.getUniformLocation(prog, "uTiltX");
@@ -149,7 +166,6 @@
 
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-  gl.uniform3f(uColor, COLOR[0], COLOR[1], COLOR[2]);
   gl.uniform1f(uTiltX, TILT);
 
   var w = 0, h = 0;
@@ -171,12 +187,23 @@
   function draw() {
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+    gl.uniform3f(uColor, COLOR[0], COLOR[1], COLOR[2]);
     gl.uniform1f(uPointScale, Math.max(3, w / 55));
     gl.drawArrays(gl.POINTS, 0, pointCount);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, markerBuf);
+    gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+    gl.uniform3f(uColor, MARKER_COLOR[0], MARKER_COLOR[1], MARKER_COLOR[2]);
+    gl.uniform1f(uPointScale, Math.max(6, w / 26));
+    gl.drawArrays(gl.POINTS, 0, 1);
   }
 
-  var angle = 0;
-  gl.uniform1f(uAngleY, angle);
+  var angleY = 0;
+  var tiltX = TILT;
+  gl.uniform1f(uAngleY, angleY);
   resize();
   draw(); // paint before the first rAF frame so the canvas is never blank
 
@@ -189,12 +216,68 @@
   if (ro) ro.observe(host);
   window.addEventListener("resize", onResize);
 
+  // Drag-to-rotate, matching the reference's own mechanics: horizontal drag
+  // spins it, vertical drag tilts it (clamped so it can't flip past the
+  // poles), release keeps a decaying velocity going before auto-rotate
+  // resumes — same shape as the reference's drag/velocity/lerp system, just
+  // without a separate smoothing lerp on top (nothing here needs it at this
+  // scale). Pointer Events cover touch too, not just mouse, at no extra
+  // cost.
+  var DRAG_SENS = 0.008;
+  var VEL_DECAY = 0.92;
+  var VEL_THRESHOLD = 0.0002;
+  var isDragging = false;
+  var lastX = 0, lastY = 0;
+  var velY = 0, velX = 0;
+
+  function onPointerDown(e) {
+    isDragging = true;
+    velY = 0;
+    velX = 0;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    if (canvas.setPointerCapture) {
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+  }
+  function onPointerMove(e) {
+    if (!isDragging) return;
+    var dx = e.clientX - lastX;
+    var dy = e.clientY - lastY;
+    angleY += dx * DRAG_SENS;
+    tiltX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, tiltX + dy * DRAG_SENS));
+    velY = dx * DRAG_SENS * 0.3;
+    velX = dy * DRAG_SENS * 0.3;
+    lastX = e.clientX;
+    lastY = e.clientY;
+  }
+  function onPointerUp() {
+    isDragging = false;
+  }
+  canvas.addEventListener("pointerdown", onPointerDown);
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("pointerup", onPointerUp);
+  window.addEventListener("pointercancel", onPointerUp);
+
   var raf = 0, lastT = 0;
   function loop(t) {
     var dt = lastT ? (t - lastT) / 1000 : 0;
     lastT = t;
-    angle += SPEED * dt;
-    gl.uniform1f(uAngleY, angle);
+    if (!isDragging) {
+      var hasVelocity = Math.abs(velY) > VEL_THRESHOLD || Math.abs(velX) > VEL_THRESHOLD;
+      if (hasVelocity) {
+        angleY += velY;
+        tiltX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, tiltX + velX));
+        velY *= VEL_DECAY;
+        velX *= VEL_DECAY;
+      } else {
+        velY = 0;
+        velX = 0;
+        angleY += SPEED * dt;
+      }
+    }
+    gl.uniform1f(uAngleY, angleY);
+    gl.uniform1f(uTiltX, tiltX);
     draw();
     raf = requestAnimationFrame(loop);
   }
