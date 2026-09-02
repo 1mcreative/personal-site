@@ -52,7 +52,7 @@
     "  float d = length(c);",
     "  if (d > 0.5) discard;",
     "  float edge = smoothstep(0.5, 0.35, d);",
-    "  float alpha = 0.15 + vDepth * 0.85;",
+    "  float alpha = 0.4 + vDepth * 0.6;",
     "  gl_FragColor = vec4(uColor, edge * alpha);",
     "}",
   ].join("\n");
@@ -137,7 +137,7 @@
   function draw() {
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniform1f(uPointScale, Math.max(2, w / 140));
+    gl.uniform1f(uPointScale, Math.max(3, w / 55));
     gl.drawArrays(gl.POINTS, 0, pointCount);
   }
 
