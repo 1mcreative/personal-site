@@ -119,7 +119,9 @@
   // a finer base grid than a uniform sphere would need, since ~2/3 of
   // candidates fall on ocean and get dropped.
   var positions = [];
-  var LAT_STEP = 5;
+  var LAT_STEP = 3; // matches the land mask's own resolution — denser, so
+                     // smaller landmasses (India's peninsula, for one) hold
+                     // enough dots to actually read as a shape
   for (var lat = -88; lat <= 88; lat += LAT_STEP) {
     var latRad = (lat * Math.PI) / 180;
     var cosLat = Math.cos(latRad);
@@ -191,7 +193,7 @@
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
     gl.uniform3f(uColor, COLOR[0], COLOR[1], COLOR[2]);
-    gl.uniform1f(uPointScale, Math.max(3, w / 55));
+    gl.uniform1f(uPointScale, Math.max(2.5, w / 75));
     gl.drawArrays(gl.POINTS, 0, pointCount);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, markerBuf);

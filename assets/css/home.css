@@ -84,6 +84,11 @@
   aspect-ratio: 1;
   transform: translate(-50%, 50%);
   cursor: grab;
+  /* Without this, a browser can claim a click-drag as its own pan/scroll
+     gesture before pointermove ever reaches globe.js's handler — mobile's
+     coarse touch-drag mostly survives that anyway, but a trackpad or
+     precision-pointer drag on desktop is exactly the case this breaks. */
+  touch-action: none;
 }
 
 .hero-globe:active {
