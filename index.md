@@ -50,4 +50,6 @@ permalink: /
     </svg>
     <span>keep going</span>
   </a>
+
+  <p class="hero-copyright">&copy; {{ 'now' | date: "%Y" }} Bhavesh Nakum</p>
 </section>

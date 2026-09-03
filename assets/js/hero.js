@@ -51,17 +51,61 @@
     }
   }
 
+  // The homepage no longer scrolls at all (.theme-home has overflow:hidden —
+  // see home.css) — there's nothing below the hero to reveal. Instead, any
+  // wheel/touch scroll *gesture* is read as "take me to the resume" and
+  // navigates there directly, letting the sitewide view-transition wipe
+  // (tokens.css) play exactly as it would from a normal link click. This
+  // replaces the deprecated sentinel/IntersectionObserver mechanic below —
+  // same intent (a scroll gesture opens /resume/), but since the page
+  // physically can't scroll anymore there's no sentinel to watch for.
+  // Downward gestures only (deltaY > 0 / swipe-up), so a user idly rocking
+  // a trackpad or trying to scroll back up doesn't get launched into a
+  // navigation. The always-present .scroll-cue link is still the fallback
+  // for reduced-motion, keyboard, and no-JS visitors.
+  if (!reduceMotion) {
+    var navigated = false;
+    var goToResume = function () {
+      if (navigated) return;
+      navigated = true;
+      window.location.href = "/resume/";
+    };
+
+    window.addEventListener(
+      "wheel",
+      function (e) {
+        if (e.deltaY > 4) goToResume();
+      },
+      { passive: true }
+    );
+
+    var touchStartY = null;
+    window.addEventListener(
+      "touchstart",
+      function (e) {
+        touchStartY = e.touches[0].clientY;
+      },
+      { passive: true }
+    );
+    window.addEventListener(
+      "touchmove",
+      function (e) {
+        if (touchStartY === null) return;
+        var dy = touchStartY - e.touches[0].clientY;
+        if (dy > 24) goToResume();
+      },
+      { passive: true }
+    );
+  }
+
   // DEPRECATED (not deleted): auto-navigating to /resume/ once the user
   // scrolled past a sentinel. Explicit feedback: real visitors don't commit
   // to a long deliberate scroll, they either bail after a small scroll
   // attempt or use the "keep going" button — and this mechanic meant the
   // footer (right after the sentinel in home.html) was never reachable,
-  // since navigation fired the moment the sentinel came into view. The
-  // scroll-cue link (a real <a href="/resume/">) is now the only path from
-  // the homepage into /resume/ via scrolling intent — simpler than before,
-  // since it no longer needs to double as "the reduced-motion fallback for
-  // the mechanic below" now that there's only one mechanism for everyone.
-  // Re-enabling: restore .scroll-veil/.scroll-runway/#hero-sentinel in
+  // since navigation fired the moment the sentinel came into view. Superseded
+  // above by a direct wheel/touch listener now that the page can't scroll at
+  // all. Re-enabling: restore .scroll-veil/.scroll-runway/#hero-sentinel in
   // index.md and remove this return.
   return;
 

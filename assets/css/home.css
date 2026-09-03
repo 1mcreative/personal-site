@@ -15,6 +15,12 @@
 
   background: var(--bg);
   color: var(--text);
+  /* No scroll on the homepage at all, per explicit request — the hero fills
+     the viewport exactly and there's nothing below it to scroll to anymore
+     (the footer moved inside .hero as .hero-copyright). A wheel/touch
+     scroll attempt navigates to /resume/ instead (hero.js) — this is what
+     makes that a safe, non-destructive gesture rather than a dead end. */
+  overflow: hidden;
 }
 
 /* The hero needs full viewport width for the background blobs; tokens.css
@@ -619,22 +625,23 @@
   50% { transform: translateY(6px); }
 }
 
-.hero-sentinel {
-  height: 1px;
-}
-
-.theme-home .home-footer {
-  position: relative;
+/* Copyright line — no longer a separate <footer> after the hero (that
+   added document height beyond .hero's own 100dvh, which is exactly the
+   scroll this page isn't supposed to have — see the no-scroll rule on
+   .theme-home below). Lives inside .hero as a small corner mark instead,
+   bottom-left so it doesn't compete with .scroll-cue (center) or
+   .spotlight-text (top-right, desktop). Email address dropped per explicit
+   request — it's still one click away via /resume/'s own contact line,
+   this was purely decorative legal text on the homepage, not a unique
+   contact path. */
+.hero-copyright {
+  position: absolute;
   z-index: 1;
-  background: var(--bg);
+  left: var(--space-3);
+  bottom: var(--space-2);
+  margin: 0;
   color: var(--muted);
-  text-align: center;
-  padding: var(--space-3) var(--space-3) var(--space-4);
-  font-size: 0.85rem;
-}
-
-.theme-home .home-footer a {
-  color: var(--muted);
+  font-size: 0.75rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
