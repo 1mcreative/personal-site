@@ -571,7 +571,14 @@
 /* A real link, not just a hint — the only way into /resume/ that doesn't
    depend on scrolling or motion (hero.js skips the whole scroll mechanic
    under prefers-reduced-motion, so this has to work standing alone). Styled
-   quietly on purpose; it's still a full link underneath. */
+   quietly on purpose; it's still a full link underneath.
+   A soft backdrop pill was added once the bigger globe (see .hero-globe)
+   started reaching high enough to sit directly behind this text on wide
+   viewports — z-index already kept the text on top and clickable, but a
+   dense field of dots right behind it made it genuinely harder to read.
+   The pill is deliberately background-agnostic (a plain blurred white
+   wash, not "globe-colored") so it stays correct if what's behind it ever
+   changes again. */
 .scroll-cue {
   position: absolute;
   bottom: var(--space-3);
@@ -582,6 +589,11 @@
   flex-direction: column;
   align-items: center;
   gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   color: var(--muted);
   font-size: 0.8rem;
   text-decoration: none;
