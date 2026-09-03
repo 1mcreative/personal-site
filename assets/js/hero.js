@@ -68,7 +68,25 @@
     var goToResume = function () {
       if (navigated) return;
       navigated = true;
-      window.location.href = "/resume/";
+      // pixel-name.js's explode is a loading-screen flourish, not a
+      // dependency — if it never formed (still loading, reduced motion,
+      // an error) the function is just never defined, and this falls
+      // straight through to an immediate navigation like before. The
+      // setTimeout is a safety net in case the callback itself never
+      // fires for some reason: the nav must never depend on a single
+      // JS animation completing.
+      if (typeof window.pixelNameExplode === "function") {
+        var finished = false;
+        var finish = function () {
+          if (finished) return;
+          finished = true;
+          window.location.href = "/resume/";
+        };
+        window.pixelNameExplode(finish);
+        setTimeout(finish, 900);
+      } else {
+        window.location.href = "/resume/";
+      }
     };
 
     window.addEventListener(
