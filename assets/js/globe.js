@@ -187,6 +187,27 @@
   var markerScaleMult = 1;
   gl.uniform1f(uCamDist, camDist);
 
+  // Entrance grow-in (window.globeRevealDots below): "globe is in position
+  // but dots are very small at first, then it comes to regular size."
+  // Defaults to 1 (normal) so a caller that never triggers this — reduced
+  // motion, or this script running with no intro splash at all — just
+  // shows the globe at its regular size immediately, same as before this
+  // existed. intro-sequence.js calls the trigger at the exact moment the
+  // splash reveals the globe, so the shrink-then-grow is timed to when a
+  // visitor can actually see it, not to whenever this script happened to
+  // finish loading underneath the (still opaque) splash.
+  var revealScaleMult = 1;
+  var revealing = false;
+  var revealStart = 0;
+  var REVEAL_START_SCALE = 0.05;
+  var REVEAL_MS = 900;
+
+  window.globeRevealDots = function () {
+    revealing = true;
+    revealScaleMult = REVEAL_START_SCALE;
+    revealStart = 0;
+  };
+
   var w = 0, h = 0;
   function resize() {
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -211,13 +232,13 @@
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
     gl.uniform3f(uColor, COLOR[0], COLOR[1], COLOR[2]);
-    gl.uniform1f(uPointScale, Math.max(2, w / 105));
+    gl.uniform1f(uPointScale, Math.max(2, w / 105) * revealScaleMult);
     gl.drawArrays(gl.POINTS, 0, pointCount);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, markerBuf);
     gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
     gl.uniform3f(uColor, MARKER_COLOR[0], MARKER_COLOR[1], MARKER_COLOR[2]);
-    gl.uniform1f(uPointScale, Math.max(6, w / 26) * markerScaleMult);
+    gl.uniform1f(uPointScale, Math.max(6, w / 26) * markerScaleMult * revealScaleMult);
     gl.drawArrays(gl.POINTS, 0, 1);
   }
 
@@ -374,7 +395,20 @@
         var cb = focusCallback;
         focusCallback = null;
         requestAnimationFrame(function () {
-          requestAnimationFrame(cb);
+          requestAnimationFrame(function () {
+            // "Screen should be white instead of yellow at the end — our
+            // next page is white, that's why." Ending on solid amber and
+            // then hard-cutting to a white page reads as a color clash;
+            // fading just the canvas (not the whole .hero-globe, whose own
+            // --globe-zoom transform is still mid-flight) to transparent
+            // reveals .theme-home's own white background underneath,
+            // landing on the same white the next page opens on. Timed
+            // fully inside hero.js's existing safety-net window, not an
+            // extra wait bolted on top of it.
+            canvas.style.transition = "opacity 0.3s ease";
+            canvas.style.opacity = "0";
+            setTimeout(cb, 300);
+          });
         });
       }
       raf = requestAnimationFrame(loop);
@@ -391,6 +425,16 @@
         velY = 0;
         velX = 0;
         angleY += SPEED * dt;
+      }
+    }
+    if (revealing) {
+      if (!revealStart) revealStart = t;
+      var rt = Math.min(1, (t - revealStart) / REVEAL_MS);
+      var re = 1 - Math.pow(1 - rt, 3);
+      revealScaleMult = REVEAL_START_SCALE + (1 - REVEAL_START_SCALE) * re;
+      if (rt >= 1) {
+        revealing = false;
+        revealScaleMult = 1;
       }
     }
     gl.uniform1f(uAngleY, angleY);

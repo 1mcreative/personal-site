@@ -81,7 +81,10 @@
       // globeFocusMarker (script didn't load, reduced motion, an error)
       // just means an immediate navigation, same as before this
       // transition existed — nothing here is load-bearing. Safety-net
-      // timeout leaves margin past the spin+zoom's combined ~1400ms.
+      // timeout leaves margin past the spin+zoom+white-fade's combined
+      // ~1730ms (globe.js fades its canvas to white for ~300ms once the
+      // zoom lands, before calling back, so the page doesn't hard-cut from
+      // amber straight to the next page's own white background).
       var finished = false;
       var finish = function () {
         if (finished) return;
@@ -96,7 +99,7 @@
             globeEl.style.setProperty("--globe-zoom", "9");
           }, 700);
         }
-        setTimeout(finish, 1800);
+        setTimeout(finish, 2200);
       } else {
         finish();
       }

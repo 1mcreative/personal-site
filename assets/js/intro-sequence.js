@@ -35,6 +35,17 @@
     if (typeof window.scrambleIntroStart === "function") {
       window.scrambleIntroStart();
     }
+    // "After name and intro is loaded, globe is in position but dots are
+    // very small at first, then it comes to regular size." The globe has
+    // been rendering underneath the splash the whole time (see the CSS
+    // comment on .intro-splash), so its dots would otherwise just snap to
+    // full size the instant the splash reveals it — this makes that
+    // moment its own small entrance instead. A missing globeRevealDots
+    // (script didn't load, reduced motion, an error) just means the globe
+    // shows at its regular size immediately, same as before this existed.
+    if (typeof window.globeRevealDots === "function") {
+      window.globeRevealDots();
+    }
   }
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
