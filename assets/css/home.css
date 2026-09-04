@@ -318,6 +318,82 @@
   color: transparent;
 }
 
+/* Name Kinetic — a small one-shot "appear" flourish for the word "Bhavesh"
+   (assets/js/name-kinetic.js), adapted from a pasted Originkit "Appear
+   Text" / KineticTextGrid React+Framer-Motion reference: a grid of
+   repeated copies of the word spreads out and zooms in, then all but one
+   fade away, leaving the survivor to settle exactly where the plain text
+   already sits. Added per explicit feedback that the plain text (after
+   pixel-name.js was deprecated) "looks boring" — a scoped reply to that,
+   not a reversal of the same message's "make it simple": this plays once
+   on load, then locks into plain text permanently, same "simple at rest"
+   outcome, just with an entrance. Cut from the reference: the infinite
+   marquee loop (repeat: Infinity, its reset/reveal-again cycle) and the
+   per-word clip-path wipe sweep — replaced with a plain opacity fade,
+   since the wipe's staggered timing needs real machinery to justify itself
+   at full-screen scale that a single inline word doesn't need.
+   Reuses .pixel-name-plain's own span (two classes on one element) rather
+   than a second overlapping "Bhavesh" — both features target the exact
+   same word, so duplicating the DOM node would either show it twice or
+   need one hidden anyway; sharing the element keeps `.pixel-name-plain`
+   independently re-enablable (it's still a valid selector for pixel-name.js
+   if that script's tag is ever uncommented again) while name-kinetic
+   operates through its own class. */
+.name-kinetic-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.name-kinetic-plain.name-kinetic-hidden {
+  color: transparent;
+}
+
+.name-kinetic-grid {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12em;
+  pointer-events: none;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.name-kinetic-grid.name-kinetic-in {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.name-kinetic-row {
+  display: flex;
+  gap: 0.35em;
+  white-space: nowrap;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.name-kinetic-row-top {
+  transform: translateX(0.6em);
+}
+
+.name-kinetic-row-bottom {
+  transform: translateX(-0.6em);
+}
+
+.name-kinetic-grid.name-kinetic-in .name-kinetic-row-top,
+.name-kinetic-grid.name-kinetic-in .name-kinetic-row-bottom {
+  transform: translateX(0);
+}
+
+.name-kinetic-word {
+  display: inline-block;
+  transition: opacity 0.5s ease 0.15s;
+}
+
+.name-kinetic-grid.name-kinetic-in .name-kinetic-word:not(.name-kinetic-survivor) {
+  opacity: 0;
+}
+
 .hero-inner {
   position: relative;
   z-index: 1;

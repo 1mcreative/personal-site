@@ -356,14 +356,27 @@
           // everything here instead — navigation is only a beat away by
           // this point anyway (hero.js), so there's nothing to resume for.
           focusPhase = "held";
-          var cb = focusCallback;
-          focusCallback = null;
-          if (cb) cb();
         }
       }
       gl.uniform1f(uAngleY, angleY);
       gl.uniform1f(uTiltX, tiltX);
       draw();
+      if (focusPhase === "held" && focusCallback) {
+        // Reported as "works in Safari/mobile but Chrome doesn't wait for
+        // the transition" — root cause was calling the callback (which
+        // sets location.href) in the same tick as the draw() call above,
+        // before the browser had actually composited that final frame.
+        // Chrome apparently pre-empts the pending paint for the incoming
+        // navigation more eagerly than Safari does, so the fully-zoomed
+        // frame this whole sequence built up to was sometimes never shown
+        // at all. A double rAF guarantees at least one full paint of the
+        // held frame has happened before anything navigates.
+        var cb = focusCallback;
+        focusCallback = null;
+        requestAnimationFrame(function () {
+          requestAnimationFrame(cb);
+        });
+      }
       raf = requestAnimationFrame(loop);
       return;
     }
