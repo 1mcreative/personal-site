@@ -10,18 +10,29 @@
 // scroll-into-view replay. The hover effects specifically are a deliberate
 // cut, not a scope-trim — this is body text meant to be read, and
 // re-scrambling words every time the cursor passes over them while reading
-// would be a real usability regression, not a flourish. The page also has
-// nothing to scroll into view on (this plays once on load, same as every
-// other one-shot effect on this page).
+// would be a real usability regression, not a flourish.
 //
 // No separate glitch color either, matching the reference's own default
 // (glitchColor === color there too) — the moving letters themselves are
 // the whole effect.
+//
+// Sequencing: this used to start itself on document.fonts.ready. Per an
+// explicit request to sequence the whole homepage intro — the name alone
+// first, full-screen, then everything else together — this now waits for
+// intro-sequence.js to call window.scrambleIntroStart() once its splash
+// fades away, so the scramble visibly plays as part of "phase 2" instead
+// of having already finished underneath the splash. A generous fallback
+// timer still fires on its own regardless, guarded so it's a no-op if the
+// real trigger already ran: this effect must never depend on another
+// script actually calling it, the same "never load-bearing" rule every
+// cross-script handoff on this page already follows.
 (function () {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   var el = document.querySelector(".hero-sub-text");
   if (!el) return;
+
+  var started = false;
 
   var GLITCH_UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   var GLITCH_LOWER = "abcdefghijklmnopqrstuvwxyz";
@@ -35,6 +46,9 @@
   }
 
   function start() {
+    if (started) return;
+    started = true;
+
     var text = el.textContent;
     // Clear and rebuild synchronously — no paint happens between these
     // statements, so there's no flash of empty text.
@@ -84,9 +98,20 @@
     requestAnimationFrame(tick);
   }
 
+  window.scrambleIntroStart = start;
+
+  // Fallback: if intro-sequence.js's splash never got here (missing
+  // markup, a script error, or it's simply not loaded) this still runs on
+  // its own a couple seconds in — comfortably past the splash's own
+  // ~1.6s sequence in the normal case, so the fallback never fires
+  // alongside a real trigger; `started` makes double-firing harmless
+  // either way.
+  var FALLBACK_MS = 2600;
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(start, start);
+    document.fonts.ready.then(function () {
+      setTimeout(start, FALLBACK_MS);
+    });
   } else {
-    start();
+    setTimeout(start, FALLBACK_MS);
   }
 })();

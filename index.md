@@ -6,6 +6,8 @@ permalink: /
 ---
 
 <section class="hero">
+  <div class="intro-splash" aria-hidden="true"></div>
+
   <div class="hero-globe" aria-hidden="true">
     <canvas class="hero-globe-canvas"></canvas>
   </div>
@@ -28,7 +30,7 @@ permalink: /
   <canvas class="pixel-name-canvas" aria-hidden="true"></canvas>
 
   <div class="hero-inner">
-    <h1>Hi, I'm <span class="name-kinetic-wrap"><span class="pixel-name-plain name-kinetic-plain">Bhavesh</span></span>.</h1>
+    <h1>Hi, I'm <span class="name-kinetic-wrap"><span class="pixel-name-plain name-kinetic-plain dynamic-weight">Bhavesh</span></span>.</h1>
     <p class="hero-sub"><span class="hero-sub-text">I write backend systems for a living, and I'm a lot less organized about everything else. Poke around &mdash; there's more here than it looks.</span></p>
   </div>
 

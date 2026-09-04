@@ -10,8 +10,15 @@
     {{ content }}
   </main>
   <script src="{{ '/assets/js/hero.js' | relative_url }}" defer></script>
-  <script src="{{ '/assets/js/name-kinetic.js' | relative_url }}" defer></script>
   <script src="{{ '/assets/js/scramble-intro.js' | relative_url }}" defer></script>
+  <script src="{{ '/assets/js/intro-sequence.js' | relative_url }}" defer></script>
+  <!-- name-kinetic.js: deprecated per explicit request to sequence the
+       intro ("i want Appear Text effect first in whole screen") —
+       superseded by .intro-splash (home.css) + intro-sequence.js, which
+       run the same grid mechanic full-screen instead of inline in the h1.
+       File and markup (.name-kinetic-wrap in index.md) left intact;
+       re-enabling is just uncommenting this tag. -->
+  <!-- <script src="{{ '/assets/js/name-kinetic.js' | relative_url }}" defer></script> -->
   <!-- pixel-name.js: deprecated per explicit request ("remove/hide
        transetion on my name lets make it simple") — "Bhavesh" is plain
        text again, since .pixel-name-plain was always the real text

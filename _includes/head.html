@@ -12,7 +12,12 @@
 <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/sitemap.xml' | absolute_url }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet">
+<!-- Fraunces upright range widened to 400..900 (was two static weights,
+     500/600) for .dynamic-weight's hover-to-bold transition on the
+     homepage name — Fraunces is a variable font, so this is genuine
+     weight interpolation on the one loaded file, not synthetic bolding,
+     and the wider range still covers the 500/600 used everywhere else. -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ '/assets/css/tokens.css' | relative_url }}">
 <link rel="stylesheet" href="{{ '/assets/css/' | append: page.layout | append: '.css' | relative_url }}">
 {% if page.extra-css %}<link rel="stylesheet" href="{{ page.extra-css | relative_url }}">{% endif %}

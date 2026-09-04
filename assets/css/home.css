@@ -41,6 +41,89 @@
   padding: var(--space-4) var(--space-3);
 }
 
+/* Intro Sequence — full-screen "Bhavesh" splash (assets/js/intro-sequence.js),
+   playing before the rest of the homepage is revealed. Per explicit
+   sequencing request: the name appears alone, full-screen, first; once it
+   settles the splash fades away and everything else — the globe, glitter,
+   the subhead's own Scramble Text reveal — is revealed together. Those
+   other pieces aren't actually delayed or coordinated in any way: they've
+   been running/rendering underneath this opaque overlay the entire time,
+   so "reveal together" is just this overlay's own opacity transition, not
+   a scheduling change to any other script. Supersedes .name-kinetic-*
+   (deprecated below) — same grid-spread-then-survivor mechanic, just
+   full-screen instead of inline inside the h1.
+   display:none by default — reduced motion / no JS / a script error all
+   leave this never shown at all, so the real page (already fully
+   rendered underneath, since none of that markup depends on this splash)
+   is what those visitors see immediately. JS only ever adds
+   .intro-splash-active once it can actually run the sequence, same
+   progressive-enhancement shape as every other effect on this page. */
+.intro-splash {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: var(--bg);
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease;
+}
+
+.intro-splash.intro-splash-active {
+  display: flex;
+}
+
+.intro-splash.intro-splash-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-splash-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.5rem, 11vw, 6.5rem);
+  color: var(--text);
+  transform: scale(1.18);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.intro-splash-grid.intro-splash-in {
+  transform: scale(1);
+}
+
+.intro-splash-row {
+  display: flex;
+  gap: 0.35em;
+  white-space: nowrap;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.intro-splash-row-top {
+  transform: translateX(0.6em);
+}
+
+.intro-splash-row-bottom {
+  transform: translateX(-0.6em);
+}
+
+.intro-splash-grid.intro-splash-in .intro-splash-row-top,
+.intro-splash-grid.intro-splash-in .intro-splash-row-bottom {
+  transform: translateX(0);
+}
+
+.intro-splash-word {
+  display: inline-block;
+  transition: opacity 0.5s ease 0.15s;
+}
+
+.intro-splash-grid.intro-splash-in .intro-splash-word:not(.intro-splash-survivor) {
+  opacity: 0;
+}
+
 /* DEPRECATED (not deleted): .hero-glow (Beyond Horizon's WebGL canvas),
    superseded by .hero-globe below per explicit request ("instade of
    horaizon add this glob animation"). Markup removed from index.md; CSS and
@@ -318,27 +401,90 @@
   color: transparent;
 }
 
-/* Name Kinetic — a small one-shot "appear" flourish for the word "Bhavesh"
-   (assets/js/name-kinetic.js), adapted from a pasted Originkit "Appear
-   Text" / KineticTextGrid React+Framer-Motion reference: a grid of
-   repeated copies of the word spreads out and zooms in, then all but one
-   fade away, leaving the survivor to settle exactly where the plain text
-   already sits. Added per explicit feedback that the plain text (after
-   pixel-name.js was deprecated) "looks boring" — a scoped reply to that,
-   not a reversal of the same message's "make it simple": this plays once
-   on load, then locks into plain text permanently, same "simple at rest"
-   outcome, just with an entrance. Cut from the reference: the infinite
-   marquee loop (repeat: Infinity, its reset/reveal-again cycle) and the
-   per-word clip-path wipe sweep — replaced with a plain opacity fade,
-   since the wipe's staggered timing needs real machinery to justify itself
-   at full-screen scale that a single inline word doesn't need.
-   Reuses .pixel-name-plain's own span (two classes on one element) rather
-   than a second overlapping "Bhavesh" — both features target the exact
-   same word, so duplicating the DOM node would either show it twice or
-   need one hidden anyway; sharing the element keeps `.pixel-name-plain`
-   independently re-enablable (it's still a valid selector for pixel-name.js
-   if that script's tag is ever uncommented again) while name-kinetic
-   operates through its own class. */
+/* DEPRECATED — Name Kinetic, a small inline one-shot "appear" flourish for
+   the word "Bhavesh" (assets/js/name-kinetic.js), adapted from a pasted
+   Originkit "Appear Text" / KineticTextGrid React+Framer-Motion reference.
+   Superseded by .intro-splash above per explicit request to sequence the
+   intro — the same grid-spread-then-survivor mechanic now plays full-
+   screen, alone, before the rest of the page, rather than inline inside
+   the h1 while everything else is already visible. Script tag commented
+   out in home.html; CSS and markup (`.name-kinetic-wrap` in index.md) left
+   intact — re-enabling is one uncommented script tag, and the two effects
+   don't conflict since `.intro-splash` covers the whole screen regardless
+   of what the (now-inert) inline version would have done underneath it. */
+.name-kinetic-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.name-kinetic-plain.name-kinetic-hidden {
+  color: transparent;
+}
+
+.name-kinetic-grid {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12em;
+  pointer-events: none;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.name-kinetic-grid.name-kinetic-in {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.name-kinetic-row {
+  display: flex;
+  gap: 0.35em;
+  white-space: nowrap;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.name-kinetic-row-top {
+  transform: translateX(0.6em);
+}
+
+.name-kinetic-row-bottom {
+  transform: translateX(-0.6em);
+}
+
+.name-kinetic-grid.name-kinetic-in .name-kinetic-row-top,
+.name-kinetic-grid.name-kinetic-in .name-kinetic-row-bottom {
+  transform: translateX(0);
+}
+
+.name-kinetic-word {
+  display: inline-block;
+  transition: opacity 0.5s ease 0.15s;
+}
+
+.name-kinetic-grid.name-kinetic-in .name-kinetic-word:not(.name-kinetic-survivor) {
+  opacity: 0;
+}
+
+/* Dynamic Weight — "after everything, hovering the name gets it bold,
+   that's it." A plain CSS :hover on the same shared "Bhavesh" span
+   (.pixel-name-plain/.name-kinetic-plain), genuinely interpolated rather
+   than synthetically faked: Fraunces is a variable font and its loaded
+   weight range was widened to 400..900 (see head.html) specifically so
+   this transition has real in-between weights to animate through, not
+   just a jump between two static cuts. No JS, no hover-capability
+   gating — it's a harmless enhancement on non-hover devices (a tap either
+   does nothing or transiently applies :hover, both fine), so there's
+   nothing here that needs feature-detecting the way cursor-tracking
+   effects elsewhere on this page do. */
+.dynamic-weight {
+  transition: font-weight 0.3s ease;
+}
+
+.dynamic-weight:hover {
+  font-weight: 900;
+}
 .name-kinetic-wrap {
   position: relative;
   display: inline-block;
