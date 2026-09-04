@@ -1,0 +1,383 @@
+/* Component Lab — a plug-and-play catalog of every visual element this site
+   has ever shipped (current, deprecated, and the original "stock" reference
+   components some were adapted from), for other developers to borrow.
+   Live demos on this page load the site's own real home.css/professional.css
+   directly (see _layouts/lab.html) rather than reimplementing each effect a
+   second time — so `.theme-lab` needs the same --bg/--text/--muted/--accent
+   custom properties `.theme-home` defines, or every `var(--bg)` etc.
+   reference throughout those files would resolve to nothing. Matches the
+   Grind (light) palette, since that's what most of these effects were
+   actually designed against. */
+.theme-lab {
+  --bg: #ffffff;
+  --text: #14171c;
+  --muted: #5b6572;
+  --accent: #1d4ed8;
+  --surface: #f5f6f8;
+  --border: #e3e6ea;
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+.theme-lab a {
+  color: var(--accent);
+}
+
+.lab-header {
+  border-bottom: 1px solid var(--border);
+}
+
+.lab-header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+}
+
+.lab-header nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.lab-header nav a {
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.lab-header nav a:hover {
+  color: var(--text);
+}
+
+.lab-header-current {
+  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.theme-lab main#main {
+  max-width: 1100px;
+  padding-left: var(--space-3);
+  padding-right: var(--space-3);
+}
+
+.lab-intro {
+  padding-top: var(--space-3);
+  max-width: 68ch;
+}
+
+.lab-intro h1 {
+  font-size: clamp(1.9rem, 4vw, 2.5rem);
+  margin-bottom: 0.4rem;
+}
+
+.lab-intro p {
+  color: var(--muted);
+}
+
+.lab-intro code {
+  background: var(--surface);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  font-size: 0.92em;
+}
+
+.lab-section {
+  margin-top: var(--space-5);
+}
+
+.lab-section-head {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+  margin-bottom: var(--space-3);
+}
+
+.lab-section-head h2 {
+  font-size: 1.3rem;
+  margin: 0 0 0.25rem;
+}
+
+.lab-section-head p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.lab-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+
+@media (min-width: 760px) {
+  .lab-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.lab-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.lab-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: var(--space-2) var(--space-2) 0;
+}
+
+.lab-card-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-family: var(--font-display);
+}
+
+.lab-badge {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.lab-badge-live {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.lab-badge-deprecated {
+  background: #f1f2f4;
+  color: #5b6572;
+}
+
+.lab-badge-reference {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.lab-card-desc {
+  padding: 0.35rem var(--space-2) 0;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  max-width: none;
+}
+
+.lab-demo {
+  margin: var(--space-2);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(45deg, #fafafa 25%, transparent 25%) 0 0 / 16px 16px,
+    linear-gradient(-45deg, #fafafa 25%, transparent 25%) 0 0 / 16px 16px,
+    linear-gradient(45deg, transparent 75%, #fafafa 75%) 0 0 / 16px 16px,
+    linear-gradient(-45deg, transparent 75%, #fafafa 75%) 0 0 / 16px 16px,
+    #ffffff;
+  position: relative;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.lab-demo-tall {
+  min-height: 340px;
+}
+
+.lab-demo-dark {
+  background: #0f1419;
+}
+
+/* Demos that are full-viewport-fixed on the real site (the intro splash,
+   the "keep going" pill, page-corner/portal-orb) need their positioning
+   context contained to just this box instead of the real page — .lab-demo
+   is the containing block for any `position: fixed` *descendant that also
+   sets a transform*, but plain `position: fixed` still escapes to the
+   viewport regardless. Cards demoing those effects opt into
+   `.lab-demo-contain` (`contain: layout`) which turns this box itself into
+   a fixed-position containing block per spec, so "fixed" elements inside
+   stay confined to the card instead of covering the real page. */
+.lab-demo-contain {
+  contain: layout;
+}
+
+.lab-demo-controls {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 50;
+}
+
+.lab-btn {
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.lab-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lab-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0 var(--space-2) var(--space-2);
+  margin-top: auto;
+}
+
+.lab-copy-btn {
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.lab-copy-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lab-copy-btn-done {
+  border-color: #166534 !important;
+  color: #166534 !important;
+}
+
+/* Stock (original pasted reference) vs Ours (the adapted, shipped version) */
+.lab-tabs-nav {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0 var(--space-2);
+}
+
+.lab-tab-btn {
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px 999px 0 0;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.lab-tab-btn-active {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.lab-tab-panel[hidden] {
+  display: none;
+}
+
+.lab-code-note {
+  margin: 0.5rem var(--space-2) 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.lab-code-details {
+  margin: 0 var(--space-2) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.lab-code-details summary {
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface);
+  list-style: none;
+}
+
+.lab-code-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.lab-code-details summary::before {
+  content: "▸ ";
+}
+
+.lab-code-details[open] summary::before {
+  content: "▾ ";
+}
+
+.lab-code {
+  margin: 0;
+  padding: 0.9rem;
+  max-height: 360px;
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  background: #12161c;
+  color: #d6dde5;
+  white-space: pre;
+}
+
+.lab-foundation-swatch {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.lab-swatch {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.lab-foundation-label {
+  font-size: 0.85rem;
+}
+
+.lab-foundation-label code {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-copy-btn,
+  .lab-btn {
+    transition: none;
+  }
+}

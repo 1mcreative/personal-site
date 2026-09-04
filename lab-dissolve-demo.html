@@ -1,0 +1,39 @@
+---
+permalink: /lab-dissolve-demo.html
+sitemap: false
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Standalone iframe target for the Component Lab's Dissolve demo.
+     dissolve.js toggles a .dissolving class on <html> itself (the whole
+     document fades to black), which can't be scoped to a sub-tree with
+     CSS — isolating it in its own document/iframe is the only way to
+     demo it without the effect hijacking the real lab page's background. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ '/assets/css/tokens.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/home.css' | relative_url }}">
+<style>
+  html, body { margin: 0; height: 100%; }
+  .hero { min-height: 100%; padding: 1.5rem; }
+  .page-corner { display: block !important; }
+</style>
+</head>
+<body class="theme-home">
+<section class="hero">
+  <div class="hero-inner" style="position:static;">
+    <h1 style="font-size:1.8rem;">Click the corner to dissolve</h1>
+    <p class="hero-sub" style="max-width:none;">Real content elements get sampled into particles individually — this heading, this line, and the corner itself.</p>
+  </div>
+  <a class="page-corner" href="#done" aria-label="Dissolve demo">
+    <span class="page-corner-back" aria-hidden="true"></span>
+    <span class="page-corner-front" aria-hidden="true"></span>
+  </a>
+</section>
+<script src="{{ '/assets/js/dissolve.js' | relative_url }}" defer></script>
+</body>
+</html>

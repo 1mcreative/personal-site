@@ -1,0 +1,33 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% include head.html %}
+<!-- Live demos on this page reuse the site's own real component CSS
+     directly (not reimplementations) so nothing here can silently drift
+     from what actually ships — home.css/professional.css supply the
+     classes every demo card's markup uses (globe, glitter, buttons, hint
+     effects, etc). tokens.css (shared components + view-transition) is
+     already loaded by head.html for every page. -->
+<link rel="stylesheet" href="{{ '/assets/css/home.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/professional.css' | relative_url }}">
+</head>
+<body class="theme-lab">
+  <header class="lab-header">
+    <div class="lab-header-inner">
+      <a class="brand" href="/">Bhavesh Nakum</a>
+      <nav aria-label="Lab">
+        <a href="/resume/">The Grind</a>
+        <a href="/life/">The Chaos</a>
+        <span class="lab-header-current">Component Lab</span>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    {{ content }}
+  </main>
+  {% include footer.html %}
+  <script src="{{ '/assets/js/lab.js' | relative_url }}" defer></script>
+</body>
+</html>

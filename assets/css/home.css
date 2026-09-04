@@ -508,60 +508,6 @@
 .dynamic-weight:hover {
   font-weight: 900;
 }
-.name-kinetic-wrap {
-  position: relative;
-  display: inline-block;
-}
-
-.name-kinetic-plain.name-kinetic-hidden {
-  color: transparent;
-}
-
-.name-kinetic-grid {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) scale(1.18);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.12em;
-  pointer-events: none;
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.name-kinetic-grid.name-kinetic-in {
-  transform: translate(-50%, -50%) scale(1);
-}
-
-.name-kinetic-row {
-  display: flex;
-  gap: 0.35em;
-  white-space: nowrap;
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.name-kinetic-row-top {
-  transform: translateX(0.6em);
-}
-
-.name-kinetic-row-bottom {
-  transform: translateX(-0.6em);
-}
-
-.name-kinetic-grid.name-kinetic-in .name-kinetic-row-top,
-.name-kinetic-grid.name-kinetic-in .name-kinetic-row-bottom {
-  transform: translateX(0);
-}
-
-.name-kinetic-word {
-  display: inline-block;
-  transition: opacity 0.5s ease 0.15s;
-}
-
-.name-kinetic-grid.name-kinetic-in .name-kinetic-word:not(.name-kinetic-survivor) {
-  opacity: 0;
-}
 
 .hero-inner {
   position: relative;
