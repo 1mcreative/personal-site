@@ -68,6 +68,22 @@
     var goToResume = function () {
       if (navigated) return;
       navigated = true;
+      // "Zoom into globe and than change to resume page" — a quick,
+      // dramatic scale-up (see .hero-globe's --globe-zoom transition in
+      // home.css) reading as diving into the sphere right as the page
+      // changes. No opacity fade: .hero's own overflow:hidden clips the
+      // blown-up sphere to the viewport, so growing it fills the screen
+      // with dots rushing past rather than just vanishing — the actual
+      // page navigation is the hard cut, same as the rest of this site's
+      // transitions never needed a fade-to-black first. Purely CSS-driven
+      // and fire-and-forget: it doesn't gate navigation the way
+      // pixel-name's explode does below, since a missing .hero-globe
+      // (e.g. reduced motion never rendered one) is just a no-op, not a
+      // broken transition.
+      var globe = document.querySelector(".hero-globe");
+      if (globe) {
+        globe.style.setProperty("--globe-zoom", "9");
+      }
       // pixel-name.js's explode is a loading-screen flourish, not a
       // dependency — if it never formed (still loading, reduced motion,
       // an error) the function is just never defined, and this falls

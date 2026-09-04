@@ -88,13 +88,22 @@
   bottom: 0;
   width: min(58vw, 560px);
   aspect-ratio: 1;
-  transform: translate(-50%, 50%);
+  transform: translate(-50%, 50%) scale(var(--globe-zoom, 1));
   cursor: grab;
   /* Without this, a browser can claim a click-drag as its own pan/scroll
      gesture before pointermove ever reaches globe.js's handler — mobile's
      coarse touch-drag mostly survives that anyway, but a trackpad or
      precision-pointer drag on desktop is exactly the case this breaks. */
   touch-action: none;
+  /* --globe-zoom is 1 at rest (drag/auto-rotate are both handled inside
+     globe.js's own WebGL uniforms, not this transform, so this transition
+     never fights them). hero.js bumps it way up right before navigating to
+     /resume/ on the scroll-gesture, per explicit request ("zoom into
+     globe and than change to resume page") — .hero's own overflow:hidden
+     clips the blown-up sphere to the viewport, so it reads as diving into
+     the sphere (dots rushing past, filling the screen) rather than just
+     growing off past the edges, right before the page navigates. */
+  transition: transform 0.8s cubic-bezier(0.55, 0, 1, 0.45);
 }
 
 .hero-globe:active {
@@ -113,7 +122,7 @@
   .hero-globe {
     width: min(80vw, 360px);
     bottom: 6%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) scale(var(--globe-zoom, 1));
   }
 }
 
@@ -321,14 +330,27 @@
    same max-width:640px breakpoint the globe's own mobile sizing uses.
    Same treatment as .scroll-cue's pill: a plain blurred white wash rather
    than a globe-matched color, so it stays correct if the background effect
-   changes again. */
+   changes again.
+   Backdropped per text block (h1, then the subhead paragraph), not one
+   shared box around .hero-inner as a whole — a single enclosing box added
+   its own padding/border-radius/margin-bottom gap on top of the text,
+   covering noticeably more of the globe underneath than the text itself
+   needed. Two small inline-block pills hug their own content instead, per
+   explicit feedback ("it should only block where text is writtten not
+   more than that"). */
 @media (max-width: 640px) {
-  .hero-inner {
+  .hero-inner h1,
+  .hero-inner .hero-sub {
+    display: inline-block;
     background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border-radius: 24px;
-    padding: var(--space-3) var(--space-3);
+    border-radius: 12px;
+    padding: 0.1em 0.5em;
+  }
+
+  .hero-inner .hero-sub {
+    margin-top: 0.5rem;
   }
 }
 
