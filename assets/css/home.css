@@ -95,15 +95,17 @@
      coarse touch-drag mostly survives that anyway, but a trackpad or
      precision-pointer drag on desktop is exactly the case this breaks. */
   touch-action: none;
-  /* --globe-zoom is 1 at rest (drag/auto-rotate are both handled inside
-     globe.js's own WebGL uniforms, not this transform, so this transition
-     never fights them). hero.js bumps it way up right before navigating to
-     /resume/ on the scroll-gesture, per explicit request ("zoom into
-     globe and than change to resume page") — .hero's own overflow:hidden
-     clips the blown-up sphere to the viewport, so it reads as diving into
-     the sphere (dots rushing past, filling the screen) rather than just
-     growing off past the edges, right before the page navigates. */
-  transition: transform 0.8s cubic-bezier(0.55, 0, 1, 0.45);
+  /* --globe-zoom is 1 at rest. A WebGL canvas can only ever render within
+     its own drawing buffer (sized to this element's own box, e.g. up to
+     560px square) — so globe.js growing the marker's gl_PointSize alone
+     can make the amber dot dominate that small box, but can't make it
+     cover an actual 1280px+ viewport on its own. This CSS scale is what
+     actually balloons the whole element up to fill the screen; hero.js
+     sets it right as globe.js's own spin-then-zoom sequence reaches its
+     zoom phase, so the two effects land together — the sphere is already
+     facing the marker and its dot is already growing internally by the
+     time the container itself starts visibly expanding. */
+  transition: transform 0.7s cubic-bezier(0.55, 0, 1, 0.45);
 }
 
 .hero-globe:active {

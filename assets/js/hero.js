@@ -68,40 +68,37 @@
     var goToResume = function () {
       if (navigated) return;
       navigated = true;
-      // "Zoom into globe and than change to resume page" — a quick,
-      // dramatic scale-up (see .hero-globe's --globe-zoom transition in
-      // home.css) reading as diving into the sphere right as the page
-      // changes. No opacity fade: .hero's own overflow:hidden clips the
-      // blown-up sphere to the viewport, so growing it fills the screen
-      // with dots rushing past rather than just vanishing — the actual
-      // page navigation is the hard cut, same as the rest of this site's
-      // transitions never needed a fade-to-black first. Purely CSS-driven
-      // and fire-and-forget: it doesn't gate navigation the way
-      // pixel-name's explode does below, since a missing .hero-globe
-      // (e.g. reduced motion never rendered one) is just a no-op, not a
-      // broken transition.
-      var globe = document.querySelector(".hero-globe");
-      if (globe) {
-        globe.style.setProperty("--globe-zoom", "9");
-      }
-      // pixel-name.js's explode is a loading-screen flourish, not a
-      // dependency — if it never formed (still loading, reduced motion,
-      // an error) the function is just never defined, and this falls
-      // straight through to an immediate navigation like before. The
-      // setTimeout is a safety net in case the callback itself never
-      // fires for some reason: the nav must never depend on a single
-      // JS animation completing.
-      if (typeof window.pixelNameExplode === "function") {
-        var finished = false;
-        var finish = function () {
-          if (finished) return;
-          finished = true;
-          window.location.href = "/resume/";
-        };
-        window.pixelNameExplode(finish);
-        setTimeout(finish, 900);
-      } else {
+      // "Zoom to happen to the yellow dot — if it's on the back side the
+      // globe should spin and bring it to the front, then fill the screen
+      // with that color before the next page." globe.js's
+      // globeFocusMarker() does the WebGL half (rotate to the marker, then
+      // grow its own point sprite) and calls back once that finishes; this
+      // also bumps --globe-zoom (home.css) ~700ms in, once the spin is
+      // done and the marker's own zoom is under way, so the whole element
+      // balloons up to actually cover the viewport at the same moment —
+      // a WebGL canvas can only render within its own small box otherwise,
+      // no matter how large a single point's gl_PointSize gets. A missing
+      // globeFocusMarker (script didn't load, reduced motion, an error)
+      // just means an immediate navigation, same as before this
+      // transition existed — nothing here is load-bearing. Safety-net
+      // timeout leaves margin past the spin+zoom's combined ~1400ms.
+      var finished = false;
+      var finish = function () {
+        if (finished) return;
+        finished = true;
         window.location.href = "/resume/";
+      };
+      if (typeof window.globeFocusMarker === "function") {
+        window.globeFocusMarker(finish);
+        var globeEl = document.querySelector(".hero-globe");
+        if (globeEl) {
+          setTimeout(function () {
+            globeEl.style.setProperty("--globe-zoom", "9");
+          }, 700);
+        }
+        setTimeout(finish, 1800);
+      } else {
+        finish();
       }
     };
 

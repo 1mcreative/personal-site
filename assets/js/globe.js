@@ -32,15 +32,15 @@
     "uniform float uAngleY;",
     "uniform float uTiltX;",
     "uniform float uPointScale;",
+    "uniform float uCamDist;",
     "varying float vDepth;",
     "void main() {",
     "  float ct = cos(uTiltX), st = sin(uTiltX);",
     "  vec3 p = vec3(aPos.x, aPos.y * ct - aPos.z * st, aPos.y * st + aPos.z * ct);",
     "  float cy = cos(uAngleY), sy = sin(uAngleY);",
     "  vec3 r = vec3(p.x * cy + p.z * sy, p.y, -p.x * sy + p.z * cy);",
-    "  float camDist = 3.0;",
     "  float focal = 2.4;",
-    "  float z = r.z + camDist;",
+    "  float z = r.z + uCamDist;",
     "  float persp = focal / z;",
     "  gl_Position = vec4(r.x * persp, r.y * persp, 0.0, 1.0);",
     "  vDepth = clamp((r.z + 1.0) / 2.0, 0.0, 1.0);",
@@ -171,10 +171,21 @@
   var uTiltX = gl.getUniformLocation(prog, "uTiltX");
   var uPointScale = gl.getUniformLocation(prog, "uPointScale");
   var uColor = gl.getUniformLocation(prog, "uColor");
+  var uCamDist = gl.getUniformLocation(prog, "uCamDist");
 
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   gl.uniform1f(uTiltX, TILT);
+
+  // Zoom-to-marker exit transition (window.globeFocusMarker below): camDist
+  // and the marker's own point-size multiplier are both mutable so the
+  // "zoom" phase can shrink the camera distance toward the sphere while
+  // blowing the marker dot up until it fills the frame — see the "focus"
+  // block inside loop() further down.
+  var CAM_DIST_BASE = 3.0;
+  var camDist = CAM_DIST_BASE;
+  var markerScaleMult = 1;
+  gl.uniform1f(uCamDist, camDist);
 
   var w = 0, h = 0;
   function resize() {
@@ -195,6 +206,7 @@
   function draw() {
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform1f(uCamDist, camDist);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
@@ -205,7 +217,7 @@
     gl.bindBuffer(gl.ARRAY_BUFFER, markerBuf);
     gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
     gl.uniform3f(uColor, MARKER_COLOR[0], MARKER_COLOR[1], MARKER_COLOR[2]);
-    gl.uniform1f(uPointScale, Math.max(6, w / 26));
+    gl.uniform1f(uPointScale, Math.max(6, w / 26) * markerScaleMult);
     gl.drawArrays(gl.POINTS, 0, 1);
   }
 
@@ -267,10 +279,94 @@
   window.addEventListener("pointerup", onPointerUp);
   window.addEventListener("pointercancel", onPointerUp);
 
+  // Zoom-to-marker exit transition: "zoom to happen to yellow dot, if it's
+  // on the back side the globe should spin and bring it to the front, then
+  // fill the screen with that color before the next page." Two phases —
+  // "spin" rotates uAngleY (tiltX left alone) until the marker sits at
+  // screen-center facing the camera, "zoom" then shrinks camDist while
+  // blowing markerScaleMult up until the marker's own point sprite is
+  // bigger than the viewport, reading as the screen filling with amber.
+  // Runs entirely inside the existing loop() below rather than a second
+  // rAF chain, so it shares draw() and never fights the auto-rotate/drag
+  // state (both are simply skipped for as long as focusPhase is set).
+  var focusPhase = null; // null | "spin" | "zoom"
+  var focusStart = 0;
+  var focusFromAngle = 0;
+  var focusTargetAngle = 0;
+  var focusCallback = null;
+  var SPIN_MS = 700;
+  var ZOOM_MS = 700;
+
+  // Undo the vertex shader's tilt+spin for the marker's fixed sphere
+  // position to find the uAngleY that puts it at screen-center (x=0,
+  // z maximized): tilt only mixes y/z, so p.x stays markerPos[0], and the
+  // remaining (p.x, p.z) is a 2D vector that uAngleY then rotates — solving
+  // r.x=0 for that rotation gives targetAngle = -atan2(p.x, p.z).
+  function angleToFrontMarker() {
+    var ct = Math.cos(tiltX), st = Math.sin(tiltX);
+    var px = markerPos[0];
+    var pz = markerPos[1] * st + markerPos[2] * ct;
+    var theta = Math.atan2(px, pz);
+    var base = -theta;
+    var twoPi = Math.PI * 2;
+    // Nearest equivalent angle to the current one, so the spin takes the
+    // short way round instead of potentially unwinding almost a full turn.
+    return base + Math.round((angleY - base) / twoPi) * twoPi;
+  }
+
+  window.globeFocusMarker = function (callback) {
+    isDragging = false;
+    velY = 0;
+    velX = 0;
+    focusFromAngle = angleY;
+    focusTargetAngle = angleToFrontMarker();
+    focusCallback = callback || null;
+    focusPhase = "spin";
+    focusStart = 0;
+  };
+
   var raf = 0, lastT = 0;
   function loop(t) {
     var dt = lastT ? (t - lastT) / 1000 : 0;
     lastT = t;
+    if (focusPhase) {
+      if (!focusStart) focusStart = t;
+      if (focusPhase === "spin") {
+        var st = Math.min(1, (t - focusStart) / SPIN_MS);
+        var se = 1 - Math.pow(1 - st, 3);
+        angleY = focusFromAngle + (focusTargetAngle - focusFromAngle) * se;
+        if (st >= 1) {
+          focusPhase = "zoom";
+          focusStart = t;
+        }
+      } else if (focusPhase === "zoom") {
+        var zt = Math.min(1, (t - focusStart) / ZOOM_MS);
+        var ze = zt * zt;
+        camDist = CAM_DIST_BASE * (1 - ze) + 0.05 * ze;
+        markerScaleMult = 1 + ze * 60;
+        if (zt >= 1) {
+          // "held": camDist is now razor-thin, so even the tiny angleY
+          // nudge from resuming auto-rotate would sweep the marker's
+          // front-facing sliver away within a frame or two and the huge
+          // amber fill would vanish just as fast as it appeared (caught
+          // by instrumenting angleY/camDist/markerScaleMult directly —
+          // a screenshot a moment later showed plain small dots again,
+          // even though camDist/markerScaleMult were still at their
+          // zoomed values, because angleY had quietly moved on). Freeze
+          // everything here instead — navigation is only a beat away by
+          // this point anyway (hero.js), so there's nothing to resume for.
+          focusPhase = "held";
+          var cb = focusCallback;
+          focusCallback = null;
+          if (cb) cb();
+        }
+      }
+      gl.uniform1f(uAngleY, angleY);
+      gl.uniform1f(uTiltX, tiltX);
+      draw();
+      raf = requestAnimationFrame(loop);
+      return;
+    }
     if (!isDragging) {
       var hasVelocity = Math.abs(velY) > VEL_THRESHOLD || Math.abs(velX) > VEL_THRESHOLD;
       if (hasVelocity) {

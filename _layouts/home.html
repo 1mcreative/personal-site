@@ -10,7 +10,13 @@
     {{ content }}
   </main>
   <script src="{{ '/assets/js/hero.js' | relative_url }}" defer></script>
-  <script src="{{ '/assets/js/pixel-name.js' | relative_url }}" defer></script>
+  <!-- pixel-name.js: deprecated per explicit request ("remove/hide
+       transetion on my name lets make it simple") — "Bhavesh" is plain
+       text again, since .pixel-name-plain was always the real text
+       underneath and nothing here ever hid it except this script adding
+       .pixel-name-hidden. File and markup (index.md, home.css) left
+       intact; re-enabling is just uncommenting this tag. -->
+  <!-- <script src="{{ '/assets/js/pixel-name.js' | relative_url }}" defer></script> -->
   <!-- beyond-horizon.js: deprecated in favor of globe.js, per explicit
        request ("instade of horaizon add this glob animation"). File kept
        intact, .hero-glow markup removed from index.md. Re-enabling needs
