@@ -331,26 +331,44 @@
    Same treatment as .scroll-cue's pill: a plain blurred white wash rather
    than a globe-matched color, so it stays correct if the background effect
    changes again.
-   Backdropped per text block (h1, then the subhead paragraph), not one
-   shared box around .hero-inner as a whole — a single enclosing box added
-   its own padding/border-radius/margin-bottom gap on top of the text,
-   covering noticeably more of the globe underneath than the text itself
-   needed. Two small inline-block pills hug their own content instead, per
-   explicit feedback ("it should only block where text is writtten not
-   more than that"). */
+   Backdropped per text block, not one shared box around .hero-inner as a
+   whole — a single enclosing box added its own padding/border-radius/
+   margin-bottom gap on top of the text, covering noticeably more of the
+   globe than the text itself needed. First fix moved to one inline-block
+   pill per block (h1, then the subhead paragraph) — still too much,
+   because .hero-sub wraps across 3-4 lines and a single inline-block box
+   is one rectangle sized to the WIDEST line, so shorter lines (e.g. "...
+   than it looks.") got backdrop stretching well past their own text on
+   both sides, still eating into the globe. Fixed with the standard
+   multi-line-highlight technique instead: the subhead's actual text is a
+   `.hero-sub-text` span (see index.md) that goes `display: inline` with
+   `box-decoration-break: clone`, so the browser gives each wrapped line
+   its own tightly-sized background box rather than one shared rectangle.
+   The outer `<p class="hero-sub">` stays a normal block — critical,
+   because making the PARAGRAPH itself `display:inline` (the first attempt)
+   removed the automatic line break between it and the h1 above, letting
+   the first few characters of the subhead render up on the heading's own
+   line before wrapping, a real rendering bug caught via getClientRects()
+   (5 fragments, the first only 16px wide sitting in the h1's row) rather
+   than just eyeballing a screenshot. h1 stays inline-block since it's
+   always one line — no per-line issue to fix there. */
 @media (max-width: 640px) {
-  .hero-inner h1,
-  .hero-inner .hero-sub {
+  .hero-inner h1 {
     display: inline-block;
     background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border-radius: 12px;
-    padding: 0.1em 0.5em;
+    border-radius: 10px;
+    padding: 0.05em 0.4em;
   }
 
-  .hero-inner .hero-sub {
-    margin-top: 0.5rem;
+  .hero-inner .hero-sub-text {
+    display: inline;
+    background: rgba(255, 255, 255, 0.78);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    border-radius: 6px;
+    padding: 0.2em 0.35em;
   }
 }
 

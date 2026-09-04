@@ -113,20 +113,30 @@
       { passive: true }
     );
 
+    // .hero-globe has its own drag-to-rotate gesture (globe.js) — a touch
+    // that starts there is someone playing with the globe, not trying to
+    // leave the page, and an upward drag (rotating it) would otherwise
+    // read as exactly the swipe-up this listener is watching for. Ignoring
+    // touches that start on the globe was the actual fix for "the globe
+    // zooms in [when I'm just trying to rotate it]" — reported after
+    // testing on a real phone, not reproducible via this session's own
+    // synthetic touch events (those never touch the globe itself).
     var touchStartY = null;
+    var touchOnGlobe = false;
     window.addEventListener(
       "touchstart",
       function (e) {
         touchStartY = e.touches[0].clientY;
+        touchOnGlobe = !!(e.target && e.target.closest && e.target.closest(".hero-globe"));
       },
       { passive: true }
     );
     window.addEventListener(
       "touchmove",
       function (e) {
-        if (touchStartY === null) return;
+        if (touchStartY === null || touchOnGlobe) return;
         var dy = touchStartY - e.touches[0].clientY;
-        if (dy > 24) goToResume();
+        if (dy > 48) goToResume();
       },
       { passive: true }
     );

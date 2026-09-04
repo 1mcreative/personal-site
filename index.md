@@ -29,7 +29,7 @@ permalink: /
 
   <div class="hero-inner">
     <h1>Hi, I'm <span class="pixel-name-plain">Bhavesh</span>.</h1>
-    <p class="hero-sub">I write backend systems for a living, and I'm a lot less organized about everything else. Poke around &mdash; there's more here than it looks.</p>
+    <p class="hero-sub"><span class="hero-sub-text">I write backend systems for a living, and I'm a lot less organized about everything else. Poke around &mdash; there's more here than it looks.</span></p>
   </div>
 
   <a class="page-corner" href="/life/" aria-label="The Chaos — the personal side">
