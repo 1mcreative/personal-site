@@ -70,15 +70,35 @@
     var navigated = false;
 
     // Swipe left (or the .life-pull-btn click) opens /life/: grow
-    // .life-wipe from a sliver at the right edge — where the button lives
-    // — into a full black screen, then navigate once it's covered. Same
-    // "no wheel/touch actually locked, just react once the gesture is
-    // clearly intentional" spirit as goToResume below, just simpler —
-    // there's no WebGL half to coordinate with here.
+    // .life-wipe from the button's own current box into a full black
+    // screen, then navigate once it's covered. Same "no wheel/touch
+    // actually locked, just react once the gesture is clearly intentional"
+    // spirit as goToResume below, just simpler — there's no WebGL half to
+    // coordinate with here.
     var lifeWipe = document.querySelector(".life-wipe");
+    var pullBtn = document.querySelector(".life-pull-btn");
+
+    // Keeps .life-wipe's rest clip-path pinned to the button's real
+    // on-screen box (home.css's --wipe-* custom properties), so the panel
+    // genuinely starts as the button's own shape instead of a
+    // separately-sized rectangle that merely starts nearby. Run on load
+    // and on resize — the button's size/position both change at the
+    // 640px breakpoint.
+    var syncLifeWipe = function () {
+      if (!lifeWipe || !pullBtn) return;
+      var r = pullBtn.getBoundingClientRect();
+      lifeWipe.style.setProperty("--wipe-top", r.top + "px");
+      lifeWipe.style.setProperty("--wipe-right", (window.innerWidth - r.right) + "px");
+      lifeWipe.style.setProperty("--wipe-bottom", (window.innerHeight - r.bottom) + "px");
+      lifeWipe.style.setProperty("--wipe-left", r.left + "px");
+    };
+    syncLifeWipe();
+    window.addEventListener("resize", syncLifeWipe, { passive: true });
+
     var goToLife = function () {
       if (navigated || !lifeWipe) return;
       navigated = true;
+      syncLifeWipe();
       lifeWipe.classList.add("life-wipe-active");
       var finished = false;
       var finish = function () {
@@ -87,10 +107,9 @@
         window.location.href = "/life/";
       };
       lifeWipe.addEventListener("transitionend", finish, { once: true });
-      setTimeout(finish, 700);
+      setTimeout(finish, 750);
     };
 
-    var pullBtn = document.querySelector(".life-pull-btn");
     if (pullBtn) {
       pullBtn.addEventListener("click", function (e) {
         e.preventDefault();
@@ -115,14 +134,28 @@
       // just means an immediate navigation, same as before this
       // transition existed — nothing here is load-bearing. Safety-net
       // timeout leaves margin past the spin+zoom+white-fade's combined
-      // ~1730ms (globe.js fades its canvas to white for ~300ms once the
-      // zoom lands, before calling back, so the page doesn't hard-cut from
-      // amber straight to the next page's own white background).
+      // ~1750ms (spin 700 + zoom 700 + double-rAF ~32 + .resume-wipe's own
+      // 320ms fade-then-navigate below).
+      // The white handoff lives here, not in globe.js: fading just
+      // the globe's own canvas used to reveal the rest of .hero (headline,
+      // subhead, glitter, the life pull-tab, copyright) still sitting there
+      // untouched — a real bug, reported as "the landing page again for
+      // half a second" between the amber zoom and the actual navigation.
+      // .resume-wipe covers the whole viewport, not just the canvas, so
+      // there's nothing left showing through underneath it.
+      var resumeWipe = document.querySelector(".resume-wipe");
       var finished = false;
       var finish = function () {
         if (finished) return;
         finished = true;
-        window.location.href = "/resume/";
+        if (!resumeWipe) {
+          window.location.href = "/resume/";
+          return;
+        }
+        resumeWipe.classList.add("resume-wipe-active");
+        setTimeout(function () {
+          window.location.href = "/resume/";
+        }, 320);
       };
       if (typeof window.globeFocusMarker === "function") {
         window.globeFocusMarker(finish);

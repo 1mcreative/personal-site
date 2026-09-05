@@ -392,23 +392,21 @@
         // frame this whole sequence built up to was sometimes never shown
         // at all. A double rAF guarantees at least one full paint of the
         // held frame has happened before anything navigates.
+        //
+        // What used to happen here — fading just this canvas to transparent
+        // — was a real bug, not the fix it looked like: it only removes the
+        // canvas, so everything else in .hero (headline, subhead, glitter,
+        // the life pull-tab, the copyright mark) was still sitting there
+        // fully visible underneath, right in the middle of the screen —
+        // reported as "the landing page again for half a second" before
+        // the actual navigation. hero.js now owns the white handoff with a
+        // proper full-viewport overlay (.resume-wipe) that covers all of
+        // that, not just the canvas — this function's only job is to
+        // guarantee the held frame painted before handing back.
         var cb = focusCallback;
         focusCallback = null;
         requestAnimationFrame(function () {
-          requestAnimationFrame(function () {
-            // "Screen should be white instead of yellow at the end — our
-            // next page is white, that's why." Ending on solid amber and
-            // then hard-cutting to a white page reads as a color clash;
-            // fading just the canvas (not the whole .hero-globe, whose own
-            // --globe-zoom transform is still mid-flight) to transparent
-            // reveals .theme-home's own white background underneath,
-            // landing on the same white the next page opens on. Timed
-            // fully inside hero.js's existing safety-net window, not an
-            // extra wait bolted on top of it.
-            canvas.style.transition = "opacity 0.3s ease";
-            canvas.style.opacity = "0";
-            setTimeout(cb, 300);
-          });
+          requestAnimationFrame(cb);
         });
       }
       raf = requestAnimationFrame(loop);

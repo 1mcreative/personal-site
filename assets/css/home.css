@@ -973,32 +973,74 @@
 
 /* The wipe that plays on the way into /life/ — a swipe-left gesture or a
    .life-pull-btn click both call goToLife() (hero.js), which grows this
-   from a sliver at the right edge (where the button lives) into a
-   full-screen black panel before navigating. A plain scaleX transform
-   reads as "black sweeping in from the button, toward the left" without
-   needing a canvas or particle system — the earlier, more elaborate
-   "Thanos snap" (assets/js/dissolve.js) was explicitly cut for being more
-   than what was wanted; this is the simpler effect asked for instead.
-   #05070a (not pure black) is reused directly from dissolve.js's own
-   dark-handoff color, so the wipe lands close to /life/'s own #0f1419
-   background rather than introducing a new shade. */
+   from the button's own current position/size into a full-screen black
+   panel before navigating. Shaped with clip-path, not a transform: the
+   rest state's --wipe-* custom properties are kept in sync with the
+   button's real getBoundingClientRect() (hero.js), so the visible patch
+   sits exactly on top of the button — genuinely growing out of it, not a
+   separately-shaped panel that merely starts near it. z-index sits one
+   below .life-pull-btn specifically so that resting patch is fully hidden
+   behind the opaque button until it actually starts growing past the
+   button's own footprint. The earlier, more elaborate "Thanos snap"
+   (assets/js/dissolve.js) was explicitly cut for being more than what was
+   wanted; this is the simpler effect asked for instead. #05070a (not pure
+   black) is reused directly from dissolve.js's own dark-handoff color, so
+   the wipe lands close to /life/'s own #0f1419 background rather than
+   introducing a new shade. */
 .life-wipe {
   position: fixed;
   inset: 0;
-  z-index: 45;
+  z-index: 39;
   background: #05070a;
-  transform-origin: 100% 50%;
-  transform: scaleX(0);
+  --wipe-top: 50%;
+  --wipe-right: 0px;
+  --wipe-bottom: 50%;
+  --wipe-left: 90%;
+  clip-path: inset(var(--wipe-top) var(--wipe-right) var(--wipe-bottom) var(--wipe-left) round 14px 0 0 14px);
   pointer-events: none;
 }
 
+/* A slight overshoot (the curve dips past 1 before settling) reads as the
+   panel "popping" out of the button before it fills the screen, per
+   explicit request for the growth to feel like it "came out of the right
+   edge slightly bumped" rather than a flat, mechanical wipe. */
 .life-wipe-active {
-  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: scaleX(1);
+  transition: clip-path 0.65s cubic-bezier(0.3, 1.2, 0.4, 1);
+  clip-path: inset(0 0 0 0 round 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .life-wipe-active {
+    transition: none;
+  }
+}
+
+/* The white handoff on the way into /resume/ (hero.js's goToResume,
+   triggered once globe.js's marker-zoom finishes) — a real full-viewport
+   cover, not just a fade on the globe's own canvas. Fading only the
+   canvas used to reveal the rest of .hero (headline, subhead, glitter,
+   the life pull-tab, copyright) still sitting there untouched, which
+   showed up as "the landing page again for half a second" between the
+   amber zoom and the actual navigation — see globe.js and hero.js for the
+   fuller story. #ffffff, not a new shade: both .theme-home and /resume/
+   share the same white background, so fading to opaque white lands on
+   exactly the color the next page opens on. */
+.resume-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  background: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.resume-wipe-active {
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resume-wipe-active {
     transition: none;
   }
 }
