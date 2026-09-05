@@ -64,7 +64,40 @@
   // navigation. The always-present .scroll-cue link is still the fallback
   // for reduced-motion, keyboard, and no-JS visitors.
   if (!reduceMotion) {
+    // Shared by goToResume and goToLife below — whichever gesture fires
+    // first wins, the other is a no-op, since only one navigation can
+    // ever actually happen.
     var navigated = false;
+
+    // Swipe left (or the .life-pull-btn click) opens /life/: grow
+    // .life-wipe from a sliver at the right edge — where the button lives
+    // — into a full black screen, then navigate once it's covered. Same
+    // "no wheel/touch actually locked, just react once the gesture is
+    // clearly intentional" spirit as goToResume below, just simpler —
+    // there's no WebGL half to coordinate with here.
+    var lifeWipe = document.querySelector(".life-wipe");
+    var goToLife = function () {
+      if (navigated || !lifeWipe) return;
+      navigated = true;
+      lifeWipe.classList.add("life-wipe-active");
+      var finished = false;
+      var finish = function () {
+        if (finished) return;
+        finished = true;
+        window.location.href = "/life/";
+      };
+      lifeWipe.addEventListener("transitionend", finish, { once: true });
+      setTimeout(finish, 700);
+    };
+
+    var pullBtn = document.querySelector(".life-pull-btn");
+    if (pullBtn) {
+      pullBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        goToLife();
+      });
+    }
+
     var goToResume = function () {
       if (navigated) return;
       navigated = true;
@@ -105,27 +138,36 @@
       }
     };
 
+    // Whichever axis moves more decides the destination — a wheel
+    // gesture that's mostly vertical shouldn't accidentally fire the
+    // left-swipe just because deltaX ticked up slightly, and vice versa.
     window.addEventListener(
       "wheel",
       function (e) {
-        if (e.deltaY > 4) goToResume();
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+          if (e.deltaX > 4) goToLife();
+        } else if (e.deltaY > 4) {
+          goToResume();
+        }
       },
       { passive: true }
     );
 
     // .hero-globe has its own drag-to-rotate gesture (globe.js) — a touch
     // that starts there is someone playing with the globe, not trying to
-    // leave the page, and an upward drag (rotating it) would otherwise
-    // read as exactly the swipe-up this listener is watching for. Ignoring
-    // touches that start on the globe was the actual fix for "the globe
-    // zooms in [when I'm just trying to rotate it]" — reported after
-    // testing on a real phone, not reproducible via this session's own
-    // synthetic touch events (those never touch the globe itself).
+    // leave the page, and a drag in either direction (spinning or tilting
+    // it) would otherwise read as exactly one of the swipes below.
+    // Ignoring touches that start on the globe was the actual fix for
+    // "the globe zooms in [when I'm just trying to rotate it]" — reported
+    // after testing on a real phone, not reproducible via this session's
+    // own synthetic touch events (those never touch the globe itself).
+    var touchStartX = null;
     var touchStartY = null;
     var touchOnGlobe = false;
     window.addEventListener(
       "touchstart",
       function (e) {
+        touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
         touchOnGlobe = !!(e.target && e.target.closest && e.target.closest(".hero-globe"));
       },
@@ -134,9 +176,14 @@
     window.addEventListener(
       "touchmove",
       function (e) {
-        if (touchStartY === null || touchOnGlobe) return;
+        if (touchStartX === null || touchOnGlobe) return;
+        var dx = touchStartX - e.touches[0].clientX;
         var dy = touchStartY - e.touches[0].clientY;
-        if (dy > 48) goToResume();
+        if (Math.abs(dx) > Math.abs(dy)) {
+          if (dx > 48) goToLife();
+        } else if (dy > 48) {
+          goToResume();
+        }
       },
       { passive: true }
     );

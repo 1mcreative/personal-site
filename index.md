@@ -55,5 +55,13 @@ permalink: /
     <span>keep going</span>
   </a>
 
+  <a class="life-pull-btn" href="/life/" aria-label="Pull to see The Chaos">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M15 4L7 12l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+
+  <div class="life-wipe" aria-hidden="true"></div>
+
   <p class="hero-copyright">&copy; {{ 'now' | date: "%Y" }} Bhavesh Nakum</p>
 </section>

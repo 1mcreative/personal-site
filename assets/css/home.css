@@ -922,6 +922,92 @@
   50% { transform: translateY(6px); }
 }
 
+/* Pull tab into /life/ — a real link, same "always works standing alone"
+   rule as .scroll-cue. Colored from the personal theme's own palette
+   (#12181f fill, reused from .keycap-btn; #e8eef7 personal text for the
+   arrow) rather than anything homepage-specific, since it's the button's
+   destination that should read on it, not whatever's behind it — same
+   convention as every other cross-side button on this site. */
+.life-pull-btn {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 76px;
+  background: #12181f;
+  border-radius: 14px 0 0 14px;
+  color: #e8eef7;
+  text-decoration: none;
+  box-shadow: -2px 0 14px rgba(0, 0, 0, 0.22);
+  transition: width 0.25s var(--ease), background 0.25s ease;
+}
+
+.life-pull-btn:hover,
+.life-pull-btn:focus-visible {
+  width: 40px;
+  background: #1a232e;
+}
+
+.life-pull-btn:focus-visible {
+  outline: 2px solid #6ec1ff;
+  outline-offset: -2px;
+}
+
+.life-pull-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .life-pull-btn {
+    width: 22px;
+    height: 60px;
+  }
+
+  .life-pull-btn:hover,
+  .life-pull-btn:focus-visible {
+    width: 30px;
+  }
+}
+
+/* The wipe that plays on the way into /life/ — a swipe-left gesture or a
+   .life-pull-btn click both call goToLife() (hero.js), which grows this
+   from a sliver at the right edge (where the button lives) into a
+   full-screen black panel before navigating. A plain scaleX transform
+   reads as "black sweeping in from the button, toward the left" without
+   needing a canvas or particle system — the earlier, more elaborate
+   "Thanos snap" (assets/js/dissolve.js) was explicitly cut for being more
+   than what was wanted; this is the simpler effect asked for instead.
+   #05070a (not pure black) is reused directly from dissolve.js's own
+   dark-handoff color, so the wipe lands close to /life/'s own #0f1419
+   background rather than introducing a new shade. */
+.life-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: #05070a;
+  transform-origin: 100% 50%;
+  transform: scaleX(0);
+  pointer-events: none;
+}
+
+.life-wipe-active {
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .life-wipe-active {
+    transition: none;
+  }
+}
+
 /* Copyright line — no longer a separate <footer> after the hero (that
    added document height beyond .hero's own 100dvh, which is exactly the
    scroll this page isn't supposed to have — see the no-scroll rule on
