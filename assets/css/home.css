@@ -944,12 +944,12 @@
   color: #e8eef7;
   text-decoration: none;
   box-shadow: -2px 0 14px rgba(0, 0, 0, 0.22);
-  transition: width 0.25s var(--ease), background 0.25s ease;
+  transition: transform 0.25s var(--ease), background 0.25s ease;
 }
 
 .life-pull-btn:hover,
 .life-pull-btn:focus-visible {
-  width: 40px;
+  transform: translate(-10px, -50%);
   background: #1a232e;
 }
 
@@ -968,11 +968,6 @@
   .life-pull-btn {
     width: 22px;
     height: 60px;
-  }
-
-  .life-pull-btn:hover,
-  .life-pull-btn:focus-visible {
-    width: 30px;
   }
 }
 
