@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.3, 1.2, 0.4, 1)",
+        "createdAt": "2026-09-05T03:57:12.380Z",
+        "reason": "user explicitly asked for the /life/ wipe to feel like it 'came out of the right edge slightly bumped' — the overshoot is the intended effect, not accidental bounce easing"
+      }
+    ]
+  }
+}
