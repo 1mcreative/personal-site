@@ -991,7 +991,42 @@
    have made the swap itself a visible flicker. The earlier, more
    elaborate "Thanos snap" (assets/js/dissolve.js) was explicitly cut for
    being more than what was wanted; this is the simpler effect asked for
-   instead. */
+   instead.
+
+   Each side of the inset (plus the corner radius) is its own
+   @property-registered custom property — the same technique
+   .spotlight-text's --spot-size already uses — so top/bottom, left, and
+   the radius can each transition on their own timeline instead of one
+   single clip-path transition moving all four numbers in lockstep. A
+   single shared transition reads as the button "ballooning" outward in
+   every direction at once (all four sides starting their own distance
+   from 0 at the same eased rate) rather than sweeping — reported
+   directly as "looks different than we discussed... doesn't look like a
+   clean sweep from right to left." Splitting top/bottom (a quick pop to
+   full height) from left/radius (the actual leftward sweep, once the
+   panel is already full height) below is what makes it read as a wall
+   sliding in from the right, not a shape swelling from a point. */
+@property --wipe-top {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --wipe-bottom {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --wipe-left {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --wipe-radius {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
 .life-wipe {
   position: fixed;
   inset: 0;
@@ -1001,18 +1036,29 @@
   --wipe-right: 0px;
   --wipe-bottom: 50%;
   --wipe-left: 90%;
-  clip-path: inset(var(--wipe-top) var(--wipe-right) var(--wipe-bottom) var(--wipe-left) round 14px 0 0 14px);
+  --wipe-radius: 14px;
+  clip-path: inset(var(--wipe-top) var(--wipe-right) var(--wipe-bottom) var(--wipe-left) round var(--wipe-radius) 0 0 var(--wipe-radius));
   pointer-events: none;
 }
 
-/* A slight overshoot (the curve dips past 1 before settling) reads as the
-   panel "popping" out of the button before it fills the screen, per
-   explicit request for the growth to feel like it "came out of the right
-   edge slightly bumped" rather than a flat, mechanical wipe. */
+/* Phase 1 (top/bottom, --wipe-radius unset here so it holds at rest):
+   a quick pop to full height with a slight overshoot — the "came out of
+   the right edge slightly bumped" part. Phase 2 (left + radius, delayed
+   until phase 1 is essentially done): the actual right-to-left sweep,
+   full height already established, widening from the button's own
+   width out to the full screen while the rounded corner flattens along
+   with it. goToLife() (hero.js) sets the *target* --wipe-* values
+   (all 0) via inline style once this class is on — this rule only owns
+   the timing, not the values, so the button's real on-screen box (set by
+   syncLifeWipe(), also inline) stays the one source of truth for where
+   the growth actually starts from. */
 .life-wipe-active {
   z-index: 41;
-  transition: clip-path 0.65s cubic-bezier(0.3, 1.2, 0.4, 1);
-  clip-path: inset(0 0 0 0 round 0);
+  transition:
+    --wipe-top 0.2s cubic-bezier(0.3, 1.2, 0.4, 1),
+    --wipe-bottom 0.2s cubic-bezier(0.3, 1.2, 0.4, 1),
+    --wipe-left 0.5s 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+    --wipe-radius 0.5s 0.15s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {

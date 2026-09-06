@@ -83,9 +83,11 @@
     // genuinely starts as the button's own shape instead of a
     // separately-sized rectangle that merely starts nearby. Run on load
     // and on resize — the button's size/position both change at the
-    // 640px breakpoint.
+    // 640px breakpoint. No-ops once a navigation is already under way, so
+    // a stray resize event mid-transition can't overwrite the "grow to
+    // zero" target values goToLife() is about to set.
     var syncLifeWipe = function () {
-      if (!lifeWipe || !pullBtn) return;
+      if (navigated || !lifeWipe || !pullBtn) return;
       var r = pullBtn.getBoundingClientRect();
       lifeWipe.style.setProperty("--wipe-top", r.top + "px");
       lifeWipe.style.setProperty("--wipe-right", (window.innerWidth - r.right) + "px");
@@ -100,14 +102,22 @@
       navigated = true;
       syncLifeWipe();
       lifeWipe.classList.add("life-wipe-active");
-      var finished = false;
-      var finish = function () {
-        if (finished) return;
-        finished = true;
+      // home.css's transition list only sets the timing; the actual
+      // target values are set here, the same way the rest values above
+      // are — so the button's real geometry (not a hardcoded guess)
+      // stays the one source of truth for both ends of the animation.
+      lifeWipe.style.setProperty("--wipe-top", "0px");
+      lifeWipe.style.setProperty("--wipe-bottom", "0px");
+      lifeWipe.style.setProperty("--wipe-left", "0px");
+      lifeWipe.style.setProperty("--wipe-radius", "0px");
+      // A fixed timeout, not transitionend: top/bottom and left/radius
+      // finish on two different schedules now (the whole point of the
+      // split), so transitionend would fire on whichever finishes first
+      // — same lesson already learned for name-kinetic.js's own
+      // multi-part settle (see DESIGN.md).
+      setTimeout(function () {
         window.location.href = "/life/";
-      };
-      lifeWipe.addEventListener("transitionend", finish, { once: true });
-      setTimeout(finish, 750);
+      }, 750);
     };
 
     if (pullBtn) {
