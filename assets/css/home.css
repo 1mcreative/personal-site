@@ -978,20 +978,25 @@
    rest state's --wipe-* custom properties are kept in sync with the
    button's real getBoundingClientRect() (hero.js), so the visible patch
    sits exactly on top of the button — genuinely growing out of it, not a
-   separately-shaped panel that merely starts near it. z-index sits one
-   below .life-pull-btn specifically so that resting patch is fully hidden
-   behind the opaque button until it actually starts growing past the
-   button's own footprint. The earlier, more elaborate "Thanos snap"
-   (assets/js/dissolve.js) was explicitly cut for being more than what was
-   wanted; this is the simpler effect asked for instead. #05070a (not pure
-   black) is reused directly from dissolve.js's own dark-handoff color, so
-   the wipe lands close to /life/'s own #0f1419 background rather than
-   introducing a new shade. */
+   separately-shaped panel that merely starts near it. At rest this sits
+   one z-index below .life-pull-btn, so the resting patch is fully hidden
+   behind the opaque button; .life-wipe-active (below) jumps it above the
+   button instead, at the same instant its clip-path starts matching the
+   button's own shape/color exactly — otherwise the button, still opaque
+   and still on top, would keep rendering unchanged for the whole growth,
+   reading as a black flood spreading from behind a button that never
+   itself seems to move. #12181f is the button's own fill (.life-pull-btn
+   below), not a new color, precisely so that z-index swap is invisible —
+   picking a close-but-different shade like the earlier #05070a would
+   have made the swap itself a visible flicker. The earlier, more
+   elaborate "Thanos snap" (assets/js/dissolve.js) was explicitly cut for
+   being more than what was wanted; this is the simpler effect asked for
+   instead. */
 .life-wipe {
   position: fixed;
   inset: 0;
   z-index: 39;
-  background: #05070a;
+  background: #12181f;
   --wipe-top: 50%;
   --wipe-right: 0px;
   --wipe-bottom: 50%;
@@ -1005,6 +1010,7 @@
    explicit request for the growth to feel like it "came out of the right
    edge slightly bumped" rather than a flat, mechanical wipe. */
 .life-wipe-active {
+  z-index: 41;
   transition: clip-path 0.65s cubic-bezier(0.3, 1.2, 0.4, 1);
   clip-path: inset(0 0 0 0 round 0);
 }
