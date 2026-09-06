@@ -931,16 +931,28 @@
    circle, not the earlier rectangular pull-tab, per explicit request for
    the trigger to read as a "dot" that then expands into a "big circle" —
    the resting shape and the expansion shape needing to already match is
-   what "seamless" means here. */
+   what "seamless" means here.
+
+   Seamless into the edge, not floating near it: `right: -20px` (half the
+   button's own width) puts the circle's *center* exactly on the
+   viewport's right edge, so only its left half ever renders — the
+   viewport boundary itself does the clipping, no clip-path needed. That
+   silhouette is exactly "width 0 at the top, curving out to full width
+   in the middle, back to 0 at the bottom" per explicit request: the
+   top/bottom of a circle sit directly above/below its center (zero
+   horizontal offset from it), so those points land precisely on the
+   edge, while the leftmost point — the vertical middle — is a full
+   radius away, the widest the bulge ever gets. */
 .life-pull-btn {
   position: fixed;
   top: 50%;
-  right: 20px;
+  right: -20px;
   transform: translateY(-50%);
   z-index: 40;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-left: 2px;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -962,6 +974,9 @@
   outline-offset: 2px;
 }
 
+/* Centered within the whole circle (half of which is off-screen) would
+   put the icon right on the edge, half invisible — shifted into the
+   visible left half instead via the button's own flex/padding above. */
 .life-pull-btn svg {
   width: 16px;
   height: 16px;
@@ -979,9 +994,17 @@
 @media (max-width: 640px) {
   .life-pull-btn {
     top: 62%;
-    right: 14px;
+    right: -16px;
     width: 32px;
     height: 32px;
+  }
+
+  /* The visible half is only 16px wide here — a 16px icon would exactly
+     fill it edge to edge with zero breathing room, so it shrinks a
+     touch to leave a hair of margin on both sides. */
+  .life-pull-btn svg {
+    width: 13px;
+    height: 13px;
   }
 }
 
