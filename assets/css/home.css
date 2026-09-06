@@ -922,40 +922,44 @@
   50% { transform: translateY(6px); }
 }
 
-/* Pull tab into /life/ — a real link, same "always works standing alone"
+/* Pull dot into /life/ — a real link, same "always works standing alone"
    rule as .scroll-cue. Colored from the personal theme's own palette
    (#12181f fill, reused from .keycap-btn; #e8eef7 personal text for the
    arrow) rather than anything homepage-specific, since it's the button's
    destination that should read on it, not whatever's behind it — same
-   convention as every other cross-side button on this site. */
+   convention as every other cross-side button on this site. A small
+   circle, not the earlier rectangular pull-tab, per explicit request for
+   the trigger to read as a "dot" that then expands into a "big circle" —
+   the resting shape and the expansion shape needing to already match is
+   what "seamless" means here. */
 .life-pull-btn {
   position: fixed;
   top: 50%;
-  right: 0;
+  right: 20px;
   transform: translateY(-50%);
   z-index: 40;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 76px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   background: #12181f;
-  border-radius: 14px 0 0 14px;
   color: #e8eef7;
   text-decoration: none;
-  box-shadow: -2px 0 14px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.22);
   transition: transform 0.25s var(--ease), background 0.25s ease;
 }
 
 .life-pull-btn:hover,
 .life-pull-btn:focus-visible {
-  transform: translate(-10px, -50%);
+  transform: translateY(-50%) scale(1.12);
   background: #1a232e;
 }
 
 .life-pull-btn:focus-visible {
   outline: 2px solid #6ec1ff;
-  outline-offset: -2px;
+  outline-offset: 2px;
 }
 
 .life-pull-btn svg {
@@ -964,101 +968,69 @@
   flex-shrink: 0;
 }
 
+/* A real overlap, not a hypothetical one: at 50% vertical center, this
+   button's box genuinely intersects .hero-sub-text's own bounding box on
+   a typical phone height (confirmed via getBoundingClientRect — the
+   subhead wraps to 4 lines on narrow viewports, reaching well past the
+   screen's vertical center). Moved down to 62% instead, clearing the
+   subhead with margin to spare; the globe sits in that same region but
+   overlapping a decorative dot field is a non-issue next to overlapping
+   readable text. */
 @media (max-width: 640px) {
   .life-pull-btn {
-    width: 22px;
-    height: 60px;
+    top: 62%;
+    right: 14px;
+    width: 32px;
+    height: 32px;
   }
 }
 
-/* The wipe that plays on the way into /life/ — a swipe-left gesture or a
-   .life-pull-btn click both call goToLife() (hero.js), which grows this
-   from the button's own current position/size into a full-screen black
-   panel before navigating. Shaped with clip-path, not a transform: the
-   rest state's --wipe-* custom properties are kept in sync with the
-   button's real getBoundingClientRect() (hero.js), so the visible patch
-   sits exactly on top of the button — genuinely growing out of it, not a
-   separately-shaped panel that merely starts near it. At rest this sits
-   one z-index below .life-pull-btn, so the resting patch is fully hidden
-   behind the opaque button; .life-wipe-active (below) jumps it above the
-   button instead, at the same instant its clip-path starts matching the
-   button's own shape/color exactly — otherwise the button, still opaque
-   and still on top, would keep rendering unchanged for the whole growth,
-   reading as a black flood spreading from behind a button that never
-   itself seems to move. #12181f is the button's own fill (.life-pull-btn
-   below), not a new color, precisely so that z-index swap is invisible —
-   picking a close-but-different shade like the earlier #05070a would
-   have made the swap itself a visible flicker. The earlier, more
-   elaborate "Thanos snap" (assets/js/dissolve.js) was explicitly cut for
-   being more than what was wanted; this is the simpler effect asked for
-   instead.
+/* The "bubble" that plays on the way into /life/ — a swipe-left gesture
+   or a .life-pull-btn click both call goToLife() (hero.js), which grows
+   this from a small circle centered exactly on the button into one big
+   enough to cover the whole screen, then navigates. Plain clip-path
+   circle(), not @property-registered custom properties: a circle only
+   ever needs one number (its radius) to grow, since the center point
+   never moves, so there's no multi-property choreography to build here
+   at all — hero.js sets the literal "from" and "to" clip-path strings
+   directly via inline style (both the rest radius, matching the dot, and
+   the active radius, computed from the button's center to the farthest
+   corner of the viewport so the circle is guaranteed to cover every
+   pixel regardless of aspect ratio), and this rule only owns the
+   transition's timing.
 
-   Each side of the inset (plus the corner radius) is its own
-   @property-registered custom property — the same technique
-   .spotlight-text's --spot-size already uses — so top/bottom, left, and
-   the radius can each transition on their own timeline instead of one
-   single clip-path transition moving all four numbers in lockstep. A
-   single shared transition reads as the button "ballooning" outward in
-   every direction at once (all four sides starting their own distance
-   from 0 at the same eased rate) rather than sweeping — reported
-   directly as "looks different than we discussed... doesn't look like a
-   clean sweep from right to left." Splitting top/bottom (a quick pop to
-   full height) from left/radius (the actual leftward sweep, once the
-   panel is already full height) below is what makes it read as a wall
-   sliding in from the right, not a shape swelling from a point. */
-@property --wipe-top {
-  syntax: "<length-percentage>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --wipe-bottom {
-  syntax: "<length-percentage>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --wipe-left {
-  syntax: "<length-percentage>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --wipe-radius {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
+   This replaces an earlier rectangular version (a clip-path: inset()
+   sweep, plain transform: scaleX() before that) — worth calling out
+   directly since the earlier inset() version used @property to give
+   its four sides independent timing, and @property support is real but
+   not universal (a materially newer addition than plain clip-path
+   interpolation, which has worked in every evergreen browser for years);
+   on a browser without it, those custom properties silently stop being
+   animatable and the whole transition just snaps to its end state
+   instantly — reported directly as "the transition is very fast and
+   unable to see it happening." A single-value circle() radius needs no
+   such registration, so this version doesn't carry that risk. At rest
+   this sits one z-index below .life-pull-btn (hidden behind the opaque
+   dot); .life-wipe-active jumps it above instead, at the exact moment
+   its clip-path starts matching the dot's own shape/color/position
+   exactly, for the same reason the rectangular version needed that swap
+   — otherwise the dot, still opaque and still on top, would just sit
+   there unchanged while the circle grew everywhere around it. #12181f
+   is the button's own fill, not a new color, so that swap is invisible.
+   The earlier, more elaborate "Thanos snap" (assets/js/dissolve.js) was
+   explicitly cut for being more than what was wanted; this is the
+   simpler effect asked for instead. */
 .life-wipe {
   position: fixed;
   inset: 0;
   z-index: 39;
   background: #12181f;
-  --wipe-top: 50%;
-  --wipe-right: 0px;
-  --wipe-bottom: 50%;
-  --wipe-left: 90%;
-  --wipe-radius: 14px;
-  clip-path: inset(var(--wipe-top) var(--wipe-right) var(--wipe-bottom) var(--wipe-left) round var(--wipe-radius) 0 0 var(--wipe-radius));
   pointer-events: none;
 }
 
-/* Phase 1 (top/bottom, --wipe-radius unset here so it holds at rest):
-   a quick pop to full height with a slight overshoot — the "came out of
-   the right edge slightly bumped" part. Phase 2 (left + radius, delayed
-   until phase 1 is essentially done): the actual right-to-left sweep,
-   full height already established, widening from the button's own
-   width out to the full screen while the rounded corner flattens along
-   with it. goToLife() (hero.js) sets the *target* --wipe-* values
-   (all 0) via inline style once this class is on — this rule only owns
-   the timing, not the values, so the button's real on-screen box (set by
-   syncLifeWipe(), also inline) stays the one source of truth for where
-   the growth actually starts from. */
 .life-wipe-active {
   z-index: 41;
-  transition:
-    --wipe-top 0.2s cubic-bezier(0.3, 1.2, 0.4, 1),
-    --wipe-bottom 0.2s cubic-bezier(0.3, 1.2, 0.4, 1),
-    --wipe-left 0.5s 0.15s cubic-bezier(0.22, 1, 0.36, 1),
-    --wipe-radius 0.5s 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: clip-path 0.6s cubic-bezier(0.3, 1.2, 0.4, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {

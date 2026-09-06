@@ -70,54 +70,54 @@
     var navigated = false;
 
     // Swipe left (or the .life-pull-btn click) opens /life/: grow
-    // .life-wipe from the button's own current box into a full black
-    // screen, then navigate once it's covered. Same "no wheel/touch
-    // actually locked, just react once the gesture is clearly intentional"
-    // spirit as goToResume below, just simpler — there's no WebGL half to
-    // coordinate with here.
+    // .life-wipe from a small circle centered on the button into one big
+    // enough to cover the whole screen, then navigate. Same "no
+    // wheel/touch actually locked, just react once the gesture is
+    // clearly intentional" spirit as goToResume below, just simpler —
+    // there's no WebGL half to coordinate with here.
     var lifeWipe = document.querySelector(".life-wipe");
     var pullBtn = document.querySelector(".life-pull-btn");
 
     // Keeps .life-wipe's rest clip-path pinned to the button's real
-    // on-screen box (home.css's --wipe-* custom properties), so the panel
-    // genuinely starts as the button's own shape instead of a
-    // separately-sized rectangle that merely starts nearby. Run on load
-    // and on resize — the button's size/position both change at the
+    // on-screen center, so the circle genuinely starts as the dot itself
+    // rather than a separately-placed shape that merely starts nearby.
+    // Run on load and on resize — the button's position changes at the
     // 640px breakpoint. No-ops once a navigation is already under way, so
     // a stray resize event mid-transition can't overwrite the "grow to
-    // zero" target values goToLife() is about to set.
+    // cover everything" target goToLife() is about to set.
     var syncLifeWipe = function () {
       if (navigated || !lifeWipe || !pullBtn) return;
       var r = pullBtn.getBoundingClientRect();
-      lifeWipe.style.setProperty("--wipe-top", r.top + "px");
-      lifeWipe.style.setProperty("--wipe-right", (window.innerWidth - r.right) + "px");
-      lifeWipe.style.setProperty("--wipe-bottom", (window.innerHeight - r.bottom) + "px");
-      lifeWipe.style.setProperty("--wipe-left", r.left + "px");
+      var cx = r.left + r.width / 2;
+      var cy = r.top + r.height / 2;
+      var restR = Math.min(r.width, r.height) / 2;
+      lifeWipe.style.clipPath = "circle(" + restR + "px at " + cx + "px " + cy + "px)";
     };
     syncLifeWipe();
     window.addEventListener("resize", syncLifeWipe, { passive: true });
 
     var goToLife = function () {
-      if (navigated || !lifeWipe) return;
+      if (navigated || !lifeWipe || !pullBtn) return;
       navigated = true;
       syncLifeWipe();
       lifeWipe.classList.add("life-wipe-active");
-      // home.css's transition list only sets the timing; the actual
-      // target values are set here, the same way the rest values above
-      // are — so the button's real geometry (not a hardcoded guess)
-      // stays the one source of truth for both ends of the animation.
-      lifeWipe.style.setProperty("--wipe-top", "0px");
-      lifeWipe.style.setProperty("--wipe-bottom", "0px");
-      lifeWipe.style.setProperty("--wipe-left", "0px");
-      lifeWipe.style.setProperty("--wipe-radius", "0px");
-      // A fixed timeout, not transitionend: top/bottom and left/radius
-      // finish on two different schedules now (the whole point of the
-      // split), so transitionend would fire on whichever finishes first
-      // — same lesson already learned for name-kinetic.js's own
-      // multi-part settle (see DESIGN.md).
+      // The circle's center never moves, so growing it to cover every
+      // pixel just needs one number: the distance from that center to
+      // whichever corner is farthest away (Pythagoras on the larger of
+      // the two horizontal gaps and the larger of the two vertical
+      // gaps) — same idea as clip-path's own "farthest-corner" keyword,
+      // computed by hand since a transition needs an actual number on
+      // both ends, not a keyword, to interpolate between.
+      var r = pullBtn.getBoundingClientRect();
+      var cx = r.left + r.width / 2;
+      var cy = r.top + r.height / 2;
+      var dx = Math.max(cx, window.innerWidth - cx);
+      var dy = Math.max(cy, window.innerHeight - cy);
+      var farthest = Math.sqrt(dx * dx + dy * dy);
+      lifeWipe.style.clipPath = "circle(" + farthest + "px at " + cx + "px " + cy + "px)";
       setTimeout(function () {
         window.location.href = "/life/";
-      }, 750);
+      }, 700);
     };
 
     if (pullBtn) {
