@@ -2361,6 +2361,64 @@ host.addEventListener("pointermove", function (e) {
       </div>
     </div>
 
+    <div class="lab-card">
+      <div class="lab-card-head">
+        <h3>Hero Hover Glow</h3>
+        <span class="lab-badge lab-badge-deprecated">Deprecated</span>
+      </div>
+      <p class="lab-card-desc">A radial blue bloom behind the hero content, faded in via <code>:has()</code> whenever the Galaxy Button (further down this page) is hovered or focused — pure CSS, no JS. It was originally a dark dimming effect, inverted into a bloom once the homepage itself went dark for a stretch, then left in place once the Galaxy Button moved off the homepage entirely and into the résumé nav. The selector simply never matches anymore; the CSS is still real and still correct, just permanently dormant on this page.</p>
+      <div class="lab-demo">
+        <div class="hero-hover-glow" style="opacity:1;" aria-hidden="true"></div>
+      </div>
+      <p class="lab-code-note">Forced visible here since its real trigger (hovering the Galaxy Button inside <code>.hero</code>) doesn't exist on this page anymore — see the <code>:has()</code> selector in the code below.</p>
+      <div class="lab-card-actions">
+        <button class="lab-copy-btn" data-copy-target="snippet-hero-hover-glow">Copy CSS</button>
+      </div>
+      <details class="lab-code-details">
+        <summary>View code</summary>
+        <pre class="lab-code" id="snippet-hero-hover-glow"><code>.hero-hover-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(120% 90% at 50% 65%, rgba(29, 78, 216, 0.28), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+@supports selector(:has(a)) {
+  .hero:has(.trigger-el:hover, .trigger-el:focus-visible) .hero-hover-glow {
+    opacity: 1;
+  }
+}</code></pre>
+      </details>
+    </div>
+
+    <div class="lab-card">
+      <div class="lab-card-head">
+        <h3>Scroll Veil</h3>
+        <span class="lab-badge lab-badge-deprecated">Deprecated</span>
+      </div>
+      <p class="lab-card-desc">A full-screen radial glow whose opacity tracked <code>--scroll-progress</code>, building visual anticipation as a visitor scrolled toward the (also deprecated) auto-navigate sentinel below the hero. Removed along with that whole scroll-to-enter mechanic once real visitors turned out not to commit to a long deliberate scroll — nothing sets <code>--scroll-progress</code> anymore, so this permanently sits at <code>opacity: 0</code>.</p>
+      <div class="lab-demo lab-demo-dark">
+        <div class="scroll-veil" style="position:absolute; opacity:0.6;" aria-hidden="true"></div>
+      </div>
+      <div class="lab-card-actions">
+        <button class="lab-copy-btn" data-copy-target="snippet-scroll-veil">Copy CSS</button>
+      </div>
+      <details class="lab-code-details">
+        <summary>View code</summary>
+        <pre class="lab-code" id="snippet-scroll-veil"><code>.scroll-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  background: radial-gradient(circle at 50% 100%, rgba(29, 78, 216, 0.4), transparent 70%);
+  opacity: var(--scroll-progress, 0); /* set by a scroll listener, 0 → 1 */
+  pointer-events: none;
+}</code></pre>
+      </details>
+    </div>
+
   </div>
 </section>
 
@@ -2663,6 +2721,56 @@ if (matchMedia("(hover: hover)").matches) {
   background: #1a232e;
 }
 .life-pull-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+&lt;/style&gt;</code></pre>
+      </details>
+    </div>
+
+    <div class="lab-card">
+      <div class="lab-card-head">
+        <h3>Social Card Hover</h3>
+        <span class="lab-badge lab-badge-live">Live</span>
+      </div>
+      <p class="lab-card-desc">The only interactive touch on <code>/life/</code> itself, outside the shared cross-page buttons: hovering an Instagram card lifts it 2px and swaps its border to the personal theme's own accent blue. Nothing clever — a plain <code>transform</code> + <code>border-color</code> transition — but it's the one place that page tells you something on the page is actually meant to be clicked, not just read.</p>
+      <div class="lab-demo lab-demo-dark theme-personal" style="padding:1.5rem;">
+        <div class="social-card" style="max-width:220px;">
+          <h2>Instagram</h2>
+          <p>Main account.</p>
+          <a class="handle" href="#" onclick="return false;">@handle</a>
+        </div>
+      </div>
+      <div class="lab-card-actions">
+        <button class="lab-copy-btn" data-copy-target="snippet-social-card">Copy HTML + CSS</button>
+      </div>
+      <details class="lab-code-details">
+        <summary>View code</summary>
+        <pre class="lab-code" id="snippet-social-card"><code>&lt;div class="social-card"&gt;
+  &lt;h2&gt;Instagram&lt;/h2&gt;
+  &lt;p&gt;Main account.&lt;/p&gt;
+  &lt;a class="handle" href="https://instagram.com/wherever"&gt;@handle&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+.social-card {
+  background: var(--surface, #1a2332);
+  border: 1px solid var(--border, #263041);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+.social-card:hover {
+  border-color: var(--accent, #6ec1ff);
+  transform: translateY(-2px);
+}
+.social-card a.handle {
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+.social-card a.handle::after {
+  content: " ↗";
+  font-weight: 400;
+  opacity: 0.6;
+}
 &lt;/style&gt;</code></pre>
       </details>
     </div>
