@@ -5,9 +5,12 @@ description: "Bhavesh Nakum's personal side: Instagram, photos, and hobbies outs
 permalink: /life/
 ---
 
-<div class="life-intro">
-  <h1>Outside of work</h1>
-  <p>Instagram's where most of this happens. Everything else on this page is still catching up.</p>
+<div class="life-hero">
+  <canvas class="life-hero-canvas" aria-hidden="true"></canvas>
+  <div class="life-hero-inner">
+    <h1>Outside of work</h1>
+    <p>Instagram's where most of this happens. Everything else on this page is still catching up.</p>
+  </div>
 </div>
 
 <div class="social-grid">
