@@ -1,3 +1,38 @@
+/* Opt every page into cross-document view transitions. Browsers that support
+   it animate same-origin navigations between opted-in pages automatically —
+   no JS needed; unsupported browsers just navigate normally. The new page
+   wipes up into view rather than a plain cross-fade — it "stops and reveals"
+   the destination, echoing the scroll-down gesture that got you there. A
+   literal particle-dissolve would need canvas/WebGL; this is the CSS-only
+   approximation. */
+@view-transition {
+  navigation: auto;
+}
+
+@keyframes reveal-old {
+  to { opacity: 0.3; }
+}
+
+@keyframes reveal-new {
+  from { clip-path: inset(100% 0 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+::view-transition-old(root) {
+  animation: reveal-old 0.45s var(--ease) forwards;
+}
+
+::view-transition-new(root) {
+  animation: reveal-new 0.5s var(--ease) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
 /* Shared design tokens — see DESIGN.md for the rationale behind each value. */
 :root {
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -104,4 +139,142 @@ p {
   :root {
     --space-5: 2.5rem;
   }
+}
+
+/* ---------------------------------------------------------------------
+   Shared components — used on any page, not tied to one theme's CSS file.
+   Each carries its own fixed color identity (see DESIGN.md): the offset
+   button is "the professional button" wherever it appears (resume actions,
+   the personal page's link back to the résumé); the keycap button is "the
+   personal button" (the homepage's and résumé's links into /life/). Same
+   component + same colors everywhere it's used, regardless of which
+   page's background it sits on.
+   --------------------------------------------------------------------- */
+
+/* Offset button — dashed pill, lifts up-left on hover with a hard offset
+   shadow. The button body matches its own page — background: var(--bg),
+   text/dashed border: var(--text) — so it reads as native to whichever
+   theme it's on (white body/black text/black dashes on the light pages,
+   dark body/white text/white dashes on the personal page). Blue is the one
+   constant: the hover shadow is always the same accent blue, in both
+   themes, so that's the button's fixed "professional" signal regardless of
+   background. Shape never changes (always a full pill) — only position and
+   shadow animate, so hover reads as "lifting," not "turning into a
+   different control." */
+.offset-btn {
+  --offset-shadow: #1d4ed8;
+
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(0.4rem, 1vw, 0.6rem);
+  padding: clamp(0.6rem, 1.2vw + 0.3rem, 0.95rem) clamp(1.1rem, 2.5vw + 0.4rem, 1.85rem);
+  border-radius: 999px;
+  border: 2px dashed var(--text);
+  background: var(--bg);
+  /* !important: professional.css/personal.css set a blanket `a { color:
+     var(--accent) }` for prose links, which outranks a bare `.offset-btn`
+     class on specificity (class+type beats class alone) — without this the
+     label silently renders in the wrong color. */
+  color: var(--text) !important;
+  font-weight: 600;
+  font-size: clamp(0.9rem, 0.6vw + 0.75rem, 1.05rem);
+  text-decoration: none;
+  transition:
+    transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.offset-btn .btn-arrow {
+  transition: transform 0.25s ease;
+}
+
+.offset-btn:hover,
+.offset-btn:focus-visible {
+  transform: translate(-8px, -8px);
+  box-shadow: 8px 8px 0 var(--offset-shadow);
+}
+
+.offset-btn:hover .btn-arrow,
+.offset-btn:focus-visible .btn-arrow {
+  transform: translateX(4px);
+}
+
+.offset-btn:active {
+  transform: translate(0, 0);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  transition-duration: 0.08s;
+}
+
+.offset-btn:focus-visible {
+  outline: 3px solid var(--offset-shadow);
+  outline-offset: 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offset-btn,
+  .offset-btn .btn-arrow {
+    transition-duration: 0.01ms;
+  }
+
+  .offset-btn:hover,
+  .offset-btn:focus-visible {
+    transform: none;
+  }
+}
+
+/* A nav bar is a tighter space than a hero — same component, smaller. */
+.site-header .offset-btn {
+  padding: 0.5rem 1.1rem;
+  font-size: 0.9rem;
+  gap: 0.4rem;
+}
+
+/* Keycap button — a rectangular key with a solid offset "lip" standing in
+   for its side wall (classic flat-3D keycap trick, no perspective/rotation:
+   an earlier tilted version was hard to read). Hover only glows, never
+   moves; the lip collapses and the key drops into it on :active, like an
+   actual keypress. Sized to match plain nav-link text so it doesn't dominate
+   next to "Resume"/"Life & Instagram". */
+.keycap-btn {
+  --keycap-fill: #12181f;
+  --keycap-edge: #080b0f;
+  --keycap-glow: #6ec1ff;
+  --keycap-text: #cfe6ff;
+  --keycap-text-hover: #ffffff;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  background: var(--keycap-fill);
+  color: var(--keycap-text) !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  box-shadow:
+    0 4px 0 var(--keycap-edge),
+    0 6px 12px rgba(0, 0, 0, 0.35);
+  transition: box-shadow 0.2s var(--ease), color 0.2s ease;
+}
+
+.keycap-btn:hover,
+.keycap-btn:focus-visible {
+  color: var(--keycap-text-hover) !important;
+  box-shadow:
+    0 4px 0 var(--keycap-edge),
+    0 6px 12px rgba(0, 0, 0, 0.35),
+    0 0 18px 3px var(--keycap-glow);
+}
+
+.keycap-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+  transition-duration: 0.05s;
+}
+
+.keycap-btn:focus-visible {
+  outline: 2px solid var(--keycap-glow);
+  outline-offset: 3px;
 }

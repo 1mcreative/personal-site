@@ -15,9 +15,9 @@ Each version of the site lives on its own branch, named after the phase it repre
 
 A version is a coherent, reviewable chunk of work — not every commit. Rough phases for this rebuild:
 
-1. **Structure** — Jekyll skeleton, layouts, resume + life pages, no motion or polish (this phase).
-2. **Theming** — refine the professional/personal visual styles once content is final.
-3. **Transition** — the light/dark particle-dissolve effect between the two sides.
+1. **Structure** — Jekyll skeleton, layouts, resume + life pages, no motion or polish. Done, `v1-structure`.
+2. **Theming** — refine the professional/personal visual styles once content is final. Done, `v2-theming`.
+3. **Transition** — button-free interactive homepage, scroll-triggered entry into the résumé, and a shared cross-document wipe transition used both directions (home↔resume, home↔life). Done, `v3-transition`. Note: the originally-imagined dark-mode-specific "Thanos snap" particle-dissolve was not built — that would need canvas/WebGL; what shipped is one CSS-only wipe used everywhere.
 4. **Expansion** — interview experience, interview questions, photo gallery, YouTube — brought in one at a time, each its own version.
 
 ## Never without a check-in

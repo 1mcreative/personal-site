@@ -30,17 +30,6 @@
   color: var(--text);
 }
 
-.theme-personal .switch-side {
-  padding: 0.35rem 0.85rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-}
-
-.theme-personal .switch-side:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
 .theme-personal .site-footer {
   border-top: 1px solid var(--border);
   color: var(--muted);

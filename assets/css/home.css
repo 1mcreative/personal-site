@@ -1,101 +1,1181 @@
-/* Homepage — neutral ground between the two themes; the split itself carries the color. */
+/* Home hero — the front door to both sides of the site. Went through a
+   near-black phase (see git history / CLAUDE.md tooling log) built around
+   assets/js/beyond-horizon.js, an ambient WebGL glow, then back to light —
+   see beyond-horizon.js's own "LIGHT-THEME REMAP" comment. That effect is
+   itself now deprecated in favor of assets/js/globe.js (a rotating dot
+   sphere), per explicit request. --accent (#1d4ed8) is the site's existing
+   Grind blue, not an invented color — the globe's dots use it directly, so
+   the background effect and the site's own established accent are one
+   swatch, not two independently-chosen ones. */
 .theme-home {
-  --bg: #12161c;
-  --text: #f2f4f7;
-  --muted: #98a2b3;
+  --bg: #ffffff;
+  --text: #14171c;
+  --muted: #5b6572;
+  --accent: #1d4ed8;
 
   background: var(--bg);
   color: var(--text);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  /* No scroll on the homepage at all, per explicit request — the hero fills
+     the viewport exactly and there's nothing below it to scroll to anymore
+     (the footer moved inside .hero as .hero-copyright). A wheel/touch
+     scroll attempt navigates to /resume/ instead (hero.js) — this is what
+     makes that a safe, non-destructive gesture rather than a dead end. */
+  overflow: hidden;
 }
 
+/* The hero needs full viewport width for the background blobs; tokens.css
+   constrains main#main to --max-width by default, so override it here and
+   do the centering inside .hero-inner instead. */
 .theme-home main#main {
-  flex: 1;
+  max-width: none;
+  padding: 0;
+}
+
+.hero {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: var(--space-4) var(--space-3);
+}
+
+/* Intro Sequence — full-screen "Bhavesh" splash (assets/js/intro-sequence.js),
+   playing before the rest of the homepage is revealed. Per explicit
+   sequencing request: the name appears alone, full-screen, first; once it
+   settles the splash fades away and everything else — the globe, glitter,
+   the subhead's own Scramble Text reveal — is revealed together. Those
+   other pieces aren't actually delayed or coordinated in any way: they've
+   been running/rendering underneath this opaque overlay the entire time,
+   so "reveal together" is just this overlay's own opacity transition, not
+   a scheduling change to any other script. Supersedes .name-kinetic-*
+   (deprecated below) — same grid-spread-then-survivor mechanic, just
+   full-screen instead of inline inside the h1.
+   display:none by default — reduced motion / no JS / a script error all
+   leave this never shown at all, so the real page (already fully
+   rendered underneath, since none of that markup depends on this splash)
+   is what those visitors see immediately. JS only ever adds
+   .intro-splash-active once it can actually run the sequence, same
+   progressive-enhancement shape as every other effect on this page. */
+.intro-splash {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  overflow: hidden;
+  background: var(--bg);
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease;
+}
+
+.intro-splash.intro-splash-active {
+  display: flex;
+}
+
+.intro-splash.intro-splash-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Font-size is intentionally small relative to the old single-digit-copy
+   version — the grid needs to hold 100+ words on screen at once (see
+   intro-sequence.js), and a large font-size there would mean the density
+   only exists as invisible DOM nodes spilling past the viewport edge,
+   not anything a visitor actually perceives as "more." The survivor
+   makes up the difference by growing on its own, below. */
+.intro-splash-grid {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  max-width: 900px;
-  padding-top: var(--space-5);
-  padding-bottom: var(--space-5);
+  align-items: center;
+  gap: 0.12em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(0.85rem, 2.6vw, 1.6rem);
+  color: var(--text);
+  transform: scale(1.18);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.home-intro {
-  text-align: center;
-  margin-bottom: var(--space-5);
+.intro-splash-grid.intro-splash-in {
+  transform: scale(1);
 }
 
-.home-intro h1 {
-  font-size: clamp(1.8rem, 5vw, 2.6rem);
-  margin-bottom: var(--space-1);
+.intro-splash-row {
+  display: flex;
+  gap: 0.35em;
+  white-space: nowrap;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.home-intro p {
-  color: var(--muted);
-  max-width: 55ch;
-  margin: 0 auto;
+.intro-splash-row-top {
+  transform: translateX(0.6em);
 }
 
-.side-picker {
-  display: grid;
-  gap: var(--space-3);
+.intro-splash-row-bottom {
+  transform: translateX(-0.6em);
 }
 
-@media (min-width: 640px) {
-  .side-picker {
-    grid-template-columns: 1fr 1fr;
+.intro-splash-grid.intro-splash-in .intro-splash-row-top,
+.intro-splash-grid.intro-splash-in .intro-splash-row-bottom {
+  transform: translateX(0);
+}
+
+.intro-splash-word {
+  display: inline-block;
+  transition: opacity 0.5s ease 0.15s;
+}
+
+.intro-splash-grid.intro-splash-in .intro-splash-word:not(.intro-splash-survivor) {
+  opacity: 0;
+}
+
+/* The survivor grows on its own as the field around it fades, rather than
+   settling at the same small size everything else in the dense field
+   uses — with 100+ small copies instead of the original handful of large
+   ones, staying at the field's own font-size would make the "reveal"
+   land as a small, unremarkable word instead of the dramatic full-screen
+   name the whole splash exists for. transform doesn't affect layout, so
+   this scales in place from the survivor's own grid cell without
+   disturbing its now-fading neighbors' positions. */
+.intro-splash-survivor {
+  transition: opacity 0.5s ease 0.15s, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+}
+
+.intro-splash-grid.intro-splash-in .intro-splash-survivor {
+  transform: scale(3.2);
+}
+
+/* DEPRECATED (not deleted): .hero-glow (Beyond Horizon's WebGL canvas),
+   superseded by .hero-globe below per explicit request ("instade of
+   horaizon add this glob animation"). Markup removed from index.md; CSS and
+   assets/js/beyond-horizon.js both left fully intact. Re-enabling: restore
+   the markup in index.md and swap the script tag in home.html back. */
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.hero-glow-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Globe — a rotating dot-sphere WebGL background (assets/js/globe.js). A
+   fixed-size square container, not full-bleed: sized and positioned so a
+   circle (the sphere's silhouette) reads clearly rather than filling the
+   whole hero. On desktop it's shifted down by exactly half its own height
+   (translate 50%, not a bottom% offset — bottom/top percentages resolve
+   against the *containing block*'s height for an absolutely positioned
+   element, not the element's own, which would make this depend on the
+   hero's height instead of the globe's own size) so its vertical center
+   lands on .hero's bottom edge — combined with .hero's own overflow:hidden,
+   exactly the top half is visible, like a planet's curve rising into frame,
+   per explicit request ("in desktop i want globe to be visible half only
+   like cut from center"). Mobile drops that offset entirely so the whole
+   circle shows, per the same request's mobile carve-out.
+   pointer-events: auto (was none) + the grab cursor is for drag-to-rotate
+   (globe.js) per explicit follow-up request. .hero's own overflow:hidden
+   clips hit-testing along with paint, so dragging only works where the
+   dots are actually visible, not across the whole clipped square — and
+   .scroll-cue sits at a higher z-index, so it stays clickable where the
+   two overlap. */
+.hero-globe {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  bottom: 0;
+  width: min(58vw, 560px);
+  aspect-ratio: 1;
+  transform: translate(-50%, 50%) scale(var(--globe-zoom, 1));
+  cursor: grab;
+  /* Without this, a browser can claim a click-drag as its own pan/scroll
+     gesture before pointermove ever reaches globe.js's handler — mobile's
+     coarse touch-drag mostly survives that anyway, but a trackpad or
+     precision-pointer drag on desktop is exactly the case this breaks. */
+  touch-action: none;
+  /* --globe-zoom is 1 at rest. A WebGL canvas can only ever render within
+     its own drawing buffer (sized to this element's own box, e.g. up to
+     560px square) — so globe.js growing the marker's gl_PointSize alone
+     can make the amber dot dominate that small box, but can't make it
+     cover an actual 1280px+ viewport on its own. This CSS scale is what
+     actually balloons the whole element up to fill the screen; hero.js
+     sets it right as globe.js's own spin-then-zoom sequence reaches its
+     zoom phase, so the two effects land together — the sphere is already
+     facing the marker and its dot is already growing internally by the
+     time the container itself starts visibly expanding. */
+  transition: transform 0.7s cubic-bezier(0.55, 0, 1, 0.45);
+}
+
+.hero-globe:active {
+  cursor: grabbing;
+}
+
+.hero-globe-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .hero-globe {
+    width: min(80vw, 360px);
+    bottom: 6%;
+    transform: translateX(-50%) scale(var(--globe-zoom, 1));
   }
 }
 
-.side-card {
-  display: block;
-  text-decoration: none;
-  border-radius: var(--radius-lg);
-  padding: var(--space-4) var(--space-3);
-  transition: transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
+/* DEPRECATED (not deleted): .hero-blobs. .hero-glitter runs again below,
+   layered on top of the current background per explicit request ("i want
+   both effect in landing page") — its canvas background stays transparent
+   between star draws (see glitter.js), so whatever's behind it shows
+   through everywhere except the star pixels themselves. .hero-blobs is
+   still off; three animated backgrounds at once is more than two.
+   Re-enabling is deleting this one display:none rule, nothing to rebuild. */
+.hero-blobs {
+  display: none;
 }
 
-.side-card:hover {
-  transform: translateY(-3px);
+.hero-blobs {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* --mx/--my: set by hero.js on mousemove, a subtle parallax shift. */
+  transform: translate(var(--mx, 0px), var(--my, 0px));
+  transition: transform 0.4s ease-out;
 }
 
-.side-card.professional {
-  background: #ffffff;
-  color: #1b1f24;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+/* Builds up as the user scrolls toward the sentinel (--scroll-progress,
+   0 to 1, set on <html> by hero.js) — a hint that something's about to
+   happen, well before the actual navigation fires at the bottom. Fixed to
+   the viewport, not .hero, so it's still visible once the hero itself has
+   scrolled out of view. */
+.scroll-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  background: radial-gradient(circle at 50% 100%, rgba(29, 78, 216, 0.4), transparent 70%);
+  opacity: var(--scroll-progress, 0);
+  pointer-events: none;
 }
 
-.side-card.professional:hover {
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+/* Pure scroll distance for the veil to build up over — the hero itself is
+   ~one viewport tall, leaving almost no room to scroll "within" it before
+   hitting the sentinel. */
+.scroll-runway {
+  height: 60vh;
 }
 
-.side-card.personal {
-  background: #1a2332;
-  color: #e8eef7;
-  border: 1px solid #263041;
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.4;
+  animation: drift 20s ease-in-out infinite;
+  will-change: transform;
 }
 
-.side-card.personal:hover {
-  box-shadow: 0 12px 24px rgba(110, 193, 255, 0.15);
+.blob-a {
+  width: 26rem;
+  height: 26rem;
+  background: #93c5fd;
+  top: -8%;
+  left: -10%;
 }
 
-.side-card h2 {
-  font-size: 1.35rem;
-  margin: 0 0 0.4rem;
+.blob-b {
+  width: 22rem;
+  height: 22rem;
+  background: #fbbf24;
+  bottom: -12%;
+  right: -8%;
+  animation-delay: -7s;
 }
 
-.side-card p {
-  margin: 0;
-  opacity: 0.75;
+.blob-c {
+  width: 18rem;
+  height: 18rem;
+  background: #6ee7b7;
+  top: 45%;
+  left: 62%;
+  animation-delay: -13s;
 }
 
-.theme-home .home-footer {
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(2rem, -2.5rem) scale(1.08); }
+  66% { transform: translate(-1.5rem, 1.5rem) scale(0.95); }
+}
+
+/* Hero glitter — canvas warp-tunnel background (assets/js/glitter.js),
+   ported from a React/canvas component the user supplied. Sits between the
+   blobs and the text content. Fully skipped (script returns early, canvas
+   stays empty/transparent) under prefers-reduced-motion. */
+.hero-glitter {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Hero stars — the galaxy button's star motif, carried into the background.
+   A plain white-on-black starfield doesn't work on this light page, so
+   these are small saturated dots (richer siblings of the blob palette)
+   with a soft glow, twinkling gently. Reuses .galaxy__container's
+   star-twinkle keyframe (defined below) rather than a second one that
+   does the same thing. Positions are hand-placed via a Liquid loop in
+   index.md, not random — random would need JS or would be unstable
+   between builds, and a fixed scattered layout looks just as natural. */
+.hero-stars {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* DEPRECATED (not deleted): .hero-stars is superseded by .hero-glitter
+   above, which covers the same "twinkling star field" role with actual
+   motion. Everything above is untouched and fully working — re-enabling
+   is deleting this one rule, nothing to rebuild. */
+.hero-stars {
+  display: none;
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
+.hero-star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #60a5fa;
+  box-shadow: 0 0 6px 1px rgba(96, 165, 250, 0.6);
+  animation: star-twinkle 3.2s ease-in-out infinite;
+}
+
+.hero-star:nth-child(3n) {
+  background: #f59e0b;
+  box-shadow: 0 0 6px 1px rgba(245, 158, 11, 0.55);
+}
+
+.hero-star:nth-child(3n + 1) {
+  background: #34d399;
+  box-shadow: 0 0 6px 1px rgba(52, 211, 153, 0.5);
+}
+
+.hero-star:nth-child(4n) {
+  width: 2px;
+  height: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-star {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+/* Pixel Name — canvas particle formation for the word "Bhavesh" inside the
+   hero heading (assets/js/pixel-name.js), adapted from a pasted Originkit
+   "Pixel Drift" React reference. Sized to cover the whole hero (not just
+   the word) so particles genuinely travel in "from around the screen"
+   rather than a tight ring right next to the letters — same absolute-inset
+   pattern as .hero-globe/.hero-glitter. z-index above .hero-inner
+   (including its mobile backdrop panel above) so the formed word reads
+   clearly instead of being dimmed by that panel; the brief mid-flight
+   overlap with "Hi, I'm"/the subhead during the ~1.1s formation is an
+   acceptable trade for particles crossing real screen distance.
+   pointer-events:none and aria-hidden: purely decorative, the real text
+   underneath (.pixel-name-plain) is what a screen reader/no-JS/reduced-
+   motion visitor actually sees. */
+.pixel-name-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Made transparent, not display:none/clipped out of flow — it needs to
+   keep reserving its normal inline space in "Hi, I'm ___ ." (including
+   through the h1's responsive clamp() font-size) so hiding it never
+   shifts the surrounding plain text. Screen readers/SEO see plain visible
+   text regardless of color, so nothing is lost for those visitors; no JS
+   or reduced motion just leaves it looking exactly as it always did. */
+.pixel-name-plain.pixel-name-hidden {
+  color: transparent;
+}
+
+/* DEPRECATED — Name Kinetic, a small inline one-shot "appear" flourish for
+   the word "Bhavesh" (assets/js/name-kinetic.js), adapted from a pasted
+   Originkit "Appear Text" / KineticTextGrid React+Framer-Motion reference.
+   Superseded by .intro-splash above per explicit request to sequence the
+   intro — the same grid-spread-then-survivor mechanic now plays full-
+   screen, alone, before the rest of the page, rather than inline inside
+   the h1 while everything else is already visible. Script tag commented
+   out in home.html; CSS and markup (`.name-kinetic-wrap` in index.md) left
+   intact — re-enabling is one uncommented script tag, and the two effects
+   don't conflict since `.intro-splash` covers the whole screen regardless
+   of what the (now-inert) inline version would have done underneath it. */
+.name-kinetic-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.name-kinetic-plain.name-kinetic-hidden {
+  color: transparent;
+}
+
+.name-kinetic-grid {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12em;
+  pointer-events: none;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.name-kinetic-grid.name-kinetic-in {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.name-kinetic-row {
+  display: flex;
+  gap: 0.35em;
+  white-space: nowrap;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.name-kinetic-row-top {
+  transform: translateX(0.6em);
+}
+
+.name-kinetic-row-bottom {
+  transform: translateX(-0.6em);
+}
+
+.name-kinetic-grid.name-kinetic-in .name-kinetic-row-top,
+.name-kinetic-grid.name-kinetic-in .name-kinetic-row-bottom {
+  transform: translateX(0);
+}
+
+.name-kinetic-word {
+  display: inline-block;
+  transition: opacity 0.5s ease 0.15s;
+}
+
+.name-kinetic-grid.name-kinetic-in .name-kinetic-word:not(.name-kinetic-survivor) {
+  opacity: 0;
+}
+
+/* Dynamic Weight — "after everything, hovering the name gets it bold,
+   that's it." A plain CSS :hover on the same shared "Bhavesh" span
+   (.pixel-name-plain/.name-kinetic-plain), genuinely interpolated rather
+   than synthetically faked: Fraunces is a variable font and its loaded
+   weight range was widened to 400..900 (see head.html) specifically so
+   this transition has real in-between weights to animate through, not
+   just a jump between two static cuts. No JS, no hover-capability
+   gating — it's a harmless enhancement on non-hover devices (a tap either
+   does nothing or transiently applies :hover, both fine), so there's
+   nothing here that needs feature-detecting the way cursor-tracking
+   effects elsewhere on this page do. */
+.dynamic-weight {
+  transition: font-weight 0.3s ease;
+}
+
+.dynamic-weight:hover {
+  font-weight: 900;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
   text-align: center;
-  color: var(--muted);
-  font-size: 0.85rem;
 }
 
-.theme-home .home-footer a {
+/* On mobile the globe (see .hero-globe) sits tall enough to run straight
+   through the heading/subhead, not just brush past them — a real overlap
+   confirmed via getBoundingClientRect, not a hunch. Desktop's globe stays
+   low enough that this never triggers there, so the panel is scoped to the
+   same max-width:640px breakpoint the globe's own mobile sizing uses.
+   Same treatment as .scroll-cue's pill: a plain blurred white wash rather
+   than a globe-matched color, so it stays correct if the background effect
+   changes again.
+   Backdropped per text block, not one shared box around .hero-inner as a
+   whole — a single enclosing box added its own padding/border-radius/
+   margin-bottom gap on top of the text, covering noticeably more of the
+   globe than the text itself needed. First fix moved to one inline-block
+   pill per block (h1, then the subhead paragraph) — still too much,
+   because .hero-sub wraps across 3-4 lines and a single inline-block box
+   is one rectangle sized to the WIDEST line, so shorter lines (e.g. "...
+   than it looks.") got backdrop stretching well past their own text on
+   both sides, still eating into the globe. Fixed with the standard
+   multi-line-highlight technique instead: the subhead's actual text is a
+   `.hero-sub-text` span (see index.md) that goes `display: inline` with
+   `box-decoration-break: clone`, so the browser gives each wrapped line
+   its own tightly-sized background box rather than one shared rectangle.
+   The outer `<p class="hero-sub">` stays a normal block — critical,
+   because making the PARAGRAPH itself `display:inline` (the first attempt)
+   removed the automatic line break between it and the h1 above, letting
+   the first few characters of the subhead render up on the heading's own
+   line before wrapping, a real rendering bug caught via getClientRects()
+   (5 fragments, the first only 16px wide sitting in the h1's row) rather
+   than just eyeballing a screenshot. h1 stays inline-block since it's
+   always one line — no per-line issue to fix there. */
+@media (max-width: 640px) {
+  .hero-inner h1 {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    padding: 0.05em 0.4em;
+  }
+
+  .hero-inner .hero-sub-text {
+    display: inline;
+    background: rgba(255, 255, 255, 0.78);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    border-radius: 6px;
+    padding: 0.2em 0.35em;
+  }
+}
+
+.hero-inner h1 {
+  font-size: clamp(2.2rem, 6vw, 3.2rem);
+  margin-bottom: var(--space-2);
+  /* A touch of negative tracking at display size — every dark-canvas
+     reference checked (Linear -3px @80px, Vercel -2.4px @48px, Raycast's
+     ss03 tightening) does this on display type; kept modest here since
+     Fraunces is a serif, not the geometric sans those systems tighten. */
+  letter-spacing: -0.01em;
+}
+
+.hero-inner .hero-sub {
   color: var(--muted);
+  font-size: clamp(1.05rem, 2.2vw, 1.2rem);
+  max-width: 52ch;
+  margin: 0 auto var(--space-4);
+}
+
+/* Hero-wide glow bloom on galaxy-button hover/focus — DORMANT. The galaxy
+   button moved to the résumé nav (see professional.css), so no
+   `.galaxy-button` element exists inside `.hero` anymore and the :has()
+   selector below never matches. Left in place, not deleted, in case a
+   future hero CTA wants the same "hovering this lights up the scene"
+   treatment. Was a scoped stand-in for the reference galaxy-button's
+   `body:has(button:hover)` full-page black-out. */
+.hero-hover-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(120% 90% at 50% 65%, rgba(29, 78, 216, 0.28), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+@supports selector(:has(a)) {
+  .hero:has(.galaxy-button:hover, .galaxy-button:focus-visible) .hero-hover-glow {
+    opacity: 1;
+  }
+}
+
+/* DEPRECATED (not deleted): the page-corner (desktop) / portal-orb (mobile)
+   hint at /life/, and the .dissolving "Thanos snap" transition it triggered
+   (assets/js/dissolve.js), per explicit user feedback ("remove that page and
+   thanos effect for now it not what i am looking for"). The spotlight-text
+   hint (desktop-only, see below) and the galaxy button (now in the résumé
+   nav — see professional.css) remain the paths into /life/. Both are fully
+   intact below — markup still in index.md, JS files untouched, dissolve.js
+   just no longer loaded (see home.html) since its only triggers are now
+   hidden. Re-enabling: delete the one display:none rule below and restore
+   dissolve.js's <script> tag. */
+.page-corner,
+.portal-orb {
+  display: none !important;
+}
+
+.page-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  width: 96px;
+  height: 96px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.page-corner-back,
+.page-corner-front {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(100% 0, 100% 100%, 0 0);
+  transform-origin: 100% 0;
+}
+
+.page-corner-back {
+  background: #1c1430;
+  box-shadow: 0 0 24px 6px rgba(110, 193, 255, 0.35);
+}
+
+.page-corner-front {
+  background: #ffffff;
+  box-shadow: -6px 6px 16px rgba(20, 23, 28, 0.12);
+  animation: corner-flutter 5s ease-in-out infinite;
+  transition: transform 0.4s var(--ease);
+}
+
+.page-corner:hover .page-corner-front,
+.page-corner:focus-visible .page-corner-front {
+  transform: scale(0.82) rotate(-8deg);
+}
+
+.page-corner:focus-visible {
+  outline: 2px solid #6ec1ff;
+  outline-offset: 4px;
+}
+
+@keyframes corner-flutter {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(-3deg) scale(0.97); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-corner-front {
+    animation: none;
+    transform: rotate(-3deg) scale(0.94);
+  }
+}
+
+@media (max-width: 640px) {
+  .page-corner {
+    display: none;
+  }
+}
+
+/* Portal orb — mobile only (see .page-corner above). A small glowing dot,
+   real <a href="/life/">, whose label only appears on hover/focus; the
+   label text is always in the DOM so screen readers announce it regardless
+   of the opacity trick. Visual dot is 16px but the tap target is 44px via
+   an invisible ::before overlay. */
+.portal-orb {
+  display: none;
+}
+
+/* Was a dark dot on a light page; the homepage background is dark now too,
+   so it flips to a small bright star instead — same idea (a point of light
+   hinting at the Chaos side), same blue glow, just visible against its new
+   backdrop. */
+@media (max-width: 640px) {
+  .portal-orb {
+    display: block;
+    position: absolute;
+    z-index: 3;
+    left: 8%;
+    bottom: 8%;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #eaf4ff;
+    box-shadow: 0 0 0 4px rgba(234, 244, 255, 0.08), 0 0 22px 6px rgba(110, 193, 255, 0.65);
+    text-decoration: none;
+    cursor: pointer;
+    animation: orb-pulse 3.5s ease-in-out infinite;
+    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  }
+
+  .portal-orb::before {
+    content: "";
+    position: absolute;
+    inset: -14px;
+  }
+
+  .portal-orb:hover,
+  .portal-orb:focus-visible {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 6px rgba(234, 244, 255, 0.1), 0 0 32px 10px rgba(110, 193, 255, 0.9);
+  }
+
+  .portal-orb:focus-visible {
+    outline: 2px solid #6ec1ff;
+    outline-offset: 6px;
+  }
+
+  .portal-orb-label {
+    position: absolute;
+    right: 50%;
+    bottom: 140%;
+    transform: translate(50%, 6px);
+    white-space: nowrap;
+    background: #1c1430;
+    border: 1px solid rgba(183, 155, 250, 0.35);
+    color: #eaf4ff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .portal-orb:hover .portal-orb-label,
+  .portal-orb:focus-visible .portal-orb-label {
+    opacity: 1;
+    transform: translate(50%, 0);
+  }
+}
+
+@keyframes orb-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(234, 244, 255, 0.08), 0 0 22px 6px rgba(110, 193, 255, 0.65); }
+  50% { box-shadow: 0 0 0 4px rgba(234, 244, 255, 0.08), 0 0 28px 9px rgba(110, 193, 255, 0.85); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-orb {
+    animation: none;
+  }
+}
+
+/* Spotlight text — a second, quieter hint at /life/, à la a flashlight
+   sweeping dim text into brightness. Desktop only, per explicit request
+   ("hiddentxt should be hidden totally and it should work on only desktop
+   ... in mobile i dont want that effect or feature") — hidden outright at
+   max-width:640px below, not just left in its unenhanced fallback state.
+   On desktop: once hero.js confirms hover + motion are both available it
+   adds .spotlight-ready, which dims the text almost to nothing and switches
+   on the cursor-following reveal — genuinely hidden until hovered, not just
+   quiet. Without JS/with reduced motion on desktop, it falls back to plain
+   readable muted text rather than disappearing, since there's no way to
+   detect "hover" without JS to gate the enhancement on. */
+@property --spot-size {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+.spotlight-text {
+  position: absolute;
+  z-index: 2;
+  top: 16%;
+  right: 8%;
+  max-width: 15rem;
+  text-align: right;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+
+/* Both layers must share every metric that affects glyph width/wrapping
+   (weight, style, size) — the two layers are drawn from the same text flow
+   and have to break onto the same lines, or the mask reveals bright glyphs
+   sitting in a different spot than the dim ones underneath them. That
+   mismatch is what "misaligned" was: an earlier version only bolded the
+   bright layer, which widened its glyphs enough to reflow differently at
+   some widths. */
+.spotlight-dim,
+.spotlight-bright {
+  display: block;
+  margin: 0;
+  font: inherit;
+}
+
+.spotlight-dim {
+  color: var(--muted);
+}
+
+.spotlight-bright {
+  display: none;
+}
+
+.spotlight-text.spotlight-ready {
+  cursor: none;
+}
+
+/* Fully transparent, not just faint — per explicit request ("make it
+   complitly hidden only if cursor is on top of text than it should be
+   visible"). Combined with .spotlight-bright's --spot-size:0px default
+   (below), nothing here is visible at all until the cursor's flashlight
+   circle reveals it. */
+.spotlight-text.spotlight-ready .spotlight-dim {
+  color: transparent;
+}
+
+.spotlight-text.spotlight-ready .spotlight-bright {
+  display: block;
+  position: absolute;
+  inset: 0;
+  color: #12181f;
+  pointer-events: none;
+  --spot-size: 0px;
+  transition: --spot-size 0.3s ease;
+  -webkit-mask-image: radial-gradient(circle var(--spot-size) at var(--spot-x, 50%) var(--spot-y, 50%), black, black 55%, transparent 100%);
+  mask-image: radial-gradient(circle var(--spot-size) at var(--spot-x, 50%) var(--spot-y, 50%), black, black 55%, transparent 100%);
+}
+
+.spotlight-text.spotlight-ready:hover .spotlight-bright,
+.spotlight-text.spotlight-ready:focus-visible .spotlight-bright {
+  --spot-size: 140px;
+}
+
+.spotlight-text:focus-visible {
+  outline: 2px solid #6ec1ff;
+  outline-offset: 6px;
+}
+
+@media (max-width: 640px) {
+  .spotlight-text {
+    display: none;
+  }
+}
+
+/* A real link, not just a hint — the only way into /resume/ that doesn't
+   depend on scrolling or motion (hero.js skips the whole scroll mechanic
+   under prefers-reduced-motion, so this has to work standing alone). Styled
+   quietly on purpose; it's still a full link underneath.
+   A soft backdrop pill was added once the bigger globe (see .hero-globe)
+   started reaching high enough to sit directly behind this text on wide
+   viewports — z-index already kept the text on top and clickable, but a
+   dense field of dots right behind it made it genuinely harder to read.
+   The pill is deliberately background-agnostic (a plain blurred white
+   wash, not "globe-colored") so it stays correct if what's behind it ever
+   changes again.
+
+   The backdrop lives on the icon and the text separately now, not on
+   this shared flex container — per explicit follow-up that one pill
+   wrapping both was still covering more globe than it needed to, since
+   the gap between the arrow and "keep going" got backdrop too despite
+   having no content in it worth protecting. Two tightly-fitted shapes
+   (below) cover only the icon's own circle and the text's own pill,
+   leaving the gap between them showing the globe through untouched. */
+.scroll-cue {
+  position: absolute;
+  bottom: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+
+.scroll-cue svg,
+.scroll-cue span {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.scroll-cue svg {
+  display: block;
+  box-sizing: content-box;
+  padding: 6px;
+  border-radius: 50%;
+  animation: bob 1.8s ease-in-out infinite;
+}
+
+.scroll-cue span {
+  display: block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+}
+
+/* Mobile-only: matches .hero-sub-text's own treatment for the exact same
+   "text over the globe" problem — a solid-ish background, no
+   backdrop-filter at all — per explicit feedback that the pill's blur
+   looked heavier here than the equivalent hint elsewhere on the page.
+   Desktop keeps the original blur pill; the globe never reaches high
+   enough there to need this in the first place. */
+@media (max-width: 640px) {
+  .scroll-cue svg,
+  .scroll-cue span {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+.scroll-cue:hover,
+.scroll-cue:focus-visible {
+  color: var(--text);
+}
+
+.scroll-cue:focus-visible {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+/* Pull dot into /life/ — a real link, same "always works standing alone"
+   rule as .scroll-cue. Colored from the personal theme's own palette
+   (#12181f fill, reused from .keycap-btn; #e8eef7 personal text for the
+   arrow) rather than anything homepage-specific, since it's the button's
+   destination that should read on it, not whatever's behind it — same
+   convention as every other cross-side button on this site. A small
+   circle, not the earlier rectangular pull-tab, per explicit request for
+   the trigger to read as a "dot" that then expands into a "big circle" —
+   the resting shape and the expansion shape needing to already match is
+   what "seamless" means here.
+
+   Seamless into the edge, not floating near it: `right: -20px` (half the
+   button's own width) puts the circle's *center* exactly on the
+   viewport's right edge, so only its left half ever renders — the
+   viewport boundary itself does the clipping, no clip-path needed. That
+   silhouette is exactly "width 0 at the top, curving out to full width
+   in the middle, back to 0 at the bottom" per explicit request: the
+   top/bottom of a circle sit directly above/below its center (zero
+   horizontal offset from it), so those points land precisely on the
+   edge, while the leftmost point — the vertical middle — is a full
+   radius away, the widest the bulge ever gets. */
+.life-pull-btn {
+  position: fixed;
+  top: 50%;
+  right: -20px;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 2px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #12181f;
+  color: #e8eef7;
+  text-decoration: none;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.22);
+  transition: transform 0.25s var(--ease), background 0.25s ease;
+}
+
+.life-pull-btn:hover,
+.life-pull-btn:focus-visible {
+  transform: translateY(-50%) scale(1.12);
+  background: #1a232e;
+}
+
+.life-pull-btn:focus-visible {
+  outline: 2px solid #6ec1ff;
+  outline-offset: 2px;
+}
+
+/* Centered within the whole circle (half of which is off-screen) would
+   put the icon right on the edge, half invisible — shifted into the
+   visible left half instead via the button's own flex/padding above. */
+.life-pull-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* A real overlap, not a hypothetical one: at 50% vertical center, this
+   button's box genuinely intersects .hero-sub-text's own bounding box on
+   a typical phone height (confirmed via getBoundingClientRect — the
+   subhead wraps to 4 lines on narrow viewports, reaching well past the
+   screen's vertical center). Moved down to 62% instead, clearing the
+   subhead with margin to spare; the globe sits in that same region but
+   overlapping a decorative dot field is a non-issue next to overlapping
+   readable text. */
+@media (max-width: 640px) {
+  .life-pull-btn {
+    top: 62%;
+    right: -16px;
+    width: 32px;
+    height: 32px;
+  }
+
+  /* The visible half is only 16px wide here — a 16px icon would exactly
+     fill it edge to edge with zero breathing room, so it shrinks a
+     touch to leave a hair of margin on both sides. */
+  .life-pull-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+/* The "bubble" that plays on the way into /life/ — a swipe-left gesture
+   or a .life-pull-btn click both call goToLife() (hero.js), which grows
+   this from a small circle centered exactly on the button into one big
+   enough to cover the whole screen, then navigates. Plain clip-path
+   circle(), not @property-registered custom properties: a circle only
+   ever needs one number (its radius) to grow, since the center point
+   never moves, so there's no multi-property choreography to build here
+   at all — hero.js sets the literal "from" and "to" clip-path strings
+   directly via inline style (both the rest radius, matching the dot, and
+   the active radius, computed from the button's center to the farthest
+   corner of the viewport so the circle is guaranteed to cover every
+   pixel regardless of aspect ratio), and this rule only owns the
+   transition's timing.
+
+   This replaces an earlier rectangular version (a clip-path: inset()
+   sweep, plain transform: scaleX() before that) — worth calling out
+   directly since the earlier inset() version used @property to give
+   its four sides independent timing, and @property support is real but
+   not universal (a materially newer addition than plain clip-path
+   interpolation, which has worked in every evergreen browser for years);
+   on a browser without it, those custom properties silently stop being
+   animatable and the whole transition just snaps to its end state
+   instantly — reported directly as "the transition is very fast and
+   unable to see it happening." A single-value circle() radius needs no
+   such registration, so this version doesn't carry that risk. At rest
+   this sits one z-index below .life-pull-btn (hidden behind the opaque
+   dot); .life-wipe-active jumps it above instead, at the exact moment
+   its clip-path starts matching the dot's own shape/color/position
+   exactly, for the same reason the rectangular version needed that swap
+   — otherwise the dot, still opaque and still on top, would just sit
+   there unchanged while the circle grew everywhere around it. #12181f
+   is the button's own fill, not a new color, so that swap is invisible.
+   The earlier, more elaborate "Thanos snap" (assets/js/dissolve.js) was
+   explicitly cut for being more than what was wanted; this is the
+   simpler effect asked for instead. */
+.life-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+  background: #12181f;
+  pointer-events: none;
+}
+
+.life-wipe-active {
+  z-index: 41;
+  transition: clip-path 0.6s cubic-bezier(0.3, 1.2, 0.4, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .life-wipe-active {
+    transition: none;
+  }
+}
+
+/* The white handoff on the way into /resume/ (hero.js's goToResume,
+   triggered once globe.js's marker-zoom finishes) — a real full-viewport
+   cover, not just a fade on the globe's own canvas. Fading only the
+   canvas used to reveal the rest of .hero (headline, subhead, glitter,
+   the life pull-tab, copyright) still sitting there untouched, which
+   showed up as "the landing page again for half a second" between the
+   amber zoom and the actual navigation — see globe.js and hero.js for the
+   fuller story. #ffffff, not a new shade: both .theme-home and /resume/
+   share the same white background, so fading to opaque white lands on
+   exactly the color the next page opens on. */
+.resume-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  background: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.resume-wipe-active {
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resume-wipe-active {
+    transition: none;
+  }
+}
+
+/* Copyright line — no longer a separate <footer> after the hero (that
+   added document height beyond .hero's own 100dvh, which is exactly the
+   scroll this page isn't supposed to have — see the no-scroll rule on
+   .theme-home below). Lives inside .hero as a small corner mark instead,
+   bottom-left so it doesn't compete with .scroll-cue (center) or
+   .spotlight-text (top-right, desktop). Email address dropped per explicit
+   request — it's still one click away via /resume/'s own contact line,
+   this was purely decorative legal text on the homepage, not a unique
+   contact path. */
+.hero-copyright {
+  position: absolute;
+  z-index: 1;
+  left: var(--space-3);
+  bottom: var(--space-2);
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blob {
+    animation: none;
+  }
+
+  .scroll-cue svg {
+    animation: none;
+  }
+
+  .hero-blobs {
+    transition: none;
+  }
+
+  .portal-orb {
+    animation: none;
+  }
+
+  .portal-orb:hover,
+  .portal-orb:focus-visible {
+    transform: none;
+  }
+}
+
+/* The "Thanos snap" transition into /life/ (assets/js/dissolve.js) — the
+   deferred fuller version of the page-corner/orb hint, built once the
+   landing page itself felt done. JS adds .dissolving to <html> on click,
+   fades the hero to black underneath a canvas of particles blown apart to
+   the left, then navigates once the animation finishes. No JS or
+   prefers-reduced-motion: the click just falls through to the plain
+   <a href="/life/"> underneath, same as every other decorative effect on
+   this page. */
+.dissolve-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+html.dissolving,
+html.dissolving body {
+  background: #05070a;
+}
+
+html.dissolving .hero > * {
+  transition: opacity 0.45s ease;
+  opacity: 0;
 }
