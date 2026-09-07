@@ -867,11 +867,15 @@
    dense field of dots right behind it made it genuinely harder to read.
    The pill is deliberately background-agnostic (a plain blurred white
    wash, not "globe-colored") so it stays correct if what's behind it ever
-   changes again. Padding and opacity both trimmed down per explicit
-   feedback that it was covering more of the globe than it needed to —
-   tighter padding shrinks the pill's footprint to just around the icon
-   and text instead of a wide halo around them, and the lower opacity lets
-   noticeably more of the globe show through the part that's still covered. */
+   changes again.
+
+   The backdrop lives on the icon and the text separately now, not on
+   this shared flex container — per explicit follow-up that one pill
+   wrapping both was still covering more globe than it needed to, since
+   the gap between the arrow and "keep going" got backdrop too despite
+   having no content in it worth protecting. Two tightly-fitted shapes
+   (below) cover only the icon's own circle and the text's own pill,
+   leaving the gap between them showing the globe through untouched. */
 .scroll-cue {
   position: absolute;
   bottom: var(--space-3);
@@ -882,14 +886,30 @@
   flex-direction: column;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.3rem 0.6rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   color: var(--muted);
   font-size: 0.8rem;
   text-decoration: none;
+}
+
+.scroll-cue svg,
+.scroll-cue span {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.scroll-cue svg {
+  display: block;
+  box-sizing: content-box;
+  padding: 6px;
+  border-radius: 50%;
+  animation: bob 1.8s ease-in-out infinite;
+}
+
+.scroll-cue span {
+  display: block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
 }
 
 /* Mobile-only: matches .hero-sub-text's own treatment for the exact same
@@ -899,7 +919,8 @@
    Desktop keeps the original blur pill; the globe never reaches high
    enough there to need this in the first place. */
 @media (max-width: 640px) {
-  .scroll-cue {
+  .scroll-cue svg,
+  .scroll-cue span {
     background: rgba(255, 255, 255, 0.55);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
@@ -915,10 +936,6 @@
   outline: 2px solid #1d4ed8;
   outline-offset: 4px;
   border-radius: 4px;
-}
-
-.scroll-cue svg {
-  animation: bob 1.8s ease-in-out infinite;
 }
 
 @keyframes bob {

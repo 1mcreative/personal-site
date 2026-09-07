@@ -222,9 +222,18 @@
     revealStart = 0;
   };
 
+  // Bumped by globeFocusMarker() below: the canvas's own drawing buffer
+  // is sized for its normal on-screen footprint, but --globe-zoom then
+  // stretches that already-small raster up by a CSS transform (up to
+  // 9x) to cover the viewport — a browser has to bilinear-interpolate
+  // that kind of upscale, softening edges no matter how sharp the
+  // shader itself draws them. Rendering at higher native resolution
+  // *before* the CSS scale happens gives it real pixel detail to
+  // stretch instead of guessing between existing pixels.
+  var resScale = 1;
   var w = 0, h = 0;
   function resize() {
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var dpr = Math.min(window.devicePixelRatio || 1, 2) * resScale;
     var cssW = Math.max(1, host.clientWidth);
     var cssH = Math.max(1, host.clientHeight);
     var nw = Math.round(cssW * dpr);
@@ -360,6 +369,12 @@
     focusCallback = callback || null;
     focusPhase = "spin";
     focusStart = 0;
+    // Re-render the canvas at higher native resolution before the zoom
+    // starts growing it — see resScale's own comment above resize().
+    // Done once, up front, rather than ramped alongside the zoom itself,
+    // so there's no visible resolution "pop" partway through.
+    resScale = 4;
+    resize();
   };
 
   var raf = 0, lastT = 0;
