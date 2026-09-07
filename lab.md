@@ -2945,9 +2945,11 @@ window.globeFocusMarker = function (callback) {
           var demo = document.getElementById("lab-resume-wipe");
           var btn = document.getElementById("lab-resume-wipe-btn");
           if (!demo || !btn) return;
+          var hideTimer = null;
           btn.addEventListener("click", function () {
             demo.classList.add("resume-wipe-active");
-            setTimeout(function () {
+            clearTimeout(hideTimer);
+            hideTimer = setTimeout(function () {
               demo.classList.remove("resume-wipe-active");
             }, 900);
           });
