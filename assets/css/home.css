@@ -867,7 +867,11 @@
    dense field of dots right behind it made it genuinely harder to read.
    The pill is deliberately background-agnostic (a plain blurred white
    wash, not "globe-colored") so it stays correct if what's behind it ever
-   changes again. */
+   changes again. Padding and opacity both trimmed down per explicit
+   feedback that it was covering more of the globe than it needed to —
+   tighter padding shrinks the pill's footprint to just around the icon
+   and text instead of a wide halo around them, and the lower opacity lets
+   noticeably more of the globe show through the part that's still covered. */
 .scroll-cue {
   position: absolute;
   bottom: var(--space-3);
@@ -878,9 +882,9 @@
   flex-direction: column;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.5rem 1rem;
+  padding: 0.3rem 0.6rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.45);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   color: var(--muted);
@@ -896,7 +900,7 @@
    enough there to need this in the first place. */
 @media (max-width: 640px) {
   .scroll-cue {
-    background: rgba(255, 255, 255, 0.78);
+    background: rgba(255, 255, 255, 0.55);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }

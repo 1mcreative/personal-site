@@ -52,11 +52,19 @@
     "precision mediump float;",
     "varying float vDepth;",
     "uniform vec3 uColor;",
+    // The soft-edge falloff (0.5 down to this) is a *fraction* of the
+    // point's own radius, not a fixed pixel width — fine at the small
+    // sizes every dot on the sphere normally renders at, but the same
+    // fraction of a hugely zoomed-in marker is a huge number of actual
+    // screen pixels, which is what reads as "blurry" rather than a
+    // crisp expanding circle. A uniform lets draw() tighten this per
+    // draw call instead of it being baked in as a constant.
+    "uniform float uEdgeInner;",
     "void main() {",
     "  vec2 c = gl_PointCoord - vec2(0.5);",
     "  float d = length(c);",
     "  if (d > 0.5) discard;",
-    "  float edge = smoothstep(0.5, 0.35, d);",
+    "  float edge = smoothstep(0.5, uEdgeInner, d);",
     "  float alpha = 0.4 + vDepth * 0.6;",
     "  gl_FragColor = vec4(uColor, edge * alpha);",
     "}",
@@ -172,6 +180,7 @@
   var uPointScale = gl.getUniformLocation(prog, "uPointScale");
   var uColor = gl.getUniformLocation(prog, "uColor");
   var uCamDist = gl.getUniformLocation(prog, "uCamDist");
+  var uEdgeInner = gl.getUniformLocation(prog, "uEdgeInner");
 
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -185,6 +194,11 @@
   var CAM_DIST_BASE = 3.0;
   var camDist = CAM_DIST_BASE;
   var markerScaleMult = 1;
+  // Soft (matches every other dot on the sphere) until the "zoom" phase
+  // ramps it toward a near-hard edge, so the marker stays a normal
+  // glowing dot at rest and only tightens up as it grows large enough
+  // for the soft falloff to otherwise read as blur.
+  var markerEdgeInner = 0.35;
   gl.uniform1f(uCamDist, camDist);
 
   // Entrance grow-in (window.globeRevealDots below): "globe is in position
@@ -233,12 +247,14 @@
     gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
     gl.uniform3f(uColor, COLOR[0], COLOR[1], COLOR[2]);
     gl.uniform1f(uPointScale, Math.max(2, w / 105) * revealScaleMult);
+    gl.uniform1f(uEdgeInner, 0.35);
     gl.drawArrays(gl.POINTS, 0, pointCount);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, markerBuf);
     gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
     gl.uniform3f(uColor, MARKER_COLOR[0], MARKER_COLOR[1], MARKER_COLOR[2]);
     gl.uniform1f(uPointScale, Math.max(6, w / 26) * markerScaleMult * revealScaleMult);
+    gl.uniform1f(uEdgeInner, markerEdgeInner);
     gl.drawArrays(gl.POINTS, 0, 1);
   }
 
@@ -365,6 +381,10 @@
         var ze = zt * zt;
         camDist = CAM_DIST_BASE * (1 - ze) + 0.05 * ze;
         markerScaleMult = 1 + ze * 60;
+        // Tighten the marker's soft edge in step with how large it's
+        // getting, so the falloff that's invisible on a small dot never
+        // gets the chance to become a big visible blur at full size.
+        markerEdgeInner = 0.35 + ze * 0.14;
         if (zt >= 1) {
           // "held": camDist is now razor-thin, so even the tiny angleY
           // nudge from resuming auto-rotate would sweep the marker's
