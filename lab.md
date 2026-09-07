@@ -2361,6 +2361,64 @@ host.addEventListener("pointermove", function (e) {
       </div>
     </div>
 
+    <div class="lab-card">
+      <div class="lab-card-head">
+        <h3>Hero Hover Glow</h3>
+        <span class="lab-badge lab-badge-deprecated">Deprecated</span>
+      </div>
+      <p class="lab-card-desc">A radial blue bloom behind the hero content, faded in via <code>:has()</code> whenever the Galaxy Button (further down this page) is hovered or focused — pure CSS, no JS. It was originally a dark dimming effect, inverted into a bloom once the homepage itself went dark for a stretch, then left in place once the Galaxy Button moved off the homepage entirely and into the résumé nav. The selector simply never matches anymore; the CSS is still real and still correct, just permanently dormant on this page.</p>
+      <div class="lab-demo">
+        <div class="hero-hover-glow" style="opacity:1;" aria-hidden="true"></div>
+      </div>
+      <p class="lab-code-note">Forced visible here since its real trigger (hovering the Galaxy Button inside <code>.hero</code>) doesn't exist on this page anymore — see the <code>:has()</code> selector in the code below.</p>
+      <div class="lab-card-actions">
+        <button class="lab-copy-btn" data-copy-target="snippet-hero-hover-glow">Copy CSS</button>
+      </div>
+      <details class="lab-code-details">
+        <summary>View code</summary>
+        <pre class="lab-code" id="snippet-hero-hover-glow"><code>.hero-hover-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(120% 90% at 50% 65%, rgba(29, 78, 216, 0.28), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+@supports selector(:has(a)) {
+  .hero:has(.trigger-el:hover, .trigger-el:focus-visible) .hero-hover-glow {
+    opacity: 1;
+  }
+}</code></pre>
+      </details>
+    </div>
+
+    <div class="lab-card">
+      <div class="lab-card-head">
+        <h3>Scroll Veil</h3>
+        <span class="lab-badge lab-badge-deprecated">Deprecated</span>
+      </div>
+      <p class="lab-card-desc">A full-screen radial glow whose opacity tracked <code>--scroll-progress</code>, building visual anticipation as a visitor scrolled toward the (also deprecated) auto-navigate sentinel below the hero. Removed along with that whole scroll-to-enter mechanic once real visitors turned out not to commit to a long deliberate scroll — nothing sets <code>--scroll-progress</code> anymore, so this permanently sits at <code>opacity: 0</code>.</p>
+      <div class="lab-demo lab-demo-dark">
+        <div class="scroll-veil" style="position:absolute; opacity:0.6;" aria-hidden="true"></div>
+      </div>
+      <div class="lab-card-actions">
+        <button class="lab-copy-btn" data-copy-target="snippet-scroll-veil">Copy CSS</button>
+      </div>
+      <details class="lab-code-details">
+        <summary>View code</summary>
+        <pre class="lab-code" id="snippet-scroll-veil"><code>.scroll-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  background: radial-gradient(circle at 50% 100%, rgba(29, 78, 216, 0.4), transparent 70%);
+  opacity: var(--scroll-progress, 0); /* set by a scroll listener, 0 → 1 */
+  pointer-events: none;
+}</code></pre>
+      </details>
+    </div>
+
   </div>
 </section>
 
@@ -2547,7 +2605,7 @@ if (matchMedia("(hover: hover)").matches) {
         <h3>Scroll Cue</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">A real link (never just a decorative hint — reduced-motion/keyboard/no-JS visitors need this to actually work), styled quietly with a bobbing arrow. Backdrop pill added once a busy background started sitting behind it — a plain blurred or solid white wash, not background-matched, so it stays correct if the background changes again.</p>
+      <p class="lab-card-desc">A real link (never just a decorative hint — reduced-motion/keyboard/no-JS visitors need this to actually work), styled quietly with a bobbing arrow. The glass backdrop lives on the icon and the text separately, not on one shared pill around both — a follow-up fix after direct feedback that a single wrapper was covering more of the background behind it (the gap between icon and text included) than it needed to.</p>
       <div class="lab-demo lab-demo-dark">
         <a class="scroll-cue" href="#" onclick="return false;" style="position:static; transform:none;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -2579,19 +2637,139 @@ if (matchMedia("(hover: hover)").matches) {
   flex-direction: column;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.5rem 1rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(6px);
   color: var(--muted, #5b6572);
   font-size: 0.8rem;
   text-decoration: none;
 }
+/* Two separate glass shapes, not one shared pill — the gap between the
+   icon and text has nothing worth protecting, so it stays clear. */
+.scroll-cue svg, .scroll-cue span {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(6px);
+}
+.scroll-cue svg {
+  display: block;
+  /* The site's own global box-sizing:border-box would otherwise let the
+     svg's HTML width/height attributes win and shrink the icon to fit
+     inside this padding instead of growing around it. */
+  box-sizing: content-box;
+  padding: 6px;
+  border-radius: 50%;
+  animation: bob 1.8s ease-in-out infinite;
+}
+.scroll-cue span {
+  display: block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+}
 .scroll-cue:hover, .scroll-cue:focus-visible { color: var(--text, #14171c); }
-.scroll-cue svg { animation: bob 1.8s ease-in-out infinite; }
 @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 @media (prefers-reduced-motion: reduce) {
   .scroll-cue svg { animation: none; }
+}
+&lt;/style&gt;</code></pre>
+      </details>
+    </div>
+
+    <div class="lab-card">
+      <div class="lab-card-head">
+        <h3>Life Pull Button</h3>
+        <span class="lab-badge lab-badge-live">Live</span>
+      </div>
+      <p class="lab-card-desc">A small dark circle that bulges seamlessly out of an edge rather than floating near it: the circle's own center sits exactly on the boundary, so only its left half ever renders — the boundary itself does the clipping, no <code>clip-path</code> needed. That silhouette is zero-width at the top and bottom and widest at the vertical middle — exactly the shape I was asked for. This dot is also the exact starting point for the bubble-expand transition below — the two are one continuous idea, not a button plus an unrelated effect.</p>
+      <div class="lab-demo">
+        <a class="life-pull-btn" href="#" onclick="return false;" style="position:absolute; top:50%; right:-20px; transform:translateY(-50%);" aria-label="Pull to see the next page">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M15 4L7 12l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+      <p class="lab-code-note">This card's own right edge stands in for the viewport's — the dot bulges out of <em>this box</em> the same way it bulges out of the real page.</p>
+      <div class="lab-card-actions">
+        <button class="lab-copy-btn" data-copy-target="snippet-life-pull-btn">Copy HTML + CSS</button>
+      </div>
+      <details class="lab-code-details">
+        <summary>View code</summary>
+        <pre class="lab-code" id="snippet-life-pull-btn"><code>&lt;a class="life-pull-btn" href="/wherever" aria-label="Pull to see the next page"&gt;
+  &lt;svg viewBox="0 0 24 24" fill="none" aria-hidden="true"&gt;
+    &lt;path d="M15 4L7 12l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/&gt;
+  &lt;/svg&gt;
+&lt;/a&gt;
+
+&lt;style&gt;
+.life-pull-btn {
+  position: fixed;
+  top: 50%;
+  right: -20px; /* half the button's own width — centers it ON the edge */
+  transform: translateY(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 2px; /* keeps the icon in the visible left half, not dead-center */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #12181f;
+  color: #e8eef7;
+  text-decoration: none;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.22);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+.life-pull-btn:hover, .life-pull-btn:focus-visible {
+  transform: translateY(-50%) scale(1.12);
+  background: #1a232e;
+}
+.life-pull-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+&lt;/style&gt;</code></pre>
+      </details>
+    </div>
+
+    <div class="lab-card">
+      <div class="lab-card-head">
+        <h3>Social Card Hover</h3>
+        <span class="lab-badge lab-badge-live">Live</span>
+      </div>
+      <p class="lab-card-desc">The only interactive touch on <code>/life/</code> itself, outside the shared cross-page buttons: hovering an Instagram card lifts it 2px and swaps its border to the personal theme's own accent blue. Nothing clever — a plain <code>transform</code> + <code>border-color</code> transition — but it's the one place that page tells you something on the page is actually meant to be clicked, not just read.</p>
+      <div class="lab-demo lab-demo-dark theme-personal" style="padding:1.5rem;">
+        <div class="social-card" style="max-width:220px;">
+          <h2>Instagram</h2>
+          <p>Main account.</p>
+          <a class="handle" href="#" onclick="return false;">@handle</a>
+        </div>
+      </div>
+      <div class="lab-card-actions">
+        <button class="lab-copy-btn" data-copy-target="snippet-social-card">Copy HTML + CSS</button>
+      </div>
+      <details class="lab-code-details">
+        <summary>View code</summary>
+        <pre class="lab-code" id="snippet-social-card"><code>&lt;div class="social-card"&gt;
+  &lt;h2&gt;Instagram&lt;/h2&gt;
+  &lt;p&gt;Main account.&lt;/p&gt;
+  &lt;a class="handle" href="https://instagram.com/wherever"&gt;@handle&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+.social-card {
+  background: var(--surface, #1a2332);
+  border: 1px solid var(--border, #263041);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+.social-card:hover {
+  border-color: var(--accent, #6ec1ff);
+  transform: translateY(-2px);
+}
+.social-card a.handle {
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+.social-card a.handle::after {
+  content: " ↗";
+  font-weight: 400;
+  opacity: 0.6;
 }
 &lt;/style&gt;</code></pre>
       </details>
@@ -2704,7 +2882,7 @@ if (matchMedia("(hover: hover)").matches) {
         <h3>Globe: Focus-Zoom-to-Marker</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">An exit transition built into the Globe (above): spin the sphere to bring a specific marker to front-center — solved analytically from its lat/lng, not searched — then zoom the camera into it until its color fills the screen. A double-<code>requestAnimationFrame</code> guard makes sure the final frame actually paints before anything navigates (a real Chrome-only bug: it didn't wait for this without that guard).</p>
+      <p class="lab-card-desc">An exit transition built into the Globe (above): spin the sphere to bring a specific marker to front-center — solved analytically from its lat/lng, not searched — then zoom the camera into it until its color fills the screen. A double-<code>requestAnimationFrame</code> guard makes sure the final frame actually paints before anything navigates (a real Chrome-only bug: it didn't wait for this without that guard). Two later fixes keep the huge marker crisp instead of blurry: the fragment shader's soft edge tightens as the marker grows (a fixed fraction of a tiny dot's radius is invisible, but the same fraction of a screen-filling circle is a visible soft ring), and the canvas itself renders at 4x its normal resolution for the duration of the zoom, since the CSS scale that blows the whole element up to cover the viewport otherwise has to stretch a much lower-resolution source than it needs to.</p>
       <div class="lab-demo" style="padding:1.5rem; text-align:center;">
         <button class="lab-btn" style="position:static;" id="lab-globe-zoom-btn">Zoom to marker (on the Globe demo above ↑)</button>
       </div>
@@ -2749,6 +2927,160 @@ window.globeFocusMarker = function (callback) {
                        // double rAF before firing callback so the final
                        // frame is guaranteed to have painted)
 };</code></pre>
+      </details>
+    </div>
+
+    <div class="lab-card">
+      <div class="lab-card-head">
+        <h3>Resume Wipe</h3>
+        <span class="lab-badge lab-badge-live">Live</span>
+      </div>
+      <p class="lab-card-desc">A real full-viewport cover for the white handoff at the end of the Globe zoom above — not a fade on the globe's own canvas. Fading only the canvas used to reveal everything else still sitting in the hero (headline, subhead, glitter, the pull button, copyright) untouched, which showed up as "the landing page again for half a second" between the amber zoom and the actual navigation. This sits above everything else on the page and fades to opaque white on its own, so nothing is left showing through underneath it.</p>
+      <div class="lab-demo lab-demo-dark" style="padding:1.5rem; text-align:center;">
+        <button class="lab-btn" style="position:static;" id="lab-resume-wipe-btn">Fade to white</button>
+        <div class="resume-wipe" id="lab-resume-wipe" aria-hidden="true" style="position:absolute;"></div>
+      </div>
+      <script>
+        (function () {
+          var demo = document.getElementById("lab-resume-wipe");
+          var btn = document.getElementById("lab-resume-wipe-btn");
+          if (!demo || !btn) return;
+          var hideTimer = null;
+          btn.addEventListener("click", function () {
+            demo.classList.add("resume-wipe-active");
+            clearTimeout(hideTimer);
+            hideTimer = setTimeout(function () {
+              demo.classList.remove("resume-wipe-active");
+            }, 900);
+          });
+        })();
+      </script>
+      <div class="lab-card-actions">
+        <button class="lab-copy-btn" data-copy-target="snippet-resume-wipe">Copy HTML + CSS + trigger</button>
+      </div>
+      <details class="lab-code-details">
+        <summary>View code</summary>
+        <pre class="lab-code" id="snippet-resume-wipe"><code>&lt;div class="resume-wipe" aria-hidden="true"&gt;&lt;/div&gt;
+
+&lt;style&gt;
+.resume-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 950; /* above absolutely everything else on the page */
+  background: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+}
+.resume-wipe-active {
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+&lt;/style&gt;
+
+&lt;script&gt;
+// Trigger this once whatever exit animation you're covering for has
+// reached its final frame, then navigate after the fade completes.
+var wipe = document.querySelector(".resume-wipe");
+wipe.classList.add("resume-wipe-active");
+setTimeout(function () {
+  window.location.href = "/wherever";
+}, 320);
+&lt;/script&gt;</code></pre>
+      </details>
+    </div>
+
+    <div class="lab-card">
+      <div class="lab-card-head">
+        <h3>Life Wipe: Dot-to-Bubble</h3>
+        <span class="lab-badge lab-badge-live">Live</span>
+      </div>
+      <p class="lab-card-desc">Click the Life Pull Button (above) or swipe left on the real homepage, and a circle grows from that exact dot until it covers the whole screen, then navigates. One <code>clip-path: circle()</code>, not a multi-property choreography: the center point never moves, so only the radius needs to animate, computed by hand as the distance from that center to whichever screen corner is farthest away — the same idea as <code>clip-path</code>'s own <code>farthest-corner</code> keyword, worked out manually since a transition needs two real numbers to interpolate between, not a keyword on one end. An earlier version split a rectangular sweep across several <code>@property</code>-registered custom properties for independent timing; on a browser without <code>@property</code> support that silently stopped animating at all, reported directly as "the transition is very fast and unable to see it happening." A single circle radius needs no such registration.</p>
+      <div class="lab-demo lab-demo-dark">
+        <a class="life-pull-btn" href="#" onclick="return false;" id="lab-life-wipe-btn" style="position:absolute; top:50%; right:-20px; transform:translateY(-50%);" aria-label="Expand">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M15 4L7 12l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <div class="life-wipe" id="lab-life-wipe" aria-hidden="true" style="position:absolute;"></div>
+      </div>
+      <script>
+        (function () {
+          var demo = document.getElementById("lab-life-wipe");
+          var btn = document.getElementById("lab-life-wipe-btn");
+          if (!demo || !btn) return;
+          var box = btn.closest(".lab-demo");
+          var REST_R = 20;
+          function measure() {
+            var r = btn.getBoundingClientRect();
+            var b = box.getBoundingClientRect();
+            return {
+              cx: r.left + r.width / 2 - b.left,
+              cy: r.top + r.height / 2 - b.top,
+              w: b.width,
+              h: b.height,
+            };
+          }
+          function setClip(radius) {
+            var m = measure();
+            demo.style.clipPath = "circle(" + radius + "px at " + m.cx + "px " + m.cy + "px)";
+          }
+          setClip(REST_R);
+          var expanded = false;
+          btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            // .life-wipe-active (home.css) already carries the real
+            // z-index:41 that jumps this above the button — nothing to
+            // set by hand here, same as on the real site.
+            demo.classList.add("life-wipe-active");
+            if (expanded) {
+              setClip(REST_R);
+            } else {
+              var m = measure();
+              var dx = Math.max(m.cx, m.w - m.cx);
+              var dy = Math.max(m.cy, m.h - m.cy);
+              setClip(Math.sqrt(dx * dx + dy * dy));
+            }
+            expanded = !expanded;
+          });
+        })();
+      </script>
+      <p class="lab-code-note">Click the dot to expand, click again to collapse — the real site expands once and navigates instead of collapsing back.</p>
+      <div class="lab-card-actions">
+        <button class="lab-copy-btn" data-copy-target="snippet-life-wipe">Copy the trigger snippet</button>
+      </div>
+      <details class="lab-code-details">
+        <summary>View code</summary>
+        <pre class="lab-code" id="snippet-life-wipe"><code>// Inside hero.js: keep the circle's rest state pinned to the button's
+// own center so it genuinely starts as the dot, not a separate shape.
+var lifeWipe = document.querySelector(".life-wipe");
+var pullBtn = document.querySelector(".life-pull-btn");
+
+function syncLifeWipe() {
+  var r = pullBtn.getBoundingClientRect();
+  var cx = r.left + r.width / 2;
+  var cy = r.top + r.height / 2;
+  var restR = Math.min(r.width, r.height) / 2;
+  lifeWipe.style.clipPath = "circle(" + restR + "px at " + cx + "px " + cy + "px)";
+}
+syncLifeWipe();
+window.addEventListener("resize", syncLifeWipe);
+
+function goToLife() {
+  syncLifeWipe();
+  lifeWipe.classList.add("life-wipe-active");
+  var r = pullBtn.getBoundingClientRect();
+  var cx = r.left + r.width / 2;
+  var cy = r.top + r.height / 2;
+  // Farthest-corner distance from the center — Pythagoras on whichever
+  // horizontal gap and whichever vertical gap is bigger.
+  var dx = Math.max(cx, window.innerWidth - cx);
+  var dy = Math.max(cy, window.innerHeight - cy);
+  var farthest = Math.sqrt(dx * dx + dy * dy);
+  lifeWipe.style.clipPath = "circle(" + farthest + "px at " + cx + "px " + cy + "px)";
+  setTimeout(function () {
+    window.location.href = "/wherever";
+  }, 700);
+}</code></pre>
       </details>
     </div>
 

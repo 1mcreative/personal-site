@@ -6,12 +6,14 @@
 {% include head.html %}
 <!-- Live demos on this page reuse the site's own real component CSS
      directly (not reimplementations) so nothing here can silently drift
-     from what actually ships — home.css/professional.css supply the
-     classes every demo card's markup uses (globe, glitter, buttons, hint
-     effects, etc). tokens.css (shared components + view-transition) is
-     already loaded by head.html for every page. -->
+     from what actually ships — home.css/professional.css/personal.css
+     supply the classes every demo card's markup uses (globe, glitter,
+     buttons, hint effects, the Instagram card grid, etc). tokens.css
+     (shared components + view-transition) is already loaded by
+     head.html for every page. -->
 <link rel="stylesheet" href="{{ '/assets/css/home.css' | relative_url }}">
 <link rel="stylesheet" href="{{ '/assets/css/professional.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/personal.css' | relative_url }}">
 </head>
 <body class="theme-lab">
   <header class="lab-header">
