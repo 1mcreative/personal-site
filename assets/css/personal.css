@@ -16,7 +16,23 @@
 }
 
 .theme-personal .site-header {
-  border-bottom: 1px solid var(--border);
+  position: fixed;
+  top: var(--space-2);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  width: calc(100% - var(--space-3) * 2);
+  max-width: var(--max-width);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(15, 20, 25, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.theme-personal .site-header .header-inner {
+  padding-top: var(--space-1);
+  padding-bottom: var(--space-1);
 }
 
 .theme-personal .site-header nav a {
@@ -31,29 +47,30 @@
 }
 
 .theme-personal .site-footer {
+  position: relative;
+  z-index: 1;
   border-top: 1px solid var(--border);
   color: var(--muted);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
 }
 
 .theme-personal .site-footer a {
   color: var(--muted);
 }
 
-/* Hero — Accretion Disc WebGL background (assets/js/accretion-disc.js).
-   Breaks out to full viewport width via the negative-margin trick rather
-   than overriding main#main's max-width globally (unlike the homepage's
-   .hero, this page has real reading-column content below the fold that
-   should stay put). */
+/* Hero — WebGPU Black Hole background (assets/js/black-hole.js), fixed
+   behind the ENTIRE page rather than a bounded top section: this is the
+   page's persistent backdrop, not just a hero banner. main#main gets its
+   own stacking context (z-index 1) above it, so the hero text, then the
+   Instagram cards, then everything after scrolls in normal flow on top of
+   a background that never scrolls away. Sized big on purpose — a real
+   full-viewport canvas rendered at native resolution, not a CSS transform
+   scaled up from a small box (which would just blur it). */
 .theme-personal .life-hero {
-  position: relative;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  min-height: min(62vh, 540px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
   overflow: hidden;
-  border-bottom: 1px solid var(--border);
 }
 
 .theme-personal .life-hero-canvas {
@@ -64,21 +81,58 @@
   display: block;
 }
 
-.theme-personal .life-hero-inner {
+.theme-personal main#main {
   position: relative;
   z-index: 1;
+}
+
+/* The hero's second job — being the literal start of the page — lives here,
+   separate from the now-fixed background layer above: normal in-flow
+   content, vertically centered in its own tall block so it still reads as
+   a hero section even though the canvas behind it isn't scoped to it. */
+/* Top-aligned, not centered: the black hole's camera looks straight at
+   the disk with no vertical offset, so its bright ring/disk crossing sits
+   at a roughly constant FRACTION of viewport height (~32%-70%, verified
+   at both 450px and 900px tall) regardless of absolute size — centering
+   the text put it directly on the busiest, highest-contrast-against-itself
+   part of the render. `max(7.5rem, 15vh)` keeps the text in the calm
+   upper band on both short and tall viewports (a fixed rem alone cleared
+   it on a 900px-tall desktop but crept back toward the ring on a shorter
+   one, since the ring's own position scales with height and a fixed
+   offset doesn't). */
+.theme-personal .life-hero-inner {
+  min-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   text-align: center;
-  padding: var(--space-3);
-  max-width: 640px;
+  padding: max(7.5rem, 15vh) var(--space-3) var(--space-4);
+}
+
+/* Belt-and-suspenders alongside the positioning above: a subtle backdrop
+   pill per line (same technique as home.css's .hero-sub-text), so text
+   stays readable even if a future camera/aspect-ratio tweak shifts the
+   ring back under it. */
+.theme-personal .life-hero-inner h1,
+.theme-personal .life-hero-inner p {
+  display: inline-block;
+  background: rgba(15, 20, 25, 0.4);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border-radius: var(--radius);
 }
 
 .theme-personal .life-hero-inner h1 {
   font-size: clamp(1.9rem, 4vw, 2.5rem);
+  padding: 0.2em 0.5em;
   text-shadow: 0 2px 28px rgba(0, 0, 0, 0.85), 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
 .theme-personal .life-hero-inner p {
-  margin: 0 auto;
+  margin: var(--space-1) auto 0;
+  max-width: 480px;
+  padding: 0.3em 0.7em;
   color: var(--text);
   text-shadow: 0 2px 20px rgba(0, 0, 0, 0.85), 0 1px 3px rgba(0, 0, 0, 0.9);
 }
@@ -242,4 +296,5 @@
   margin-top: var(--space-4);
   color: var(--muted);
   font-size: 0.9rem;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
 }

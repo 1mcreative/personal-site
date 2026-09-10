@@ -17,14 +17,18 @@
 // RECOLORED, not just ported — same rule and same treatment accretion-disc.js
 // (the effect this replaces) already got: the reference's disk is copper/
 // orange (a dark red-brown dimming out to a warm near-white crest). This
-// site's new visual elements draw from the *existing* blue palette, so the
-// disk's thermal gradient now runs dark navy -> Grind's #1d4ed8 -> an icy
-// near-white-blue crest, instead of a third invented hue. The starfield's
-// per-star color temperature (meant to vary a real sky from blue-hot to
-// warm-cool stars) is narrowed to a blue-to-white range for the same reason —
-// realistic star color variance is fine, but an orange third of the sky next
-// to a blue disk is exactly the "doesn't blend in" problem this site's
-// already been burned by once (see DESIGN.md's Beyond Horizon writeup).
+// site's new visual elements draw from the site's own palette, so the disk's
+// thermal gradient runs dark navy -> Grind's #1d4ed8 -> an icy near-white-
+// blue crest on the approaching side, with the receding (redshifted) side
+// warmed toward the site's amber accent (#f59e0b, reused from the homepage
+// globe/glitter, not a new hue) — see volumeSample()'s `recede` mix. The
+// starfield's per-star color temperature (meant to vary a real sky from
+// blue-hot to warm-cool stars) is narrowed to a blue-to-white range for the
+// same reason — realistic star color variance is fine, but an orange third
+// of the sky next to a blue disk is exactly the "doesn't blend in" problem
+// this site's already been burned by once (see DESIGN.md's Beyond Horizon
+// writeup); the amber accent stays scoped to the disk's own redshift, not
+// spread across the whole scene.
 //
 // The reference's pointer handling isn't drag-to-orbit — `pointermove`
 // updates the camera target on *any* mouse movement over the canvas
@@ -159,15 +163,24 @@ fn volumeSample(point: vec3f, rayVelocity: vec3f) -> vec4f {
 
   let heat = pow(radial, 1.35);
   // Site palette, not the reference's copper/orange — dark navy -> Grind
-  // blue (#1d4ed8) -> an icy near-white-blue crest. See file header.
+  // blue (#1d4ed8) -> an icy near-white-blue crest. See file header. The
+  // receding (redshifted) side warms toward the site's own amber accent
+  // (#f59e0b, the same amber used on the homepage's globe marker and
+  // glitter field, not a new hue) instead of the crest's blue-white —
+  // real black-hole renders show exactly this blue-approaching /
+  // red-receding asymmetry, so it's a physically-motivated place to use
+  // it as an accent rather than a wholesale recolor.
   var thermal = mix(vec3f(0.05, 0.11, 0.32), vec3f(0.114, 0.306, 0.847), smoothstep(0.05, 0.55, heat));
-  thermal = mix(thermal, vec3f(0.85, 0.93, 1.0), pow(heat, 2.4));
 
   let tangent = normalize(vec3f(-point.z, 0.0, point.x));
   let orbitalSpeed = min(0.64, 0.94 / sqrt(max(radius - HORIZON, 0.25)));
   let towardObserver = dot(tangent, -normalize(rayVelocity));
   // Gentle Doppler beaming keeps the threshold bloom nearly symmetric.
   let doppler = pow(clamp(1.0 / (1.0 - orbitalSpeed * towardObserver), 0.72, 1.55), 1.5);
+  let recede = smoothstep(1.0, 0.62, doppler);
+  thermal = mix(thermal, vec3f(0.961, 0.620, 0.043), recede * 0.6);
+  thermal = mix(thermal, vec3f(0.85, 0.93, 1.0), pow(heat, 2.4));
+
   let gravitationalRedshift = sqrt(1.0 - HORIZON / radius);
   let emission = thermal * density * doppler * gravitationalRedshift * 9.5;
   return vec4f(emission, density * 2.1);
