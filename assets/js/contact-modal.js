@@ -3,13 +3,18 @@
 // upgrades its click to open the modal instead, so no-JS visitors still
 // have a working way to reach out.
 //
-// Submission goes through Formspree (https://formspree.io) since this is a
+// Submission PREFERS Formspree (https://formspree.io) since this is a
 // static GitHub Pages site with no backend of its own — the <form>'s
-// action in footer.html ships with a placeholder ID. Until that's replaced
+// action in footer.html ships with a placeholder ID until it's replaced
 // with a real one (sign up free at formspree.io, create a form, paste the
-// resulting https://formspree.io/f/xxxxxxxx URL into footer.html), submits
-// fail fast with a clear on-page message instead of a silent/broken
-// network request.
+// resulting https://formspree.io/f/xxxxxxxx URL into footer.html). Until
+// then — and as a fallback if a real endpoint is ever unreachable — this
+// builds a mailto: link from the same address already on the page's
+// trigger link and hands the filled-in message to the visitor's own email
+// app to actually send. That's a real, working delivery path today with
+// zero setup, just not a silent one-click send the way a configured
+// Formspree endpoint is: the visitor still has to hit send in their own
+// mail app, and it only works if they have one configured.
 (function () {
   var PLACEHOLDER = "YOUR_FORM_ID";
 
@@ -88,6 +93,30 @@
     }
   }
 
+  // Builds a mailto: link from the same address already on the page's own
+  // trigger (no email hardcoded twice) with the form's fields folded into
+  // a subject/body, then hands off to the visitor's own mail app.
+  function openMailtoFallback() {
+    var opener = document.querySelector("[data-contact-open][href]");
+    var mailtoBase = opener ? opener.getAttribute("href") : "";
+    if (!mailtoBase) return false;
+
+    var name = (form.querySelector('[name="name"]').value || "").trim();
+    var email = (form.querySelector('[name="email"]').value || "").trim();
+    var message = (form.querySelector('[name="message"]').value || "").trim();
+
+    var subject = "Message from bhaveshnakum.com" + (name ? " — " + name : "");
+    var bodyLines = [];
+    if (name) bodyLines.push("Name: " + name);
+    if (email) bodyLines.push("Email: " + email);
+    if (name || email) bodyLines.push("");
+    bodyLines.push(message);
+
+    var url = mailtoBase + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(bodyLines.join("\n"));
+    window.location.href = url;
+    return true;
+  }
+
   Array.prototype.forEach.call(openers, function (el) {
     el.addEventListener("click", open);
   });
@@ -98,8 +127,13 @@
   form.addEventListener("submit", function (event) {
     event.preventDefault();
     var action = form.getAttribute("action") || "";
+
     if (action.indexOf(PLACEHOLDER) !== -1) {
-      setStatus("This form isn't connected to anything yet — the owner needs to add a real Formspree endpoint. Use the mailto link instead for now.", "error");
+      if (openMailtoFallback()) {
+        setStatus("Opening your email app with this message ready to go — hit send there and it'll reach me directly.");
+      } else {
+        setStatus("This form isn't connected to anything yet, and there's no email link on the page to fall back to either.", "error");
+      }
       return;
     }
 
@@ -117,12 +151,18 @@
           setStatus("Thanks — got it. I'll get back to you soon.");
           form.reset();
           closeTimer = setTimeout(close, 1800);
+        } else if (openMailtoFallback()) {
+          setStatus("That didn't go through, so I opened your email app instead — hit send there and it'll still reach me.", "error");
         } else {
-          setStatus("Something went wrong sending that. Try again, or use the mailto link instead.", "error");
+          setStatus("Something went wrong sending that. Try again in a moment.", "error");
         }
       })
       .catch(function () {
-        setStatus("Couldn't reach the server. Try again, or use the mailto link instead.", "error");
+        if (openMailtoFallback()) {
+          setStatus("Couldn't reach the server, so I opened your email app instead — hit send there and it'll still reach me.", "error");
+        } else {
+          setStatus("Couldn't reach the server. Try again in a moment.", "error");
+        }
       })
       .then(function () {
         submitBtn.disabled = false;
