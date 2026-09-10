@@ -33,36 +33,55 @@
 // `beaming` factor it needs. Starfield narrowed from warm-to-cool to a
 // blue-white-only range for the same "doesn't blend in" reason as before.
 //
-// Camera framing (distance/fov/diskOuter) and composition (centered, no
-// roll) match this branch's existing black-hole.js rather than the
-// reference's own off-center desktop layout — this is a performance swap,
-// not a redesign, so the visual placement stays put. One real capability
-// loss from the architecture change: the previous version's hover-follow
-// moved the camera on both axes (full re-trace every frame made that
-// cheap); this one only makes horizontal parallax free, by rotating the
-// cached disk/star directions around Y after the bake instead of re-baking
-// — vertical mouse-follow would need a full re-bake per frame, which is
-// exactly the cost this rewrite exists to avoid. Touch/no-hover visitors
-// get a fixed camera, same `matchMedia('(hover: hover)')` gate as every
-// other pointer-reactive effect on this site.
+// Desktop camera framing and composition match the reference's own
+// defaultHeroSettings exactly — distance 13.5, fov 3, diskRadius 9, the
+// off-center/tilted layout (centerX 0.8, centerY 0.3, roll -0.27) —
+// confirmed against a reference screenshot of the source, including its
+// responsive desktop/mobile split (mobileQuery/applyResponsiveLayout,
+// "(max-width: 767px)"). Two deliberate deviations on mobile only, both
+// for real legibility problems the reference's own defaults don't hit on a
+// wider desktop crop. First: cameraY/distance/diskRadius/fov aren't part of
+// the reference's own responsive split (it holds those constant, only
+// moving centerX/Y/roll) — but their shared 0.16/13.5/9/3, paired with
+// mobile's centered/upright camera, left the disk reading almost invisibly
+// faint on a narrow viewport, the same "bright wings extend past the
+// frame" problem this file's predecessor hit, worse here since the disk
+// itself projects thinner at this distance. Mobile uses this branch's own
+// previously-verified-legible framing (cameraY 0.05, distance 21,
+// diskRadius 9.5, fov 1.72) instead; desktop is untouched. Second:
+// `centerFade` stays 0 on mobile instead of
+// the reference's 1 — their centerFade dims the vertical center of the
+// shader's own output, clearly meant to protect text they render centered
+// over a centered disk on mobile, but this page's text legibility is
+// already solved independently (a top-aligned position plus backdrop
+// pills, see personal.css), so turning it on here would just dim an
+// already-faint-enough disk for no benefit. One real capability loss from
+// the architecture change, unrelated to composition:
+// the old version's hover-follow moved the camera on both axes (full
+// re-trace every frame made that cheap); this one only makes horizontal
+// parallax free, by rotating the cached disk/star directions around Y after
+// the bake instead of re-baking — vertical mouse-follow would need a full
+// re-bake per frame, exactly the cost this rewrite exists to avoid.
+// Touch/no-hover visitors get a fixed camera, same `matchMedia('(hover:
+// hover)')` gate as every other pointer-reactive effect on this site.
 (function () {
   var canvas = document.querySelector(".life-hero-canvas");
   if (!canvas || !navigator.gpu) return;
 
   // ---------------------------------------------------------------------
-  // Settings — same shape as the reference's settings.ts, values chosen to
-  // match this branch's existing black-hole.js framing rather than the
-  // reference's own off-center desktop composition (see file header).
+  // Settings — the reference's own defaultHeroSettings() values, verbatim,
+  // including its responsive desktop/mobile split. See file header for the
+  // two deliberate mobile-only deviations (camera framing, centerFade).
   // ---------------------------------------------------------------------
   var settings = {
-    cameraY: 0.05,
-    distance: 21,
-    diskRadius: 9.5,
-    fov: 1.72,
+    cameraY: 0.16,
+    distance: 13.5,
+    diskRadius: 9,
+    fov: 3,
     centerX: 0,
     centerY: 0,
     cameraRoll: 0,
-    mouseYaw: 0.7,
+    mouseYaw: 0,
     centerFade: 0,
     bloom: { strength: 1, threshold: 0, knee: 0.18, radius: 1.5 },
     disk: {
@@ -76,6 +95,33 @@
   var bloomScale = Math.min(Math.max(window.devicePixelRatio || 1, 1), 2) / 2;
   settings.bloom.radius *= bloomScale;
   settings.bloom.strength *= bloomScale;
+
+  // distance/diskRadius/fov are NOT part of the reference's own responsive
+  // split (it keeps those constant and only moves centerX/Y/roll) — added
+  // here as a deliberate deviation: their shared distance/fov (13.5/3),
+  // paired with mobile's centered/upright camera, left the disk's already-
+  // narrow silhouette reading almost invisibly faint on a narrow viewport
+  // (the same "wings extend past the frame" problem as this file's
+  // predecessor, worse here since the disk itself is thinner at this
+  // distance). Mobile gets this branch's own previously-verified-legible
+  // centered framing instead; desktop stays exactly on the reference's
+  // values to match its off-center composition. See file header.
+  var DESKTOP_LAYOUT = { cameraY: 0.16, distance: 13.5, diskRadius: 9, fov: 3, centerX: 0.8, centerY: 0.3, cameraRoll: -0.27, mouseYaw: 0.15, centerFade: 0 };
+  var MOBILE_LAYOUT = { cameraY: 0.05, distance: 21, diskRadius: 9.5, fov: 1.72, centerX: 0, centerY: 0, cameraRoll: 0, mouseYaw: 0, centerFade: 0 };
+  var mobileQuery = window.matchMedia("(max-width: 767px)");
+  function applyResponsiveLayout() {
+    var layout = mobileQuery.matches ? MOBILE_LAYOUT : DESKTOP_LAYOUT;
+    settings.cameraY = layout.cameraY;
+    settings.distance = layout.distance;
+    settings.diskRadius = layout.diskRadius;
+    settings.fov = layout.fov;
+    settings.centerX = layout.centerX;
+    settings.centerY = layout.centerY;
+    settings.cameraRoll = layout.cameraRoll;
+    settings.mouseYaw = layout.mouseYaw;
+    settings.centerFade = layout.centerFade;
+  }
+  applyResponsiveLayout();
 
   var HOVER = !!(window.matchMedia && window.matchMedia("(hover: hover)").matches);
 
@@ -1166,6 +1212,11 @@ fn tonemap(linearColor: vec3f, uv: vec2f) -> vec3f {
   var lastYawAt;
   var resizeFrame = 0;
   var pendingSize = null;
+
+  mobileQuery.addEventListener("change", function () {
+    applyResponsiveLayout();
+    forceBake = true;
+  });
 
   var BLOOM_STAGES = [
     { source: "scene", target: "bloom0", dir: [0, 0], threshold: true },
