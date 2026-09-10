@@ -278,3 +278,198 @@ p {
   outline: 2px solid var(--keycap-glow);
   outline-offset: 3px;
 }
+
+/* Contact button + modal — shared across every page via footer.html.
+   Unlike .offset-btn/.keycap-btn this has no fixed brand identity: it
+   reads entirely off the current page's own theme tokens, so it looks
+   native on light and dark pages alike instead of importing one page's
+   palette into another's. */
+.contact-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.4em;
+  padding: 0.2em 0.7em;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.85em;
+  line-height: inherit;
+  /* !important: every theme sets a blanket `a { color: var(--accent) }`
+     for prose links (professional.css/personal.css/lab.css), which outranks
+     a bare .contact-btn class on specificity — same trap .offset-btn's own
+     comment documents. Coincidentally harmless on the personal/professional
+     footers (their own .site-footer a rule already matches --muted), but a
+     real, silent wrong-color bug on /lab/, which has no such footer rule to
+     accidentally save it. */
+  color: var(--muted) !important;
+  text-decoration: none;
+  background: none;
+  cursor: pointer;
+  transition: color var(--speed) var(--ease), border-color var(--speed) var(--ease);
+}
+
+.contact-btn:hover,
+.contact-btn:focus-visible {
+  color: var(--text) !important;
+  border-color: var(--text);
+}
+
+.contact-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--speed) var(--ease), visibility 0s var(--speed);
+}
+
+.contact-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity var(--speed) var(--ease);
+}
+
+.contact-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 10, 14, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* Translucent by design (not just an artifact of the backdrop underneath)
+   — color-mix keeps this reading correctly against every theme's own
+   --surface without needing a separate rgba() shade hand-tuned per page. */
+.contact-modal-panel {
+  position: relative;
+  width: min(420px, 100%);
+  max-height: min(600px, 85vh);
+  overflow-y: auto;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  color: var(--text);
+  transform: translateY(12px) scale(0.98);
+  transition: transform var(--speed) var(--ease);
+}
+
+.contact-modal.is-open .contact-modal-panel {
+  transform: translateY(0) scale(1);
+}
+
+.contact-modal-close {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color var(--speed) var(--ease), background-color var(--speed) var(--ease);
+}
+
+.contact-modal-close:hover,
+.contact-modal-close:focus-visible {
+  color: var(--text);
+  background: var(--border);
+}
+
+.contact-modal-panel h2 {
+  margin: 0 0 var(--space-1);
+  padding-right: 3.5rem;
+  font-size: 1.3rem;
+}
+
+.contact-modal-sub {
+  margin: 0 0 var(--space-3);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.contact-field {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: 0.85rem;
+}
+
+.contact-field span {
+  display: block;
+  margin-bottom: 0.35em;
+  color: var(--muted);
+}
+
+.contact-field input,
+.contact-field textarea {
+  width: 100%;
+  padding: 0.6em 0.75em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  transition: border-color var(--speed) var(--ease);
+}
+
+.contact-field input:focus-visible,
+.contact-field textarea:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.contact-submit {
+  padding: 0.65em 1.4em;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: opacity var(--speed) var(--ease);
+}
+
+.contact-submit:hover,
+.contact-submit:focus-visible {
+  opacity: 0.85;
+}
+
+.contact-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.contact-status {
+  margin: var(--space-2) 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  min-height: 1.2em;
+}
+
+.contact-status[data-state="error"] {
+  color: #e0575b;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-modal,
+  .contact-modal.is-open,
+  .contact-modal-panel {
+    transition-duration: 0.01ms;
+  }
+}
