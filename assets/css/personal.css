@@ -58,17 +58,29 @@
   color: var(--muted);
 }
 
-/* Hero — WebGPU Black Hole background (assets/js/black-hole.js), fixed
+/* Hero — WebGPU Black Hole background (assets/js/black-hole-lite.js), fixed
    behind the ENTIRE page rather than a bounded top section: this is the
    page's persistent backdrop, not just a hero banner. main#main gets its
    own stacking context (z-index 1) above it, so the hero text, then the
    Instagram cards, then everything after scrolls in normal flow on top of
    a background that never scrolls away. Sized big on purpose — a real
    full-viewport canvas rendered at native resolution, not a CSS transform
-   scaled up from a small box (which would just blur it). */
+   scaled up from a small box (which would just blur it).
+   `height: 100svh` (small viewport height, overriding the 100vh fallback
+   for browsers that support it) locks the canvas to a STABLE size on
+   mobile: `inset: 0` alone tracks the browser's large/dynamic viewport,
+   which genuinely changes as the address bar collapses/expands on scroll
+   — a real height change, not a rendering bug — and black-hole-lite.js's
+   ResizeObserver reacts to that by rebuilding every render target and
+   re-baking the expensive geodesic trace mid-scroll, reading as the whole
+   hero visibly growing/distorting. svh pins to the smallest-possible
+   viewport (as if the address bar were always shown) so that resize never
+   fires from chrome alone. */
 .theme-personal .life-hero {
   position: fixed;
   inset: 0;
+  height: 100vh;
+  height: 100svh;
   z-index: 0;
   overflow: hidden;
 }
@@ -102,12 +114,14 @@
    offset doesn't). */
 .theme-personal .life-hero-inner {
   min-height: 85vh;
+  min-height: 85svh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   text-align: center;
   padding: max(7.5rem, 15vh) var(--space-3) var(--space-4);
+  padding: max(7.5rem, 15svh) var(--space-3) var(--space-4);
 }
 
 /* Belt-and-suspenders alongside the positioning above: a subtle backdrop
