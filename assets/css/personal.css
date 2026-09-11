@@ -25,9 +25,9 @@
   max-width: var(--max-width);
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(15, 20, 25, 0.72);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(15, 20, 25, 0.5);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
 }
 
 .theme-personal .site-header .header-inner {
@@ -151,18 +151,41 @@
   text-shadow: 0 2px 20px rgba(0, 0, 0, 0.85), 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
+/* A horizontally-scrolling row (the "Netflix Top 10" pattern), not a
+   static grid — fixed-width cards in a flex row with scroll-snap, broken
+   out to full viewport width via the same negative-margin trick .life-hero
+   already uses, since a row like this reads as expansive/cinematic, not
+   confined to the reading column the rest of the page uses. With only two
+   cards today both still fit side by side on most desktop widths (no
+   scroll needed there), but the fixed card width means a narrow viewport
+   can't fit both — exactly the mobile "peek of the next card, swipe for
+   more" affordance this pattern is for, and it's already the right shape
+   for whenever more accounts get added. Scrollbar hidden (still fully
+   scrollable via touch/trackpad/shift+wheel) to match the reference. */
 .theme-personal .social-grid {
-  display: grid;
+  display: flex;
   gap: var(--space-2);
   margin-top: var(--space-4);
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: 0 var(--space-3) var(--space-1);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 
-@media (min-width: 560px) {
-  .theme-personal .social-grid {
-    grid-template-columns: 1fr 1fr;
-  }
+.theme-personal .social-grid::-webkit-scrollbar {
+  display: none;
 }
 
+/* Translucent like the nav and the contact modal, not the solid opaque fill
+   this had before — same color-mix(--surface) + blur language, at 55%
+   (between the modal's 45% and the old 100%) since a card has to stay
+   legible across whatever's scrolled behind it, not just a scrim-dimmed
+   modal backdrop. The accent-tinted border is a lighter version of the
+   modal's own glow, restrained since two or more of these render at once. */
 .theme-personal .social-card {
   --ig-grad: linear-gradient(135deg, #feda75, #e1306c 45%, #5851db);
 
@@ -170,8 +193,13 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-1);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  flex: 0 0 auto;
+  width: min(300px, 78vw);
+  scroll-snap-align: start;
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
   border-radius: var(--radius-lg);
   padding: var(--space-3);
   text-decoration: none;
