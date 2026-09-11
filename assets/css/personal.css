@@ -181,11 +181,18 @@
 }
 
 /* Translucent like the nav and the contact modal, not the solid opaque fill
-   this had before — same color-mix(--surface) + blur language, at 55%
-   (between the modal's 45% and the old 100%) since a card has to stay
-   legible across whatever's scrolled behind it, not just a scrim-dimmed
-   modal backdrop. The accent-tinted border is a lighter version of the
-   modal's own glow, restrained since two or more of these render at once. */
+   this had before — same color-mix(--surface) + blur language. First pass
+   used 55% (more opaque than the modal's 45%) on the theory that a card
+   has to stay legible against whatever's scrolled behind it, not a
+   scrim-dimmed modal backdrop — reported back as still not reading as
+   transparent, since the black hole background is fairly uniformly dark
+   at the scroll depth where these cards actually sit, the exact "80% read
+   as solid against a dark backdrop" problem the modal itself already hit
+   once. Matched the modal's own proven 45% instead of re-guessing a new
+   number; a stronger text-shadow on the label/tagline text below is the
+   legibility safety net in its place. The accent-tinted border is a
+   lighter version of the modal's own glow, restrained since two or more
+   of these render at once. */
 .theme-personal .social-card {
   --ig-grad: linear-gradient(135deg, #feda75, #e1306c 45%, #5851db);
 
@@ -196,9 +203,9 @@
   flex: 0 0 auto;
   width: min(300px, 78vw);
   scroll-snap-align: start;
-  background: color-mix(in srgb, var(--surface) 55%, transparent);
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  background: color-mix(in srgb, var(--surface) 45%, transparent);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
   border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
   border-radius: var(--radius-lg);
   padding: var(--space-3);
@@ -263,6 +270,7 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
 }
 
 .theme-personal .social-handle {
@@ -278,6 +286,7 @@
   color: var(--muted);
   font-size: 0.9rem;
   margin-top: var(--space-1);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
 }
 
 .theme-personal .social-cta {
