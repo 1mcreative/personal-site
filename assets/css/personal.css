@@ -6,6 +6,13 @@
   --muted: #9aa8b8;
   --accent: #6ec1ff;
   --border: #263041;
+  /* .section-nav's own left offset (--space-2) + icon width (44px) + one
+     unit of breathing room — how far content needs to start clear of the
+     floating nav. .social-grid breaks out to full viewport width at every
+     size (not just mobile), so this applies unconditionally, not behind a
+     media query; confirmed via a real overlap at 1024px desktop width, not
+     just assumed from the CSS. */
+  --nav-clearance: calc(var(--space-2) + 44px + var(--space-3));
 
   background: var(--bg);
   color: var(--text);
@@ -16,88 +23,449 @@
 }
 
 .theme-personal .site-header {
-  border-bottom: 1px solid var(--border);
+  position: fixed;
+  top: var(--space-2);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  width: calc(100% - var(--space-3) * 2);
+  max-width: var(--max-width);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  /* Blue-tinted glass (color-mix on --surface, the theme's own navy) rather
+     than a flat neutral rgba — same "based on our website colors" treatment
+     now applied everywhere translucent on this page, not a one-off. */
+  background: color-mix(in srgb, var(--surface) 50%, transparent);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+
+.theme-personal .site-header .header-inner {
+  padding-top: var(--space-1);
+  padding-bottom: var(--space-1);
 }
 
 .theme-personal .site-header nav a {
   text-decoration: none;
   color: var(--muted);
   font-size: 0.95rem;
+  transition: color var(--speed) var(--ease);
 }
 
+/* Blue accent on hover/current instead of plain white — the site's own
+   --accent, not a new color. Doesn't touch .offset-btn ("The Grind"): its
+   own !important color is a fixed cross-theme signal by design (see its
+   comment in tokens.css) and isn't meant to follow either page's palette. */
 .theme-personal .site-header nav a:hover,
 .theme-personal .site-header nav a[aria-current="page"] {
-  color: var(--text);
+  color: var(--accent);
 }
 
 .theme-personal .site-footer {
+  position: relative;
+  z-index: 1;
   border-top: 1px solid var(--border);
   color: var(--muted);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
 }
 
 .theme-personal .site-footer a {
   color: var(--muted);
 }
 
-.theme-personal .life-intro {
-  padding-top: var(--space-2);
-  padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--border);
+/* Hero — WebGPU Black Hole background (assets/js/black-hole-lite.js), fixed
+   behind the ENTIRE page rather than a bounded top section: this is the
+   page's persistent backdrop, not just a hero banner. main#main gets its
+   own stacking context (z-index 1) above it, so the hero text, then the
+   Instagram cards, then everything after scrolls in normal flow on top of
+   a background that never scrolls away. Sized big on purpose — a real
+   full-viewport canvas rendered at native resolution, not a CSS transform
+   scaled up from a small box (which would just blur it).
+   `height: 100svh` (small viewport height, overriding the 100vh fallback
+   for browsers that support it) locks the canvas to a STABLE size on
+   mobile: `inset: 0` alone tracks the browser's large/dynamic viewport,
+   which genuinely changes as the address bar collapses/expands on scroll
+   — a real height change, not a rendering bug — and black-hole-lite.js's
+   ResizeObserver reacts to that by rebuilding every render target and
+   re-baking the expensive geodesic trace mid-scroll, reading as the whole
+   hero visibly growing/distorting. svh pins to the smallest-possible
+   viewport (as if the address bar were always shown) so that resize never
+   fires from chrome alone. */
+.theme-personal .life-hero {
+  position: fixed;
+  inset: 0;
+  height: 100vh;
+  height: 100svh;
+  z-index: 0;
+  overflow: hidden;
 }
 
-.theme-personal .life-intro h1 {
+.theme-personal .life-hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.theme-personal main#main {
+  position: relative;
+  z-index: 1;
+}
+
+/* The hero's second job — being the literal start of the page — lives here,
+   separate from the now-fixed background layer above: normal in-flow
+   content, vertically centered in its own tall block so it still reads as
+   a hero section even though the canvas behind it isn't scoped to it. */
+/* Top-aligned, not centered: the black hole's camera looks straight at
+   the disk with no vertical offset, so its bright ring/disk crossing sits
+   at a roughly constant FRACTION of viewport height (~32%-70%, verified
+   at both 450px and 900px tall) regardless of absolute size — centering
+   the text put it directly on the busiest, highest-contrast-against-itself
+   part of the render. `max(7.5rem, 15vh)` keeps the text in the calm
+   upper band on both short and tall viewports (a fixed rem alone cleared
+   it on a 900px-tall desktop but crept back toward the ring on a shorter
+   one, since the ring's own position scales with height and a fixed
+   offset doesn't). */
+.theme-personal .life-hero-inner {
+  min-height: 85vh;
+  min-height: 85svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  padding: max(7.5rem, 15vh) var(--space-3) var(--space-4);
+  padding: max(7.5rem, 15svh) var(--space-3) var(--space-4);
+}
+
+/* Belt-and-suspenders alongside the positioning above: a subtle backdrop
+   pill per line (same technique as home.css's .hero-sub-text), so text
+   stays readable even if a future camera/aspect-ratio tweak shifts the
+   ring back under it. */
+.theme-personal .life-hero-inner h1,
+.theme-personal .life-hero-inner p {
+  display: inline-block;
+  background: color-mix(in srgb, var(--surface) 40%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border-radius: var(--radius);
+}
+
+.theme-personal .life-hero-inner h1 {
   font-size: clamp(1.9rem, 4vw, 2.5rem);
+  padding: 0.2em 0.5em;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.85), 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
+.theme-personal .life-hero-inner p {
+  margin: var(--space-1) auto 0;
+  max-width: 480px;
+  padding: 0.3em 0.7em;
+  color: var(--text);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.85), 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+/* A horizontally-scrolling row (the "Netflix Top 10" pattern), not a
+   static grid — fixed-width cards in a flex row with scroll-snap, broken
+   out to full viewport width via the same negative-margin trick .life-hero
+   already uses, since a row like this reads as expansive/cinematic, not
+   confined to the reading column the rest of the page uses. With only two
+   cards today both still fit side by side on most desktop widths (no
+   scroll needed there), but the fixed card width means a narrow viewport
+   can't fit both — exactly the mobile "peek of the next card, swipe for
+   more" affordance this pattern is for, and it's already the right shape
+   for whenever more accounts get added. Scrollbar hidden (still fully
+   scrollable via touch/trackpad/shift+wheel) to match the reference. */
 .theme-personal .social-grid {
-  display: grid;
+  display: flex;
   gap: var(--space-2);
   margin-top: var(--space-4);
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: 0 var(--space-3) var(--space-1) var(--nav-clearance);
+  /* Real box padding alone isn't enough here: with scroll-snap-type active,
+     a leading padding whose size doesn't match scroll-padding isn't a valid
+     snap position, so the browser silently jumps scrollLeft to the padding
+     value at rest (confirmed directly — scrollLeft read back as exactly
+     84px, the padding amount, with this left unset). scroll-padding-left
+     matching the real padding tells the snap machinery that inset IS the
+     correct resting/snap position, so scrollLeft correctly stays at 0. */
+  scroll-padding-left: var(--nav-clearance);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 
-@media (min-width: 560px) {
-  .theme-personal .social-grid {
-    grid-template-columns: 1fr 1fr;
-  }
+.theme-personal .social-grid::-webkit-scrollbar {
+  display: none;
 }
 
+/* Translucent like the nav and the contact modal, not the solid opaque fill
+   this had before — same color-mix(--surface) + blur language. First pass
+   used 55% (more opaque than the modal's 45%) on the theory that a card
+   has to stay legible against whatever's scrolled behind it, not a
+   scrim-dimmed modal backdrop — reported back as still not reading as
+   transparent, since the black hole background is fairly uniformly dark
+   at the scroll depth where these cards actually sit, the exact "80% read
+   as solid against a dark backdrop" problem the modal itself already hit
+   once. Matched the modal's own proven 45% instead of re-guessing a new
+   number; a stronger text-shadow on the label/tagline text below is the
+   legibility safety net in its place. The accent-tinted border is a
+   lighter version of the modal's own glow, restrained since two or more
+   of these render at once. */
 .theme-personal .social-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  --ig-grad: linear-gradient(135deg, #feda75, #e1306c 45%, #5851db);
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  flex: 0 0 auto;
+  width: min(300px, 78vw);
+  scroll-snap-align: start;
+  background: color-mix(in srgb, var(--surface) 45%, transparent);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
   border-radius: var(--radius-lg);
   padding: var(--space-3);
-  transition: border-color var(--speed) var(--ease), transform var(--speed) var(--ease);
-}
-
-.theme-personal .social-card:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
-}
-
-.theme-personal .social-card h2 {
-  margin-top: 0;
-  font-size: 1.1rem;
-}
-
-.theme-personal .social-card p {
-  color: var(--muted);
-  margin-bottom: var(--space-2);
-}
-
-.theme-personal .social-card a.handle {
   text-decoration: none;
-  font-weight: 600;
-  font-size: 1.05rem;
+  color: var(--text);
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--speed) var(--ease), transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
 }
 
-.theme-personal .social-card a.handle::after {
+.theme-personal .social-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: var(--ig-grad);
+  opacity: 0;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  transition: opacity var(--speed) var(--ease);
+  pointer-events: none;
+}
+
+.theme-personal .social-card:hover,
+.theme-personal .social-card:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px -12px rgba(225, 48, 108, 0.35);
+}
+
+.theme-personal .social-card:hover::before,
+.theme-personal .social-card:focus-visible::before {
+  opacity: 1;
+}
+
+.theme-personal .social-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.theme-personal .social-icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.theme-personal .social-card-body {
+  min-width: 0;
+}
+
+.theme-personal .social-label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+
+.theme-personal .social-handle {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.theme-personal .social-tagline {
+  display: block;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: var(--space-1);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+
+.theme-personal .social-cta {
+  margin-top: var(--space-1);
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--border);
+  width: 100%;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  opacity: 0.75;
+  transition: opacity var(--speed) var(--ease), transform var(--speed) var(--ease);
+}
+
+.theme-personal .social-cta::after {
   content: " ↗";
   font-weight: 400;
-  opacity: 0.6;
+}
+
+.theme-personal .social-card:hover .social-cta,
+.theme-personal .social-card:focus-visible .social-cta {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+/* Click effects (sniper reticle) — see assets/js/click-effects.js. Fixed
+   overlay so it works anywhere on the page, not just over the intro/cards. */
+.theme-personal .click-fx-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  overflow: hidden;
+}
+
+.theme-personal .click-fx {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.theme-personal .click-fx-tick,
+.theme-personal .click-fx-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: var(--accent);
+  border-radius: 1px;
+  opacity: 1;
+  transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 320ms ease;
+}
+
+.theme-personal .click-fx-dot {
+  border-radius: 50%;
+}
+
+.theme-personal .life-section {
+  margin-top: var(--space-4);
+  scroll-margin-top: var(--space-3);
+}
+
+.theme-personal .life-section h2 {
+  font-size: 1.1rem;
+  margin: 0 0 var(--space-1);
 }
 
 .theme-personal .coming-later {
-  margin-top: var(--space-4);
   color: var(--muted);
   font-size: 0.9rem;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+}
+
+/* Left-edge jump nav — bare floating icons, deliberately no pill/background
+   (dropped per direct feedback: ".site-header"'s translucent-pill language
+   was the first instinct, but this is meant to read as icons floating over
+   the page, not another chrome-y control). Legibility against the busy,
+   varying Black Hole background comes from a drop-shadow on each icon
+   instead — the same job text-shadow already does for every other piece of
+   foreground text on this page, just the icon-filter equivalent. The
+   colorful-vs-monochrome swap is pure CSS (grayscale filter on .is-active),
+   toggled by section-nav.js's IntersectionObserver per section's own
+   visibility — works the same way regardless of whether an icon is drawn
+   with a brand gradient (Instagram/YouTube) or flat fills (the generic
+   Album glyph), so no second "gray" copy of any icon asset is needed.
+   scroll-margin-top on .social-grid/.life-section keeps a clicked section
+   from landing flush against the viewport top. */
+.theme-personal .section-nav {
+  position: fixed;
+  left: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.theme-personal .section-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  transition: transform var(--speed) var(--ease);
+}
+
+.theme-personal .section-nav-link:hover,
+.theme-personal .section-nav-link:focus-visible {
+  transform: scale(1.15);
+}
+
+.theme-personal .section-nav-icon {
+  display: flex;
+  width: 22px;
+  height: 22px;
+  /* --icon-gray/--icon-glow let .is-active and :hover each override just
+     their own piece of the filter chain independently, instead of needing
+     four full filter strings for every active x hover combination. */
+  --icon-gray: grayscale(1);
+  --icon-glow: drop-shadow(0 0 0 transparent);
+  filter: var(--icon-gray) drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7)) var(--icon-glow);
+  opacity: 0.55;
+  transition: filter var(--speed) var(--ease), opacity var(--speed) var(--ease);
+}
+
+.theme-personal .section-nav-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.theme-personal .section-nav-link.is-active .section-nav-icon {
+  --icon-gray: grayscale(0);
+  opacity: 1;
+}
+
+/* Blue glow on hover/focus — the site's own accent, not a new color —
+   independent of grayscale/active state (drop-shadow's own color isn't
+   affected by a preceding grayscale() in the same filter chain), so it
+   works the same whether the icon is currently colorful or not. */
+.theme-personal .section-nav-link:hover .section-nav-icon,
+.theme-personal .section-nav-link:focus-visible .section-nav-icon {
+  --icon-glow: drop-shadow(0 0 10px var(--accent));
+}
+
+@media (max-width: 640px) {
+  .theme-personal .section-nav {
+    left: var(--space-1);
+  }
+
+  /* Below main's own 780px max-width, .life-section's normal-flow content
+     sits close enough to the true left edge to pass behind the floating
+     nav mid-scroll — confirmed with a real overlap at 375px width,
+     scrollY 525 (the Youtube heading crossing the nav's own vertical
+     band). Not needed above this breakpoint: main's centered column
+     already clears the nav with plenty of room once its 780px cap binds. */
+  .theme-personal .life-section {
+    padding-left: var(--nav-clearance);
+  }
 }

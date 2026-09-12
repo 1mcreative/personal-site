@@ -11,5 +11,14 @@
     {{ content }}
   </main>
   {% include footer.html %}
+  <!-- Accretion Disc DEPRECATED, not deleted — superseded by Black Hole below. -->
+  <!-- <script src="{{ '/assets/js/accretion-disc.js' | relative_url }}" defer></script> -->
+  <!-- Black Hole (raymarched) DEPRECATED, not deleted — heavy per-pixel
+       geodesic re-trace every frame made it slow to respond. Superseded by
+       the bake-once/cheap-per-frame-shade version below. -->
+  <!-- <script src="{{ '/assets/js/black-hole.js' | relative_url }}" defer></script> -->
+  <script src="{{ '/assets/js/black-hole-lite.js' | relative_url }}" defer></script>
+  <script src="{{ '/assets/js/click-effects.js' | relative_url }}" defer></script>
+  <script src="{{ '/assets/js/section-nav.js' | relative_url }}" defer></script>
 </body>
 </html>
