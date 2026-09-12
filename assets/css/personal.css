@@ -6,6 +6,13 @@
   --muted: #9aa8b8;
   --accent: #6ec1ff;
   --border: #263041;
+  /* .section-nav's own left offset (--space-2) + icon width (44px) + one
+     unit of breathing room — how far content needs to start clear of the
+     floating nav. .social-grid breaks out to full viewport width at every
+     size (not just mobile), so this applies unconditionally, not behind a
+     media query; confirmed via a real overlap at 1024px desktop width, not
+     just assumed from the CSS. */
+  --nav-clearance: calc(var(--space-2) + 44px + var(--space-3));
 
   background: var(--bg);
   color: var(--text);
@@ -168,7 +175,15 @@
   margin-top: var(--space-4);
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  padding: 0 var(--space-3) var(--space-1);
+  padding: 0 var(--space-3) var(--space-1) var(--nav-clearance);
+  /* Real box padding alone isn't enough here: with scroll-snap-type active,
+     a leading padding whose size doesn't match scroll-padding isn't a valid
+     snap position, so the browser silently jumps scrollLeft to the padding
+     value at rest (confirmed directly — scrollLeft read back as exactly
+     84px, the padding amount, with this left unset). scroll-padding-left
+     matching the real padding tells the snap machinery that inset IS the
+     correct resting/snap position, so scrollLeft correctly stays at 0. */
+  scroll-padding-left: var(--nav-clearance);
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
@@ -359,15 +374,20 @@
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
 }
 
-/* Left-edge jump nav — one fixed pill, same translucent/blurred language as
-   .site-header, icons stacked vertically. The colorful-vs-monochrome swap
-   this was actually asked for is pure CSS (grayscale filter on .is-active),
-   toggled by section-nav.js's IntersectionObserver — works the same way
-   regardless of whether an icon is drawn with a brand gradient (Instagram/
-   YouTube) or flat fills (the generic Album glyph), so no second "gray"
-   copy of any icon asset is needed. scroll-margin-top on .social-grid/
-   .life-section (not just this nav) keeps a clicked section from landing
-   flush against the viewport top. */
+/* Left-edge jump nav — bare floating icons, deliberately no pill/background
+   (dropped per direct feedback: ".site-header"'s translucent-pill language
+   was the first instinct, but this is meant to read as icons floating over
+   the page, not another chrome-y control). Legibility against the busy,
+   varying Black Hole background comes from a drop-shadow on each icon
+   instead — the same job text-shadow already does for every other piece of
+   foreground text on this page, just the icon-filter equivalent. The
+   colorful-vs-monochrome swap is pure CSS (grayscale filter on .is-active),
+   toggled by section-nav.js's IntersectionObserver per section's own
+   visibility — works the same way regardless of whether an icon is drawn
+   with a brand gradient (Instagram/YouTube) or flat fills (the generic
+   Album glyph), so no second "gray" copy of any icon asset is needed.
+   scroll-margin-top on .social-grid/.life-section keeps a clicked section
+   from landing flush against the viewport top. */
 .theme-personal .section-nav {
   position: fixed;
   left: var(--space-2);
@@ -376,13 +396,7 @@
   z-index: 3;
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-1);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: rgba(15, 20, 25, 0.5);
-  backdrop-filter: blur(18px) saturate(150%);
-  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  gap: var(--space-2);
 }
 
 .theme-personal .section-nav-link {
@@ -391,21 +405,19 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  border-radius: 50%;
-  transition: background-color var(--speed) var(--ease), transform var(--speed) var(--ease);
+  transition: transform var(--speed) var(--ease);
 }
 
 .theme-personal .section-nav-link:hover,
 .theme-personal .section-nav-link:focus-visible {
-  background-color: color-mix(in srgb, var(--accent) 18%, transparent);
-  transform: scale(1.08);
+  transform: scale(1.15);
 }
 
 .theme-personal .section-nav-icon {
   display: flex;
   width: 22px;
   height: 22px;
-  filter: grayscale(1);
+  filter: grayscale(1) drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7));
   opacity: 0.55;
   transition: filter var(--speed) var(--ease), opacity var(--speed) var(--ease);
 }
@@ -416,12 +428,22 @@
 }
 
 .theme-personal .section-nav-link.is-active .section-nav-icon {
-  filter: grayscale(0);
+  filter: grayscale(0) drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7));
   opacity: 1;
 }
 
 @media (max-width: 640px) {
   .theme-personal .section-nav {
     left: var(--space-1);
+  }
+
+  /* Below main's own 780px max-width, .life-section's normal-flow content
+     sits close enough to the true left edge to pass behind the floating
+     nav mid-scroll — confirmed with a real overlap at 375px width,
+     scrollY 525 (the Youtube heading crossing the nav's own vertical
+     band). Not needed above this breakpoint: main's centered column
+     already clears the nav with plenty of room once its 780px cap binds. */
+  .theme-personal .life-section {
+    padding-left: var(--nav-clearance);
   }
 }
