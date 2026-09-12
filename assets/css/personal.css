@@ -32,7 +32,10 @@
   max-width: var(--max-width);
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(15, 20, 25, 0.5);
+  /* Blue-tinted glass (color-mix on --surface, the theme's own navy) rather
+     than a flat neutral rgba — same "based on our website colors" treatment
+     now applied everywhere translucent on this page, not a one-off. */
+  background: color-mix(in srgb, var(--surface) 50%, transparent);
   backdrop-filter: blur(18px) saturate(150%);
   -webkit-backdrop-filter: blur(18px) saturate(150%);
 }
@@ -46,11 +49,16 @@
   text-decoration: none;
   color: var(--muted);
   font-size: 0.95rem;
+  transition: color var(--speed) var(--ease);
 }
 
+/* Blue accent on hover/current instead of plain white — the site's own
+   --accent, not a new color. Doesn't touch .offset-btn ("The Grind"): its
+   own !important color is a fixed cross-theme signal by design (see its
+   comment in tokens.css) and isn't meant to follow either page's palette. */
 .theme-personal .site-header nav a:hover,
 .theme-personal .site-header nav a[aria-current="page"] {
-  color: var(--text);
+  color: var(--accent);
 }
 
 .theme-personal .site-footer {
@@ -138,7 +146,7 @@
 .theme-personal .life-hero-inner h1,
 .theme-personal .life-hero-inner p {
   display: inline-block;
-  background: rgba(15, 20, 25, 0.4);
+  background: color-mix(in srgb, var(--surface) 40%, transparent);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   border-radius: var(--radius);
@@ -417,7 +425,12 @@
   display: flex;
   width: 22px;
   height: 22px;
-  filter: grayscale(1) drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7));
+  /* --icon-gray/--icon-glow let .is-active and :hover each override just
+     their own piece of the filter chain independently, instead of needing
+     four full filter strings for every active x hover combination. */
+  --icon-gray: grayscale(1);
+  --icon-glow: drop-shadow(0 0 0 transparent);
+  filter: var(--icon-gray) drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7)) var(--icon-glow);
   opacity: 0.55;
   transition: filter var(--speed) var(--ease), opacity var(--speed) var(--ease);
 }
@@ -428,8 +441,17 @@
 }
 
 .theme-personal .section-nav-link.is-active .section-nav-icon {
-  filter: grayscale(0) drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7));
+  --icon-gray: grayscale(0);
   opacity: 1;
+}
+
+/* Blue glow on hover/focus — the site's own accent, not a new color —
+   independent of grayscale/active state (drop-shadow's own color isn't
+   affected by a preceding grayscale() in the same filter chain), so it
+   works the same whether the icon is currently colorful or not. */
+.theme-personal .section-nav-link:hover .section-nav-icon,
+.theme-personal .section-nav-link:focus-visible .section-nav-icon {
+  --icon-glow: drop-shadow(0 0 10px var(--accent));
 }
 
 @media (max-width: 640px) {
