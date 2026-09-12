@@ -25,13 +25,19 @@
 // (much smaller) shader set.
 //
 // RECOLORED, same rule as every visual element on this site: the reference's
-// disk is copper/orange: recolored to dark navy -> Grind's #1d4ed8 -> an
-// icy near-white-blue crest, with the receding (redshifted) side warmed
-// toward the site's amber accent (#f59e0b, reused from the homepage globe/
-// glitter) — the same redshift trick black-hole.js's own volumeSample()
-// used, ported here since this shader already computes the same Doppler
-// `beaming` factor it needs. Starfield narrowed from warm-to-cool to a
-// blue-white-only range for the same "doesn't blend in" reason as before.
+// disk is copper/orange. First recolored to a blue palette (dark navy ->
+// Grind's #1d4ed8 -> icy near-white-blue) to match the site, then moved back
+// toward warm tones per direct feedback that blue didn't look like a real
+// black hole — real accretion-disk renders (EHT's M87 image, Interstellar's
+// Gargantua) are dominated by blackbody orange/gold. Now: a dark ember ->
+// the site's own amber accent (#f59e0b, reused from the homepage globe/
+// glitter) -> a warm near-white crest, with the receding (redshifted) side
+// deepening toward red rather than warming further — the same Doppler
+// `beaming` factor black-hole.js's own volumeSample() used for its redshift
+// trick, ported here and recolored again along with the rest of the disk.
+// Starfield stayed a near-white range through both recolors — white starlight
+// doesn't clash with either a blue or an orange disk, so there was nothing
+// to revert.
 //
 // Camera framing and composition match the reference's own
 // defaultHeroSettings exactly, on every breakpoint — distance 13.5, fov 3,
@@ -666,20 +672,26 @@ fn shadeDisk(
   let opticalDepth = smoke * thickness * path * look.density * 0.95;
   let coverage = 1.0 - exp(-opticalDepth);
 
-  // Site palette (dark navy -> Grind #1d4ed8 -> icy near-white-blue), not
-  // the reference's copper/orange. See file header.
+  // Warm palette built from the site's own amber accent (#f59e0b, already
+  // used on the homepage globe/glitter) instead of the earlier blue
+  // recolor — per direct feedback that blue didn't read as "a real black
+  // hole." Real accretion-disk renders (EHT's M87 image, Interstellar's
+  // Gargantua) are dominated by blackbody orange/gold, not blue, so this
+  // moves back toward that while still drawing only from this site's own
+  // palette rather than the reference's literal copper/orange.
   let heat = pow(1.0 - radiusNorm, 1.25);
-  var thermal = mix(vec3f(0.05, 0.11, 0.32), vec3f(0.114, 0.306, 0.847), smoothstep(0.03, 0.5, heat));
+  var thermal = mix(vec3f(0.20, 0.08, 0.02), vec3f(0.961, 0.620, 0.043), smoothstep(0.03, 0.5, heat));
 
   let tangent = normalize(vec3f(-plane.y, 0.0, plane.x));
   let orbitalSpeed = min(0.64, 0.94 / sqrt(max(radius - G_HORIZON, 0.25)));
   let towardObserver = dot(tangent, -normalize(viewDirection));
   let beaming = pow(clamp(1.0 / (1.0 - orbitalSpeed * towardObserver), 0.72, 1.55), 1.5 * look.doppler);
-  // Receding (redshifted) side warms toward the site's amber accent
-  // instead of stopping at the crest's blue-white — see file header.
+  // Receding (redshifted, dimmer) side deepens toward red rather than
+  // warming toward amber — the base is already amber now, so the crest
+  // whitening below is what carries the approaching (brighter) side.
   let recede = smoothstep(1.0, 0.62, beaming);
-  thermal = mix(thermal, vec3f(0.961, 0.620, 0.043), recede * 0.6);
-  thermal = mix(thermal, vec3f(0.85, 0.93, 1.0), pow(heat, 2.2));
+  thermal = mix(thermal, vec3f(0.55, 0.12, 0.02), recede * 0.6);
+  thermal = mix(thermal, vec3f(1.0, 0.95, 0.85), pow(heat, 2.2));
 
   let redshift = sqrt(max(1.0 - G_HORIZON / radius, 0.025));
   let facing = mix(0.82, 1.0, step(0.0, g.side));
