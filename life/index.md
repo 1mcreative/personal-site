@@ -14,7 +14,19 @@ permalink: /life/
   <p>Mostly Instagram. Occasionally something weirder.</p>
 </div>
 
-<div class="social-grid">
+<nav class="section-nav" aria-label="Jump to section">
+  <a href="#instagram" class="section-nav-link" data-section="instagram" aria-label="Instagram" title="Instagram">
+    <span class="section-nav-icon">{% include instagram-glyph.svg %}</span>
+  </a>
+  <a href="#youtube" class="section-nav-link" data-section="youtube" aria-label="YouTube" title="YouTube">
+    <span class="section-nav-icon">{% include youtube-glyph.svg %}</span>
+  </a>
+  <a href="#album" class="section-nav-link" data-section="album" aria-label="Photo album" title="Photo album">
+    <span class="section-nav-icon">{% include album-glyph.svg %}</span>
+  </a>
+</nav>
+
+<div class="social-grid" id="instagram">
   <a class="social-card" href="https://www.instagram.com/1mcreative" rel="me noopener" target="_blank">
     <span class="social-card-head">
       <span class="social-icon" aria-hidden="true">{% include instagram-glyph.svg %}</span>
@@ -39,4 +51,12 @@ permalink: /life/
   </a>
 </div>
 
-<p class="coming-later">Photo gallery, YouTube, and more are coming in a later pass.</p>
+<section class="life-section" id="youtube">
+  <h2>YouTube</h2>
+  <p class="coming-later">Nothing here yet.</p>
+</section>
+
+<section class="life-section" id="album">
+  <h2>Photo album</h2>
+  <p class="coming-later">Same here — a real gallery's coming.</p>
+</section>
