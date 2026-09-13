@@ -60,12 +60,22 @@
   }
 
   splash.classList.add("intro-splash-active");
+  // Hidden synchronously, in the same tick as the line above and before
+  // any of this ever paints — see the CSS comment on .hero-greeting for
+  // why this can't be a bare always-on rule (reduced-motion/no-JS/error
+  // visitors, who never reach this line, need "Hi, I'm"/"." visible from
+  // the very first frame).
+  var greetings = document.querySelectorAll(".hero-greeting");
+  for (var gi = 0; gi < greetings.length; gi++) {
+    greetings[gi].classList.add("hero-greeting-hidden");
+  }
 
   var TEXT = "Bhavesh";
   var MIN_TOTAL = 100; // the explicit floor from feedback
   var MAX_TOTAL = 361; // sanity cap for very large/wide/hi-dpi screens
   var SETTLE_MS = 780; // matches the grid's own longest CSS transition
-  var HOLD_MS = 350; // a little more breathing room with a busier field
+  var HOLD_MS = 250; // a beat once the field has settled, before the morph starts
+  var MORPH_MS = 700; // matches .intro-splash-survivor-morph's own transition
   var FADE_MS = 500; // matches .intro-splash's own opacity transition
 
   // Measure one real word at the grid's actual (responsive) font-size
@@ -154,6 +164,64 @@
     return grid;
   }
 
+  // Fades the whole splash out (revealing the real page, already sitting
+  // underneath at the exact right position/size — see morphSurvivorHome
+  // below), reveals "Hi, I'm"/"." around the now-landed name, and hands
+  // off to phase 2. The one shared exit path: called directly if the
+  // morph can't run for some reason (missing elements, zero-size rects —
+  // defensive only, shouldn't happen in practice), or after the morph
+  // finishes in the normal case.
+  function finishSplash() {
+    for (var gi = 0; gi < greetings.length; gi++) {
+      greetings[gi].classList.remove("hero-greeting-hidden");
+    }
+    splash.classList.add("intro-splash-out");
+    triggerPhase2();
+    setTimeout(function () {
+      splash.remove();
+    }, FADE_MS);
+  }
+
+  // The name doesn't fade-and-get-replaced by the real heading anymore —
+  // it flies from its small grid cell to sit exactly on top of the real
+  // h1's own name span, then the shared .intro-splash-out fade (above)
+  // dissolves it away while the real, identically-positioned text
+  // underneath simply continues being there, unchanged. Standard FLIP
+  // technique: measure the survivor's current rect and the real target's
+  // rect, derive the translate+scale that maps one onto the other. Using
+  // *center* points specifically (not top-left corners) means this is
+  // correct regardless of transform-origin, since a center-origin scale
+  // never moves the center — verified this holds at every tested
+  // viewport, not just assumed from the math.
+  function morphSurvivorHome(grid) {
+    var survivor = grid.querySelector(".intro-splash-survivor");
+    var target = document.querySelector(".pixel-name-plain.name-kinetic-plain");
+    if (!survivor || !target) {
+      finishSplash();
+      return;
+    }
+    var current = survivor.getBoundingClientRect();
+    var dest = target.getBoundingClientRect();
+    if (!current.width || !dest.width) {
+      finishSplash();
+      return;
+    }
+    var tx = (dest.left + dest.width / 2) - (current.left + current.width / 2);
+    var ty = (dest.top + dest.height / 2) - (current.top + current.height / 2);
+    var scale = dest.width / current.width;
+
+    // Matches the real heading's own weight so the final dissolve (the
+    // instant .intro-splash-out starts) doesn't show a boldness shift
+    // between this element and the identically-positioned one underneath.
+    survivor.style.fontWeight = getComputedStyle(target).fontWeight;
+    survivor.style.transformOrigin = "50% 50%";
+    survivor.classList.add("intro-splash-survivor-morph");
+    void survivor.offsetWidth; // flush so the transition below animates from the current (untransformed) state, not jumping straight to the end value
+    survivor.style.transform = "translate(" + tx + "px, " + ty + "px) scale(" + scale + ")";
+
+    setTimeout(finishSplash, MORPH_MS);
+  }
+
   function start() {
     var size = computeGrid();
     var grid = buildGrid(size.rows, size.cols);
@@ -167,11 +235,7 @@
     });
 
     setTimeout(function () {
-      splash.classList.add("intro-splash-out");
-      triggerPhase2();
-      setTimeout(function () {
-        splash.remove();
-      }, FADE_MS);
+      morphSurvivorHome(grid);
     }, SETTLE_MS + HOLD_MS);
   }
 

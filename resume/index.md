@@ -1,6 +1,6 @@
 ---
 layout: professional
-title: "Resume — Bhavesh Nakum"
+title: "Resume"
 description: "Bhavesh Nakum's resume: Senior Software Engineer (Lead) at Walmart, backend architecture and cloud data platforms."
 permalink: /resume/
 ---
@@ -42,7 +42,7 @@ permalink: /resume/
 
 <section class="resume-section">
   <h2>Summary</h2>
-  <p>I've spent the past seven-plus years building backend systems and cloud data pipelines that hold up at scale. I lead engineering teams, make the architecture calls, and build the systems that can't afford to go down &mdash; mostly in Java, Spring Boot, Kafka, and Azure. I care about clean code and about the platform actually solving the business problem it was built for.</p>
+  <p>I've spent the past seven-plus years building backend systems and cloud data pipelines that hold up at scale. I lead engineering teams, make the architecture calls, and build the systems that can't afford to go down, mostly in Java, Spring Boot, Kafka, and Azure. I care about clean code and about the platform actually solving the business problem it was built for.</p>
 </section>
 
 <section class="resume-section">
@@ -135,7 +135,7 @@ permalink: /resume/
 <section class="resume-section">
   <h2>Education &amp; certifications</h2>
   <ul>
-    <li>B.Tech, Computer Engineering &mdash; SVNIT, Surat (2018)</li>
+    <li>B.Tech, Computer Engineering at SVNIT, Surat (2018)</li>
     <li>Microsoft Certified: Azure Fundamentals</li>
     <li>Apache Airflow Fundamentals</li>
   </ul>

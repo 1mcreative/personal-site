@@ -7,6 +7,43 @@
 {% endcase %}
 <meta name="theme-color" content="{{ theme-color }}">
 {% seo %}
+<!-- A dedicated Person schema, separate from jekyll-seo-tag's own thin
+     WebSite/WebPage block above: this is what actually lets a search
+     engine's Knowledge Graph or an AI assistant answering "who is Bhavesh
+     Nakum" resolve one consistent entity (jobTitle, employer, education,
+     and the same profile links this site already marks rel="me" on).
+     Site-wide, not homepage-only, since the person it describes is the
+     same on every page. Every field here is a real, verifiable fact from
+     the résumé/profile links already on this site, nothing invented. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "{{ site.author }}",
+  "url": "{{ site.url }}",
+  "email": "mailto:{{ site.email }}",
+  "jobTitle": "Senior Software Engineer",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "Walmart"
+  },
+  "alumniOf": {
+    "@type": "CollegeOrUniversity",
+    "name": "Sardar Vallabhbhai National Institute of Technology, Surat"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Bengaluru",
+    "addressCountry": "IN"
+  },
+  "knowsAbout": ["Backend Architecture", "Java", "Spring Boot", "Apache Kafka", "Microsoft Azure", "Cloud Data Platforms", "Microservices"],
+  "sameAs": [
+    "https://www.linkedin.com/in/bhaveshnakum7",
+    "https://github.com/1mcreative",
+    "https://www.instagram.com/1mcreative"
+  ]
+}
+</script>
 <link rel="canonical" href="{{ page.url | absolute_url }}">
 <link rel="icon" href="{{ '/assets/img/favicon.svg' | relative_url }}" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/sitemap.xml' | absolute_url }}">

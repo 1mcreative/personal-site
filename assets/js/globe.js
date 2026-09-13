@@ -15,7 +15,7 @@
 // explicit follow-up request — see the pointer handlers further down.
 (function () {
   var COLOR = [0x1d / 0xff, 0x4e / 0xff, 0xd8 / 0xff]; // site's blue accent, #1d4ed8
-  var SPEED = 0.15; // radians/sec — auto-rotate resumes once drag momentum settles
+  var SPEED = 0.22; // radians/sec — auto-rotate resumes once drag momentum settles. Was 0.15 (a full turn every ~42s, read as barely moving); ~28.5s/turn still reads as calm/ambient, not frantic.
   var TILT = (23 * Math.PI) / 180; // initial tilt; draggable afterward
 
   var host = document.querySelector(".hero-globe");
@@ -29,10 +29,16 @@
 
   var VERT = [
     "attribute vec3 aPos;",
+    // aQuadOffset/uFillScale exist only for the "fill the frame" draw
+    // added below (see draw()'s third call) — (0,0) and 0.0 respectively
+    // for every other draw, at which point `center + aQuadOffset*uFillScale`
+    // reduces to exactly `center`, i.e. unchanged from before this existed.
+    "attribute vec2 aQuadOffset;",
     "uniform float uAngleY;",
     "uniform float uTiltX;",
     "uniform float uPointScale;",
     "uniform float uCamDist;",
+    "uniform float uFillScale;",
     "varying float vDepth;",
     "void main() {",
     "  float ct = cos(uTiltX), st = sin(uTiltX);",
@@ -42,7 +48,8 @@
     "  float focal = 2.4;",
     "  float z = r.z + uCamDist;",
     "  float persp = focal / z;",
-    "  gl_Position = vec4(r.x * persp, r.y * persp, 0.0, 1.0);",
+    "  vec2 center = vec2(r.x * persp, r.y * persp);",
+    "  gl_Position = vec4(center + aQuadOffset * uFillScale, 0.0, 1.0);",
     "  vDepth = clamp((r.z + 1.0) / 2.0, 0.0, 1.0);",
     "  gl_PointSize = max(1.0, uPointScale * persp);",
     "}",
@@ -60,12 +67,33 @@
     // crisp expanding circle. A uniform lets draw() tighten this per
     // draw call instead of it being baked in as a constant.
     "uniform float uEdgeInner;",
+    // Set to 1.0 only for the "fill the frame" quad draw (see draw()'s
+    // third call). gl_PointCoord is only meaningful for gl.POINTS
+    // primitives — reading it while rendering the quad's gl.TRIANGLES is
+    // undefined per spec, and empirically (confirmed via direct
+    // gl.readPixels right after the draw call, not a screenshot) read
+    // back as a value whose distance from center exceeded 0.5 every time,
+    // discarding 100% of the quad's fragments. A flat, unmasked fill
+    // bypasses that dot-circle logic entirely instead of trying to make
+    // gl_PointCoord behave for a primitive it was never meant for.
+    "uniform float uQuadMode;",
     "void main() {",
+    "  if (uQuadMode > 0.5) {",
+    "    gl_FragColor = vec4(uColor, 1.0);",
+    "    return;",
+    "  }",
     "  vec2 c = gl_PointCoord - vec2(0.5);",
     "  float d = length(c);",
     "  if (d > 0.5) discard;",
     "  float edge = smoothstep(0.5, uEdgeInner, d);",
-    "  float alpha = 0.4 + vDepth * 0.6;",
+    // Widened from 0.4-1.0 to 0.22-1.0 (2026-09-12, "still looks ok, want
+    // it to look great"): the old range kept the far side fairly close in
+    // brightness to the near side, so the sphere read as a flat,
+    // evenly-lit disc rather than a lit-and-shadowed 3D object. A lower
+    // floor pushes the far hemisphere further into the background,
+    // giving the near dots (still full alpha) more relative pop and the
+    // whole thing a genuine sense of roundness.
+    "  float alpha = 0.22 + vDepth * 0.78;",
     "  gl_FragColor = vec4(uColor, edge * alpha);",
     "}",
   ].join("\n");
@@ -175,12 +203,56 @@
   gl.bindBuffer(gl.ARRAY_BUFFER, markerBuf);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(markerPos), gl.STATIC_DRAW);
 
+  // The "fill the frame" quad for the resume-exit zoom (see draw()'s third
+  // call and globeFocusMarker below) — a plain two-triangle square, unit
+  // size before uFillScale multiplies it. Reaches ±4 in clip space at full
+  // scale: comfortably past the ±1 visible range from any on-screen marker
+  // position, including a tilted one, so the canvas's own drawing buffer
+  // ends up fully covered regardless of where exactly the marker sits.
+  var quadBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1]),
+    gl.STATIC_DRAW
+  );
+  // aPos needs the marker's *same* position at all 6 quad corners. The
+  // first attempt disabled aPos's array and set it as a plain
+  // vertexAttrib3f constant instead (skip a buffer for 3 repeated
+  // floats) — aPos turned out to be attribute location 0 (confirmed via
+  // gl.getAttribLocation), and disabling the array for location 0
+  // specifically is a known WebGL/OpenGL ES compatibility gap on some
+  // implementations. That wasn't actually the bug this time (a separate
+  // gl_PointCoord issue, see the FRAG shader's uQuadMode comment, was
+  // fully masking the result either way) but a real buffer sidesteps a
+  // known risk regardless of which one turns out to matter on a given
+  // visitor's browser/GPU, at a cost of 6 repeated floats instead of 3 —
+  // negligible, kept as the safer default rather than reverted.
+  var markerQuadPosBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, markerQuadPosBuf);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([].concat(markerPos, markerPos, markerPos, markerPos, markerPos, markerPos)),
+    gl.STATIC_DRAW
+  );
+
   var uAngleY = gl.getUniformLocation(prog, "uAngleY");
   var uTiltX = gl.getUniformLocation(prog, "uTiltX");
   var uPointScale = gl.getUniformLocation(prog, "uPointScale");
   var uColor = gl.getUniformLocation(prog, "uColor");
   var uCamDist = gl.getUniformLocation(prog, "uCamDist");
   var uEdgeInner = gl.getUniformLocation(prog, "uEdgeInner");
+  var aQuadOffset = gl.getAttribLocation(prog, "aQuadOffset");
+  var uFillScale = gl.getUniformLocation(prog, "uFillScale");
+  var uQuadMode = gl.getUniformLocation(prog, "uQuadMode");
+  // Constant (0,0)/0/0 by default — see the VERT/FRAG shader comments on
+  // why this makes every existing draw call behave exactly as it did
+  // before this attribute/uniform trio existed, unless a draw explicitly
+  // opts in.
+  gl.vertexAttrib2f(aQuadOffset, 0, 0);
+  gl.uniform1f(uFillScale, 0);
+  gl.uniform1f(uQuadMode, 0);
+  var fillScale = 0;
 
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -265,6 +337,32 @@
     gl.uniform1f(uPointScale, Math.max(6, w / 26) * markerScaleMult * revealScaleMult);
     gl.uniform1f(uEdgeInner, markerEdgeInner);
     gl.drawArrays(gl.POINTS, 0, 1);
+
+    // "Fill the frame" — only ever nonzero during/after globeFocusMarker's
+    // zoom phase (see loop() below). Draws the same marker color as a
+    // growing gl.TRIANGLES quad instead of a gl.POINTS sprite, since
+    // gl_PointSize is hardware-capped (as low as 511px on one real
+    // renderer tested — see the uFillScale comment on the VERT shader)
+    // and the point-based marker above silently stops growing once it
+    // hits that ceiling, however large uPointScale asks for. The quad has
+    // no such cap, so it's what actually guarantees full coverage.
+    if (fillScale > 0) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, markerQuadPosBuf);
+      gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(aQuadOffset);
+      gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+      gl.vertexAttribPointer(aQuadOffset, 2, gl.FLOAT, false, 0, 0);
+      gl.uniform1f(uFillScale, fillScale);
+      gl.uniform1f(uQuadMode, 1);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      // Reset both back to their constant-zero/off state so the next
+      // frame's main-cloud/marker-point draws above (which never touch
+      // this attribute or set this uniform themselves) aren't reading
+      // stale quad state.
+      gl.disableVertexAttribArray(aQuadOffset);
+      gl.vertexAttrib2f(aQuadOffset, 0, 0);
+      gl.uniform1f(uQuadMode, 0);
+    }
   }
 
   var angleY = 0;
@@ -297,6 +395,13 @@
   var velY = 0, velX = 0;
 
   function onPointerDown(e) {
+    // Touch specifically (not mouse/pen) is excluded: on mobile a touch
+    // starting on the globe used to get claimed as a drag, silently
+    // swallowing the swipe-to-navigate gesture underneath it (reported as
+    // "while scrolling down sometimes user interacts with globe"). Mobile
+    // now just auto-rotates — see the SPEED*dt branch below, untouched by
+    // this — while desktop keeps real drag-to-rotate via mouse/trackpad.
+    if (e.pointerType === "touch") return;
     isDragging = true;
     velY = 0;
     velX = 0;
@@ -369,6 +474,7 @@
     focusCallback = callback || null;
     focusPhase = "spin";
     focusStart = 0;
+    fillScale = 0;
     // Re-render the canvas at higher native resolution before the zoom
     // starts growing it — see resScale's own comment above resize().
     // Done once, up front, rather than ramped alongside the zoom itself,
@@ -400,6 +506,13 @@
         // getting, so the falloff that's invisible on a small dot never
         // gets the chance to become a big visible blur at full size.
         markerEdgeInner = 0.35 + ze * 0.14;
+        // Grows in lockstep with markerScaleMult above — same color, same
+        // center, indistinguishable from the point-based dot while both
+        // are small — but keeps going past whatever point the point
+        // sprite hits its hardware ceiling (see draw()'s comment on
+        // uFillScale), since this is what actually guarantees the canvas
+        // ends up fully covered by the end of the zoom.
+        fillScale = ze * ze * 4.0;
         if (zt >= 1) {
           // "held": camDist is now razor-thin, so even the tiny angleY
           // nudge from resuming auto-rotate would sweep the marker's
