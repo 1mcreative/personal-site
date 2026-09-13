@@ -23,6 +23,16 @@
   var MAX_PARTICLES = 4200;
   var MAX_LINES = 6;
   var LINE_PENALTY = 0.94;
+  // Measured directly (see a temporary probe run against this exact font
+  // spec): a vertical stem in this font/weight at MASK_FONT_PX is 33px wide
+  // in the mask's own coordinate space, which never changes with viewport —
+  // only how much that mask gets shrunk to fit the canvas does. 11 makes
+  // sampleTargets's cellDevice self-correct to exactly 3 sample points per
+  // stem (33/11) at *any* dispScale, so "dots per letter-stroke" stays
+  // constant across every screen width instead of only matching at the two
+  // widths it happened to be tuned against.
+  var STROKE_PX = 33;
+  var STROKE_SAMPLES = 3;
 
   function latticeError(values, unit) {
     if (!values.length || !(unit > 0)) return 0;
@@ -227,6 +237,17 @@
       var fitW = fitBox.maxX - fitBox.minX;
       var fitH = fitBox.maxY - fitBox.minY;
       dispScale = Math.min(fitW / iw, fitH / ih);
+
+      // cellDevice was only ever a bootstrap guess (resizeCanvas can't know
+      // dispScale before the mask exists) — now that the real shrink factor
+      // for *this* container is known, re-target it so the sampling grid
+      // covers the same STROKE_SAMPLES points across a letter stroke
+      // regardless of how much this container's box happens to shrink the
+      // mask. updateBounds() picks up the corrected cellDevice for particle
+      // clamping/edge margins; the tiny resulting fitBox shift is the same
+      // approximation the MAX_PARTICLES correction below already makes.
+      cellDevice = Math.max(3, Math.round((STROKE_PX / STROKE_SAMPLES) * dispScale));
+      updateBounds();
       stepMask = Math.max(1, Math.round(cellDevice / dispScale));
 
       function collect(step) {
@@ -558,13 +579,29 @@
   // (0x0) box.
   heading.classList.add("text-fall-ready");
 
+  // On a narrow phone there isn't width for "BHAVESH NAKUM" on one line at a
+  // readable size — buildTextMask's own auto line-wrap would otherwise pick
+  // whatever split scores highest, which doesn't always land on the two
+  // clean name-shaped lines a reader expects. A literal "\n" skips that
+  // guesswork entirely (buildTextMask uses hard-coded newlines as-is, no
+  // auto-wrap). This is decided once at load, like every other param below —
+  // matches how this effect already treats window size (see resizeCanvas /
+  // ResizeObserver) as "what it is when the page loads," not something to
+  // re-decide on every resize tick.
+  var mobileName = window.matchMedia("(max-width: 640px)").matches;
+
   createTextFall(root, canvas, {
-    text: "BHAVESH NAKUM",
+    text: mobileName ? "BHAVESH\nNAKUM" : "BHAVESH NAKUM",
     glyphFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
     color: "#1b1f24",
     align: "left",
     autoFall: true,
-    glyphSize: 7,
+    // Only a bootstrap seed now — sampleTargets re-derives the real
+    // cellDevice from STROKE_PX/STROKE_SAMPLES once it knows this
+    // container's actual dispScale, so the same flat value here ends up
+    // self-adjusting per viewport rather than needing a mobile/desktop
+    // split maintained by hand.
+    glyphSize: 5,
     textSize: 100,
     speed: 50,
     gravity: 50,

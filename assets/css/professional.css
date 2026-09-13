@@ -6,6 +6,11 @@
   --muted: #5b6572;
   --accent: #1d4ed8;
   --border: #e3e6ea;
+  /* Wider than the shared 780px: a resume reads better with a proper
+     two-column split (see .resume-columns) than as one narrow, tall
+     scroll. Scoped to this theme only — the other pages using the
+     780px default haven't been redesigned for extra width. */
+  --max-width: 1100px;
 
   background: var(--bg);
   color: var(--text);
@@ -92,6 +97,7 @@
   letter-spacing: 0.01em;
   transform-style: preserve-3d;
   perspective: 100vmin;
+  min-height: 44px;
   scale: calc(1 + (var(--active) * 0.06));
   box-shadow:
     0 0 calc(var(--active) * 2.5em) calc(var(--active) * 1.2em) hsl(var(--hue) 97% 61% / 0.5),
@@ -249,14 +255,20 @@
 
 /* Resume-specific structure */
 .resume-header {
-  padding-top: var(--space-2);
+  padding-top: var(--space-4);
   border-bottom: 1px solid var(--border);
-  padding-bottom: var(--space-3);
+  padding-bottom: var(--space-5);
 }
 
 .resume-header h1 {
-  margin-bottom: 0.3rem;
-  font-size: clamp(1.9rem, 4vw, 2.5rem);
+  /* Browser default h1 margin-top was stacking on top of .resume-header's
+     own padding-top, so the name sat ~76px below the header edge but only
+     ~5px above the title line — reset it to 0 and let padding-top be the
+     only source of top space, then match margin-bottom to it so the name
+     has equal room above and below. */
+  margin-top: 0;
+  margin-bottom: var(--space-4);
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
 }
 
 /* Text Fall — a canvas particle title (assets/js/text-fall.js), ported from
@@ -287,7 +299,16 @@
   display: block;
   position: relative;
   width: 100%;
-  height: clamp(70px, 10vw, 110px);
+  height: clamp(100px, 12vw, 180px);
+}
+
+/* text-fall.js forces "BHAVESH" / "NAKUM" onto two lines at this same
+   640px breakpoint (see the mobileName check there) — two lines needs
+   real height, not the single-line box above. */
+@media (max-width: 640px) {
+  .text-fall-heading.text-fall-ready .text-fall-root {
+    height: clamp(150px, 34vw, 220px);
+  }
 }
 
 .text-fall-canvas {
@@ -303,10 +324,16 @@
   font-weight: 500;
   margin-top: 0;
   font-size: 1.05rem;
+  /* Same 56ch recalibration as .resume-section (see its comment) — this is
+     a <p> too, so it inherited the sitewide 68ch token, which renders wider
+     than its name implies. Wasn't an issue until the updated title grew to
+     three long, pipe-separated clauses. */
+  max-width: 56ch;
 }
 
 .resume-header .contact-line {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 0.4rem 1.25rem;
   font-size: 0.9rem;
@@ -314,7 +341,14 @@
   margin-top: var(--space-2);
 }
 
+/* min-height instead of stretching the whole row: keeps the plain
+   "Bengaluru, India" text at its natural size while giving the two real
+   links (email, LinkedIn) a comfortable tap target. align-items: center
+   above keeps everything on one visual baseline despite the size gap. */
 .resume-header .contact-line a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--muted);
 }
 
@@ -322,8 +356,49 @@
   color: var(--accent);
 }
 
+/* Single column until there's room for a real split — narrower than this
+   and a sidebar would squeeze Experience's bullets uncomfortably. */
+.resume-columns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 900px) {
+  .resume-columns {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-5);
+  }
+}
+
 .resume-section {
   margin-top: var(--space-4);
+}
+
+.resume-main .resume-section:first-child,
+.resume-aside .resume-section:first-child {
+  margin-top: var(--space-3);
+}
+
+/* tokens.css caps <p> at 68ch sitewide for readable line length, but that
+   rule never reaches <li> — and measured live, even the capped <p> here
+   renders ~86 real characters per line, not ~68: Inter's "ch" unit tracks
+   the width of "0", which is narrower than this font's average character,
+   so 68ch reads much wider than 68 characters in practice. 56ch is
+   calibrated against this page's actual rendered text (verified via the
+   impeccable detector) to land in the ~65-75 real-character range that
+   68ch was supposed to hit. Scoped to .resume-section rather than fixed
+   in the shared token, since the other pages using plain 68ch haven't
+   been measured against this font/content and shouldn't change as a
+   side effect of a résumé-page fix. dd joined this list once the Skills
+   category values grew long enough (from the updated master resume) to
+   hit the same problem — a few run all the way to the sidebar column's
+   full width otherwise. */
+.resume-section p,
+.resume-section li,
+.resume-section dd {
+  max-width: 56ch;
 }
 
 .resume-section h2 {
@@ -346,7 +421,13 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 0.25rem 1rem;
+  /* Column-gap trimmed from 1rem: at this layout's narrower two-column
+     width, "Systems Engineer, Tata Consultancy Services" plus its date
+     range came within 1px of the row's full width, wrapping to two lines
+     while every other entry stayed on one — this gives it (and any future
+     long title/date pairing) real headroom instead of sitting right on
+     the edge. */
+  gap: 0.25rem 0.6rem;
   font-weight: 600;
   font-size: 1.02rem;
 }
@@ -401,4 +482,45 @@
 .resume-actions .offset-btn {
   padding: 0.6rem 1.3rem;
   font-size: 0.9rem;
+}
+
+/* Text Emerge (assets/js/text-emerge.js) — reveals Summary through
+   Education as you scroll to each one. .word spans only ever exist if
+   that script ran and split some text into them, so their hidden state is
+   safe to set unconditionally here — a no-JS visitor never gets a .word
+   in the first place. .emerge-pending is different: it's added to real,
+   always-present markup (.resume-section, .resume-entry, headings), so
+   its hidden state only ever applies once that same script has also
+   confirmed it's ready to reveal things — otherwise this content would
+   stay invisible for anyone without JS. */
+.word {
+  display: inline-block;
+  opacity: 0;
+  transform: scale(0.4);
+  filter: blur(4px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out, filter 0.5s ease-out;
+}
+
+.emerge-in .word {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+}
+
+.emerge-pending {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.emerge-pending.emerge-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word,
+  .emerge-pending {
+    transition: none;
+  }
 }
