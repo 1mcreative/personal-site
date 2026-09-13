@@ -121,8 +121,15 @@ a.switch-side {
    keeps the taller link vertically centered next to its siblings.
    :not(.galaxy-button) excludes the galaxy button, which is itself an <a>
    here but sizes its own tap target via .galaxy-btn-face's min-height —
-   this padding would otherwise stack on top of that. */
-.site-header nav a:not(.galaxy-button) {
+   this padding would otherwise stack on top of that.
+   :not(.offset-btn) added when merging page/life: /life/'s own nav uses
+   .offset-btn (not .galaxy-button) for its cross-link, and this rule's
+   `padding: 0.65rem 0` fully overrides all four sides — it was silently
+   zeroing out .offset-btn's own horizontal padding (0.5rem 1.1rem),
+   collapsing the button to ~44px wide with the label crammed against its
+   dashed border. Confirmed via computed style before and after this fix,
+   not just reasoned about: paddingLeft/Right read 0px beforehand. */
+.site-header nav a:not(.galaxy-button):not(.offset-btn) {
   padding: 0.65rem 0;
 }
 
