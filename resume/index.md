@@ -1,7 +1,7 @@
 ---
 layout: professional
 title: "Resume"
-description: "Bhavesh Nakum's resume: Senior Software Engineer (Lead) at Walmart, backend architecture and cloud data platforms."
+description: "Bhavesh Nakum's resume: Senior Software Engineer at eBay — backend architecture, distributed systems, and big data platforms."
 permalink: /resume/
 ---
 
@@ -12,10 +12,10 @@ permalink: /resume/
       <canvas class="text-fall-canvas"></canvas>
     </span>
   </h1>
-  <p class="title-line">Senior Software Engineer &middot; Backend Architect &middot; Cloud Data Specialist</p>
+  <p class="title-line">Senior Software Engineer &middot; Backend, Distributed Systems &amp; Big Data &middot; Cloud &amp; AI-Augmented Engineering</p>
   <p class="contact-line">
     <span>Bengaluru, India</span>
-    <a href="mailto:bhaveshnakum485@gmail.com">bhaveshnakum485@gmail.com</a>
+    <a href="mailto:bhaveshnakumcoed@gmail.com">bhaveshnakumcoed@gmail.com</a>
     <a href="https://www.linkedin.com/in/bhaveshnakum7" rel="me noopener" target="_blank">linkedin.com/in/bhaveshnakum7</a>
   </p>
   <div class="resume-actions">
@@ -25,7 +25,7 @@ permalink: /resume/
         <path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </a>
-    <a class="offset-btn" href="mailto:bhaveshnakum485@gmail.com">
+    <a class="offset-btn" href="mailto:bhaveshnakumcoed@gmail.com">
       Email me
       <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -40,9 +40,12 @@ permalink: /resume/
   </div>
 </header>
 
+<div class="resume-columns">
+<div class="resume-main">
+
 <section class="resume-section">
   <h2>Summary</h2>
-  <p>I've spent the past seven-plus years building backend systems and cloud data pipelines that hold up at scale. I lead engineering teams, make the architecture calls, and build the systems that can't afford to go down, mostly in Java, Spring Boot, Kafka, and Azure. I care about clean code and about the platform actually solving the business problem it was built for.</p>
+  <p>Senior Software Engineer with 8+ years of experience designing, developing, and operating high-performance backend systems, distributed microservices, and large-scale data platforms in Java and Python. Deep expertise across event-driven architecture (Apache Kafka, Apache Flink), big data processing (Apache Spark, Apache Airflow, Hive, HDFS), and multi-tenant, multi-region SaaS platform design with a strong focus on high availability, fault tolerance, and secure API development (OAuth, OWASP). Hands-on experience designing AI agent-driven workflows &mdash; including an agentic system that generates data schemas from natural-language chat input and a self-service, automated data consumption layer &mdash; alongside daily use of AI-augmented development tools (Cursor, Claude Code, GitHub Copilot, Qodo Merge) across coding, design, PR review, and testing. Skilled in cloud-native engineering across Microsoft Azure, Google Cloud Platform, and AWS, with hands-on experience in Kubernetes, Docker, and CI/CD pipeline automation. Proven technical leader with a track record of architecting production systems end-to-end, mentoring engineering teams, participating in technical hiring, and collaborating cross-functionally with product, data science, and business stakeholders across e-commerce, healthcare, and enterprise IT environments.</p>
 </section>
 
 <section class="resume-section">
@@ -50,17 +53,32 @@ permalink: /resume/
 
   <div class="resume-entry">
     <p class="entry-heading">
-      <span>Senior Software Engineer (Lead), Walmart</span>
-      <span class="entry-meta">Bengaluru &middot; Apr 2025 &ndash; Present</span>
+      <span>Senior Software Engineer, eBay</span>
+      <span class="entry-meta">Bengaluru &middot; Jun 2026 &ndash; Present</span>
     </p>
     <ul>
-      <li>Lead a cross-functional team of 6 engineers on Walmart's real-time pricing and anomaly detection platform, supporting 20,000+ daily users.</li>
-      <li>Architected services for dynamic repricing across millions of SKUs, holding sub-second latency at 5K+ pricing updates per second.</li>
-      <li>Led the redesign and replatforming of core pricing services, cutting false positives in pricing anomalies by 30% through better data modeling and filtering.</li>
-      <li>Rolled out zero-downtime deployments: blue-green for Kafka-based services, canary for API-based ones.</li>
-      <li>Built a reusable Micrometer metrics module that other teams adopted for consistent observability and Grafana alerting.</li>
-      <li>Cut infrastructure cost and improved availability by tuning CPU/memory allocation, enabling autoscaling, and consolidating deployables.</li>
-      <li>Work with product managers and data scientists each quarter to shape the roadmap and plan releases.</li>
+      <li><strong>Data Platform Ownership:</strong> Member of eBay's core Data team, owning end-to-end design, development, and maintenance of real-time and batch data pipelines across the eBay platform; responsible for reliable delivery of eBay Live feature data to downstream data consumers using Apache Flink, Apache Kafka, SQL, and Hadoop.</li>
+      <li><strong>AI Agent-Driven Schema Onboarding:</strong> Designed and implemented an AI agent workflow within the team's data consumption layer that automatically generates data schemas from natural-language chat input and user-provided data, replacing manual schema-definition forms and streamlining the onboarding of new datasets.</li>
+      <li><strong>Self-Service Automated Data Consumption:</strong> Built an automated data consumption layer enabling downstream consumers to write and run their own SQL queries to extract data on a batch, scheduled, or on-demand basis &mdash; eliminating the need for the data management platform team to manually author extraction queries and pipelines for each consumer request.</li>
+      <li><strong>AI-Augmented Development:</strong> Use Cursor and Claude Code for coding, PR reviews, design, and testing as part of daily engineering practice.</li>
+    </ul>
+  </div>
+
+  <div class="resume-entry">
+    <p class="entry-heading">
+      <span>Senior Software Engineer (Lead), Walmart</span>
+      <span class="entry-meta">Bengaluru &middot; Apr 2025 &ndash; May 2026</span>
+    </p>
+    <ul>
+      <li><strong>Distributed, Event-Driven Architecture:</strong> Architected Java and Spring Boot microservices on a Kafka-based event-driven architecture, processing 5K+ events per second with sub-second latency to power dynamic repricing across millions of SKUs.</li>
+      <li><strong>Multi-Tenant SaaS Platform Design:</strong> Designed the schema and key strategy for a multi-market pricing platform spanning Canada, Mexico, Chile, and additional markets, with configurable tenant-level isolation supporting both database-level separation and tenant-based table partitioning to meet country-specific data compliance requirements.</li>
+      <li><strong>High Availability Architecture:</strong> Deployed database and application infrastructure across 2 active regions and 1 replica region to eliminate single-region outage risk and optimize regional availability and latency.</li>
+      <li><strong>CI/CD, Containerization &amp; Deployment:</strong> Built Docker and Kubernetes-based deployment templates (including Helm) within Walmart's internal release pipeline, packaging code into deployable artifacts and applying blue-green deployment strategy for Kafka-based services and canary deployment for API-based applications, with automated test execution, post-deployment code coverage checks, metrics exposure, and autoscaling-based alerting.</li>
+      <li><strong>Test-Driven Development &amp; Code Quality:</strong> Practiced Test-Driven Development, writing tests before implementation with automated coverage via JUnit, Mockito, and Cucumber; led a structured PR review and merge process for a team of 6 engineers, enforcing design doc adherence, the KISS principle, and a 60/40 positive-to-negative test case ratio.</li>
+      <li><strong>Secure, Well-Architected APIs:</strong> Designed, deployed, and maintained RESTful APIs and Backend-for-Frontend (BFF) services applying OAuth-based authentication and OWASP secure coding practices, tailored to different client application needs.</li>
+      <li><strong>Observability &amp; Cost Optimization:</strong> Designed and delivered a reusable, plug-and-play Micrometer metrics module adopted across engineering teams for self-service observability and custom Grafana alerting; reduced infrastructure cost and improved availability by fine-tuning CPU/memory allocation, enabling autoscaling, and consolidating deployables.</li>
+      <li><strong>AI-Augmented Development:</strong> Used GitHub Copilot for development work and design assistance, and Qodo Merge for automated PR review on GitHub, integrated into daily engineering workflow.</li>
+      <li><strong>Technical Leadership &amp; Collaboration:</strong> Led and mentored a cross-functional team of 6 engineers, participated in hiring and interview panels for vendor and FTE roles, and partnered quarterly with product managers and data scientists to define feature roadmaps and plan cross-functional releases.</li>
     </ul>
   </div>
 
@@ -70,9 +88,9 @@ permalink: /resume/
       <span class="entry-meta">Bengaluru &middot; Apr 2022 &ndash; Mar 2025</span>
     </p>
     <ul>
-      <li>Built real-time anomaly detection and repricing pipelines that removed 1M+ mispriced items from the catalog.</li>
-      <li>Developed pricing automation tools for sellers, cutting manual overhead and improving their competitiveness.</li>
-      <li>Improved system reliability with full-stack alerting and dashboarding for production-grade observability.</li>
+      <li><strong>Pipeline Engineering:</strong> Built real-time anomaly detection and repricing pipelines, removing 1M+ mispriced items from the Walmart catalog.</li>
+      <li><strong>Seller Tools:</strong> Developed pricing automation tools for sellers, reducing manual overhead and improving competitiveness.</li>
+      <li><strong>Reliability:</strong> Enhanced system reliability with full-stack alerting and dashboarding for production-grade observability.</li>
     </ul>
   </div>
 
@@ -82,8 +100,8 @@ permalink: /resume/
       <span class="entry-meta">Hyderabad &middot; Apr 2021 &ndash; Apr 2022</span>
     </p>
     <ul>
-      <li>Designed scalable ETL pipelines on Azure (Data Factory, Databricks, Synapse) to ingest and transform healthcare data.</li>
-      <li>Built PySpark transformation logic and modular Airflow DAGs, keeping pipeline development fast and HIPAA-compliant.</li>
+      <li><strong>ETL Design:</strong> Designed scalable ETL pipelines using Azure (Data Factory, Databricks, Synapse) to ingest and transform healthcare data across supported asset classes and data domains.</li>
+      <li><strong>Automation:</strong> Developed PySpark-based transformation logic and modular Airflow DAGs to accelerate pipeline development while ensuring HIPAA compliance.</li>
     </ul>
   </div>
 
@@ -93,12 +111,15 @@ permalink: /resume/
       <span class="entry-meta">Hyderabad &middot; Sep 2018 &ndash; Apr 2021</span>
     </p>
     <ul>
-      <li>Migrated legacy data warehousing platforms to a Hadoop-based Azure ecosystem for Proximus (Belgium).</li>
-      <li>Rewrote HQL queries for performance, cutting compute costs by 25%.</li>
-      <li>Built a tool to convert Teradata SQL to Hive and PySpark scripts, using Python and regex, for Bank of America.</li>
+      <li><strong>Cloud Migration:</strong> Migrated legacy data warehousing platforms to a Hadoop-based Azure ecosystem for Proximus (Belgium).</li>
+      <li><strong>Optimization:</strong> Rewrote HQL queries to optimize performance and reduce compute costs by 25%.</li>
+      <li><strong>Modernization Tools:</strong> Engineered a Python-based tool to convert Teradata SQL to Hive and PySpark scripts using Python and Regex for Bank of America.</li>
     </ul>
   </div>
 </section>
+
+</div>
+<div class="resume-aside">
 
 <section class="resume-section">
   <h2>Skills</h2>
@@ -106,37 +127,68 @@ permalink: /resume/
     <dt>Languages</dt>
     <dd>Java, Python, SQL</dd>
 
-    <dt>Backend</dt>
-    <dd>Spring Boot, REST APIs, Microservices, Apache Kafka, event-driven architecture</dd>
+    <dt>Backend Development &amp; APIs</dt>
+    <dd>Spring Boot, RESTful Web Services, Microservices, Backend-for-Frontend (BFF), Distributed Systems, Event-Driven Architecture, Java Concurrency (Threads, Executors, CompletableFuture, Reactive Patterns)</dd>
 
-    <dt>Big data &amp; ETL</dt>
-    <dd>Apache Spark, Hive, HDFS, Sqoop, Airflow</dd>
+    <dt>Security</dt>
+    <dd>OAuth, OWASP Secure Coding Practices</dd>
 
-    <dt>Cloud</dt>
-    <dd>Azure (ADF, Databricks, Synapse, Key Vault), GCP (DataProc, BigQuery, GCS)</dd>
+    <dt>AI Agents &amp; Automation</dt>
+    <dd>Agentic Workflow Design, Automated Schema Generation from Natural Language, Self-Service Data Pipeline Automation</dd>
+
+    <dt>Big Data &amp; Streaming</dt>
+    <dd>Apache Kafka, Apache Spark, Apache Flink, Apache Airflow, Hive, HDFS, Sqoop</dd>
+
+    <dt>Data Modeling &amp; Architecture</dt>
+    <dd>Schema Design, Key Strategy &amp; Partitioning, Grain Definition, Multi-Tenant Data Isolation, NoSQL Data Modeling</dd>
+
+    <dt>Cloud Platforms</dt>
+    <dd>Microsoft Azure (Data Factory, Databricks, Synapse, Key Vault), Google Cloud Platform (DataProc, BigQuery, GCS), AWS (Lambda, S3, SQS)</dd>
+
+    <dt>High Availability &amp; Resilience</dt>
+    <dd>Multi-Region Replication, High Availability, Fault Tolerance, Blue-Green &amp; Canary Deployments, Autoscaling</dd>
 
     <dt>Databases</dt>
-    <dd>Azure Cosmos DB, Cassandra, PostgreSQL</dd>
+    <dd>PostgreSQL, MySQL, Azure Cosmos DB, Cassandra (Relational &amp; NoSQL)</dd>
 
-    <dt>DevOps &amp; tools</dt>
-    <dd>Git, Grafana, CI/CD pipelines, Jenkins, Agile, JIRA, monitoring &amp; alerting</dd>
+    <dt>CI/CD &amp; DevOps</dt>
+    <dd>Jenkins, Docker, Kubernetes, Helm, Maven, Git, CI/CD Pipeline Automation, Infrastructure Automation, Agile/Scrum/SDLC</dd>
+
+    <dt>Testing &amp; Quality</dt>
+    <dd>JUnit, Mockito, Cucumber, Test-Driven Development (TDD), Unit/Functional/E2E Testing</dd>
+
+    <dt>Observability &amp; Monitoring</dt>
+    <dd>Grafana, Micrometer, Custom Metrics &amp; Alerting, Monitoring &amp; Dashboarding</dd>
+
+    <dt>AI-Augmented Engineering</dt>
+    <dd>Cursor, Claude Code, GitHub Copilot, Qodo Merge, Claude, ChatGPT (applied to coding, design, PR review, testing, and research)</dd>
+
+    <dt>Familiarity (exposure, non-production depth)</dt>
+    <dd>Snowflake, GraphQL, Hibernate/JPA, Elasticsearch</dd>
   </dl>
 </section>
 
 <section class="resume-section">
-  <h2>Also worth knowing</h2>
+  <h2>Additional highlights</h2>
   <ul>
-    <li>Mentor new hires and junior engineers; sit on hiring and interview panels for both vendor and full-time roles.</li>
-    <li>Automated CI/CD pipelines that run functional, integration, end-to-end, and performance tests as part of deployment.</li>
-    <li>Spend a fair amount of time on performance optimization and documentation for high-concurrency systems.</li>
+    <li><strong>Agentic AI System Design:</strong> Hands-on experience designing and shipping an AI agent-driven workflow for automated data schema generation and a self-service, automated data consumption layer &mdash; moving a previously manual, team-dependent process to a fully automated, consumer-driven path.</li>
+    <li><strong>Mentorship &amp; Hiring:</strong> Mentored new hires and junior engineers; participated in hiring and interview panels for vendor and FTE roles.</li>
+    <li><strong>AI-Augmented Development:</strong> Practical, day-to-day use of AI coding tools (Cursor, Claude Code, GitHub Copilot, Qodo Merge) and general-purpose LLM tools (Claude, ChatGPT) to accelerate development, elevate code review quality, and support research and technical communication.</li>
+    <li><strong>Legacy &amp; Proprietary System Modernization:</strong> Consistent track record diving into proprietary and legacy systems &mdash; internal release pipelines, Teradata data warehouses, Hadoop platforms &mdash; to understand their inner workings and strategically modernize them.</li>
+    <li><strong>Regulated &amp; Enterprise Environments:</strong> Experience delivering technology solutions in compliance-driven settings (HIPAA-regulated healthcare data) and for large enterprise clients (Proximus/Belgium, Bank of America).</li>
+    <li><strong>CI/CD:</strong> Automated CI/CD pipelines by integrating functional, integration, end-to-end, and performance testing into the deployment process.</li>
+    <li><strong>Engineering Standards:</strong> Passionate about performance optimization, code quality, testability, and technical documentation for high-concurrency, high-throughput production systems.</li>
   </ul>
 </section>
 
 <section class="resume-section">
   <h2>Education &amp; certifications</h2>
   <ul>
-    <li>B.Tech, Computer Engineering at SVNIT, Surat (2018)</li>
+    <li>B.Tech, Computer Engineering &mdash; SVNIT, Surat (2018) &middot; CGPA 7.18/10</li>
     <li>Microsoft Certified: Azure Fundamentals</li>
     <li>Apache Airflow Fundamentals</li>
   </ul>
 </section>
+
+</div>
+</div>

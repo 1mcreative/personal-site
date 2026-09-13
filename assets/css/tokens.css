@@ -114,6 +114,18 @@ a.switch-side {
   transition: color var(--speed) var(--ease), background-color var(--speed) var(--ease), border-color var(--speed) var(--ease);
 }
 
+/* Plain-text nav links have no visible button box, so padding is the only
+   way to reach a comfortable tap target — grown vertically only (44px is
+   about height; these were already wide enough) so the look stays "text
+   link," not "button." align-items: center on .site-header nav (above)
+   keeps the taller link vertically centered next to its siblings.
+   :not(.galaxy-button) excludes the galaxy button, which is itself an <a>
+   here but sizes its own tap target via .galaxy-btn-face's min-height —
+   this padding would otherwise stack on top of that. */
+.site-header nav a:not(.galaxy-button) {
+  padding: 0.65rem 0;
+}
+
 main#main {
   padding-top: var(--space-2);
   padding-bottom: var(--space-5);
