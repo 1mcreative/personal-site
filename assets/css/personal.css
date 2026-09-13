@@ -22,6 +22,48 @@
   color: var(--accent);
 }
 
+/* Load sequence: black, then the Black Hole background alone, then the nav
+   and content — see life-intro.js for the actual timing/orchestration.
+   Everything here is scoped under body.js-intro (added synchronously in
+   personal.html, before first paint) so a no-JS visitor never sees this at
+   all: no veil, header/main just render at their normal opacity:1 from the
+   start, same as before this feature existed. */
+.theme-personal.js-intro .life-intro-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  background: #000;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.7s var(--ease);
+}
+
+.theme-personal.js-intro .life-intro-veil.is-hidden {
+  opacity: 0;
+}
+
+.theme-personal.js-intro .site-header,
+.theme-personal.js-intro main#main {
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+}
+
+.theme-personal.js-intro .site-header.is-visible,
+.theme-personal.js-intro main#main.is-visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-personal.js-intro .life-intro-veil {
+    display: none;
+  }
+
+  .theme-personal.js-intro .site-header,
+  .theme-personal.js-intro main#main {
+    opacity: 1;
+  }
+}
+
 .theme-personal .site-header {
   position: fixed;
   top: var(--space-2);
@@ -34,10 +76,15 @@
   border-radius: 999px;
   /* Blue-tinted glass (color-mix on --surface, the theme's own navy) rather
      than a flat neutral rgba — same "based on our website colors" treatment
-     now applied everywhere translucent on this page, not a one-off. */
-  background: color-mix(in srgb, var(--surface) 50%, transparent);
-  backdrop-filter: blur(18px) saturate(150%);
-  -webkit-backdrop-filter: blur(18px) saturate(150%);
+     now applied everywhere translucent on this page, not a one-off. Dropped
+     further (50%→32%) per direct "more transparent" feedback — past this
+     project's own established 45% baseline (the modal/cards both converged
+     there) since this was asked to read as clearly more see-through than
+     that, not just match it. Blur bumped to compensate (18px→24px), the
+     same pairing already used when the cards needed the identical fix. */
+  background: color-mix(in srgb, var(--surface) 32%, transparent);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
 }
 
 .theme-personal .site-header .header-inner {
@@ -59,6 +106,55 @@
 .theme-personal .site-header nav a:hover,
 .theme-personal .site-header nav a[aria-current="page"] {
   color: var(--accent);
+}
+
+/* tokens.css's shared .site-header nav sets flex-wrap: wrap (useful on
+   /resume/, where the nav can hold more items) — on this page it only ever
+   holds exactly two, and letting them wrap onto separate lines from each
+   other was producing a genuinely broken-looking result at narrow widths:
+   confirmed via getBoundingClientRect() at 320px that the header-inner AND
+   the nav itself were both wrapping, stacking brand/link/button into three
+   separate rows inside a border-radius:999px pill — a 171px-tall "pill"
+   reads as a layout bug, not a design. nowrap keeps the link+button as one
+   unit; the media query below (audited at 320-1920px) shrinks that unit
+   enough to fit next to the brand on one line at every width tested,
+   rather than accepting a two-row header at the narrow end. */
+.theme-personal .site-header nav {
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 420px) {
+  .theme-personal .site-header .header-inner {
+    gap: var(--space-1);
+  }
+
+  .theme-personal .site-header nav {
+    gap: 0.6rem;
+  }
+
+  /* min-height, not just padding: shrinking font-size on its own reduces
+     the natural line-height enough to drop both below the 44px touch-target
+     floor even with padding unchanged — confirmed directly (43.2px/41.1px)
+     before adding this, not assumed. align-items:center on the nav/button
+     containers keeps the now-taller-than-content box centered correctly. */
+  .theme-personal .site-header nav a {
+    font-size: 0.85rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .theme-personal .site-header .offset-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    gap: 0.3rem;
+    min-height: 44px;
+  }
+
+  .theme-personal .site-header .offset-btn .btn-arrow {
+    width: 13px;
+    height: 13px;
+  }
 }
 
 .theme-personal .site-footer {

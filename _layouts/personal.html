@@ -6,6 +6,16 @@
 {% include head.html %}
 </head>
 <body class="theme-personal">
+  <!-- Synchronous, not deferred: this has to run before first paint, or the
+       page would flash its normal (fully visible) state for a frame before
+       life-intro.js catches up and hides everything — the exact opposite
+       of a clean reveal. Scoped by this one class rather than styling the
+       veil/fade-in as the default state, so a no-JS visitor (this never
+       runs) just sees the page normally instead of a permanently black
+       screen — see life-intro.js's own header comment for the full
+       load-order reasoning. -->
+  <script>document.body.classList.add('js-intro');</script>
+  <div class="life-intro-veil" aria-hidden="true"></div>
   {% include nav-personal.html %}
   <main id="main">
     {{ content }}
@@ -20,5 +30,6 @@
   <script src="{{ '/assets/js/black-hole-lite.js' | relative_url }}" defer></script>
   <script src="{{ '/assets/js/click-effects.js' | relative_url }}" defer></script>
   <script src="{{ '/assets/js/section-nav.js' | relative_url }}" defer></script>
+  <script src="{{ '/assets/js/life-intro.js' | relative_url }}" defer></script>
 </body>
 </html>
