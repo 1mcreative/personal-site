@@ -1234,7 +1234,16 @@
   margin: 0;
   color: var(--muted);
   font-size: 0.75rem;
+  white-space: nowrap;
 }
+
+/* .hero-clock (assets/js/hero.js): the visitor's own local time, read
+   straight off their browser's own clock/locale — no geolocation prompt,
+   nothing sent anywhere, just Intl formatting the time zone the browser
+   already knows. Empty (and this whole span invisible, since there's
+   nothing inside it) until JS sets its text, same progressive-enhancement
+   shape as every other effect on this page: a no-JS/error visitor just
+   sees the plain copyright line, not a dangling separator. */
 
 @media (prefers-reduced-motion: reduce) {
   .blob {
