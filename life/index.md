@@ -1,6 +1,6 @@
 ---
 layout: personal
-title: "Life & Instagram — Bhavesh Nakum"
+title: "Life & Instagram"
 description: "Bhavesh Nakum's personal side: Instagram, photos, and hobbies outside of work."
 permalink: /life/
 ---

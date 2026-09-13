@@ -131,20 +131,42 @@
   opacity: 0;
 }
 
-/* The survivor grows on its own as the field around it fades, rather than
-   settling at the same small size everything else in the dense field
-   uses — with 100+ small copies instead of the original handful of large
-   ones, staying at the field's own font-size would make the "reveal"
-   land as a small, unremarkable word instead of the dramatic full-screen
-   name the whole splash exists for. transform doesn't affect layout, so
-   this scales in place from the survivor's own grid cell without
-   disturbing its now-fading neighbors' positions. */
 .intro-splash-survivor {
-  transition: opacity 0.5s ease 0.15s, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+  transition: opacity 0.5s ease 0.15s;
 }
 
-.intro-splash-grid.intro-splash-in .intro-splash-survivor {
-  transform: scale(3.2);
+/* The survivor morphs from its small grid cell directly into the real
+   h1's own on-screen position and size, added 2026-09-12 per "text size
+   should be small first, after this name should stay and in center" —
+   replaces an earlier version that scaled up to a fixed 3.2x in place
+   first, then cross-faded to the separately-positioned real heading (a
+   size/position jump at the handoff, not a continuous "the name stays").
+   The exact translate/scale can't be a static value here — it depends on
+   runtime layout (viewport size, real font metrics) at both ends — so
+   this class only owns the transition timing, same "class owns timing,
+   JS sets the value" split `.life-wipe` already uses for the identical
+   reason. `assets/js/intro-sequence.js` computes the transform via a
+   standard FLIP calculation (natural rect -> target rect) and applies it
+   inline the instant this class is added. */
+.intro-splash-survivor.intro-splash-survivor-morph {
+  transition: opacity 0.5s ease 0.15s, transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Hidden until the survivor above has finished landing on the real name
+   (assets/js/intro-sequence.js), so "Hi, I'm"/"." complete the sentence
+   around the name once it's in place instead of appearing simultaneously
+   with it. Not hidden by a bare .hero-greeting rule: JS only adds
+   .hero-greeting-hidden once it has confirmed the splash sequence is
+   actually going to run, so a reduced-motion/no-JS/error path — which
+   never adds this class — leaves the real heading fully visible
+   immediately, same progressive-enhancement shape as every other effect
+   on this page. */
+.hero-greeting {
+  transition: opacity 0.5s ease;
+}
+
+.hero-greeting.hero-greeting-hidden {
+  opacity: 0;
 }
 
 /* DEPRECATED (not deleted): .hero-glow (Beyond Horizon's WebGL canvas),
@@ -192,7 +214,25 @@
   z-index: 0;
   left: 50%;
   bottom: 0;
-  width: min(58vw, 560px);
+  /* The 100vh term is the real constraint at typical laptop heights (the
+     820px flat cap only binds on tall/external monitors). Without it,
+     "bigger" on a shorter window collides with .hero-inner: since
+     .hero-globe's visible top is hero.height - diameter/2 (the half-cut
+     trick, see the comment above) while .hero-inner sits flex-centered
+     at roughly (hero.height + hero-inner's own height) / 2, a fixed
+     diameter has *less* clearance the shorter the window gets, not more.
+     Reported "looks small on a 16-inch laptop" (2026-09-12) — measured a
+     real MacBook-Pro-16-shaped viewport (1728x1000) and found the *old*
+     640px cap left 65px of unused headroom below what the height term
+     would actually have allowed there, and separately that .hero-inner's
+     real height had dropped to 215px (from 247px) since the subhead
+     rewrite, both of which this formula now actually uses instead of
+     leaving on the table. Solving "keep a 12px gap" for diameter with
+     that real 215px height gives 100vh - 239px — re-verified by
+     measurement, not just algebra, at 1728x1000, 1512x900, 1440x900,
+     1440x800 (the original short-window regression case), and 1024x768:
+     holds a consistent small-but-real gap at every one, never negative. */
+  width: min(66vw, 820px, calc(100vh - 239px));
   aspect-ratio: 1;
   transform: translate(-50%, 50%) scale(var(--globe-zoom, 1));
   cursor: grab;
@@ -218,6 +258,31 @@
   cursor: grabbing;
 }
 
+/* DEPRECATED (not deleted): a soft ambient blue glow behind the
+   dot-sphere, added 2026-09-12 in the same session per feedback that the
+   globe read as flat/"just ok" even after two size passes — reused the
+   site's own accent blue (#1d4ed8), `::before` so it painted behind the
+   canvas through its own transparent alpha:true gaps. Explicitly asked
+   to be removed minutes later ("remove color haz (blue) from globe") —
+   the depth-contrast and rotation-speed changes made in the same pass
+   stay, only the glow itself was the problem. Re-enabling: uncomment the
+   rule below and restore `isolation: isolate` on `.hero-globe` above (it
+   existed only to pin a clean stacking context for this).
+.hero-globe::before {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(29, 78, 216, 0.2) 0%,
+    rgba(29, 78, 216, 0.09) 42%,
+    rgba(29, 78, 216, 0) 70%
+  );
+  pointer-events: none;
+}
+*/
+
 .hero-globe-canvas {
   position: absolute;
   inset: 0;
@@ -228,7 +293,7 @@
 
 @media (max-width: 640px) {
   .hero-globe {
-    width: min(80vw, 360px);
+    width: min(94vw, 430px);
     bottom: 6%;
     transform: translateX(-50%) scale(var(--globe-zoom, 1));
   }
@@ -608,12 +673,13 @@
 /* DEPRECATED (not deleted): the page-corner (desktop) / portal-orb (mobile)
    hint at /life/, and the .dissolving "Thanos snap" transition it triggered
    (assets/js/dissolve.js), per explicit user feedback ("remove that page and
-   thanos effect for now it not what i am looking for"). The spotlight-text
-   hint (desktop-only, see below) and the galaxy button (now in the résumé
-   nav — see professional.css) remain the paths into /life/. Both are fully
-   intact below — markup still in index.md, JS files untouched, dissolve.js
-   just no longer loaded (see home.html) since its only triggers are now
-   hidden. Re-enabling: delete the one display:none rule below and restore
+   thanos effect for now it not what i am looking for"). .life-pull-btn (the
+   bubble-expand button/swipe-left gesture, added later — see below) is now
+   the primary path into /life/; the spotlight-text hint (desktop-only, see
+   below) is the secondary one. Both page-corner/portal-orb are fully intact
+   below — markup still in index.md, JS files untouched, dissolve.js just no
+   longer loaded (see home.html) since its only triggers are now hidden.
+   Re-enabling: delete the one display:none rule below and restore
    dissolve.js's <script> tag. */
 .page-corner,
 .portal-orb {
@@ -898,11 +964,22 @@
   -webkit-backdrop-filter: blur(6px);
 }
 
+/* The icon needs more cover than the text: getBoundingClientRect() at
+   every tested breakpoint (375/768/1440) shows the svg's own box sits
+   fully inside .hero-globe's circle, not just brushing it, while the
+   "keep going" span mostly clears the globe's bottom edge. Per the
+   explicit "nudge the opacity back up first, not the padding" note left
+   when this was last turned down (see DESIGN.md) — the globe has grown
+   since then, so the 0.45 base opacity no longer reliably reads a thin
+   2px stroke against a dense, rotating dot field at every angle. Bumped
+   for the icon only; the text pill is untouched since it isn't actually
+   sitting on the globe. */
 .scroll-cue svg {
   display: block;
   box-sizing: content-box;
   padding: 6px;
   border-radius: 50%;
+  background: rgba(255, 255, 255, 0.65);
   animation: bob 1.8s ease-in-out infinite;
 }
 
@@ -915,15 +992,21 @@
 /* Mobile-only: matches .hero-sub-text's own treatment for the exact same
    "text over the globe" problem — a solid-ish background, no
    backdrop-filter at all — per explicit feedback that the pill's blur
-   looked heavier here than the equivalent hint elsewhere on the page.
-   Desktop keeps the original blur pill; the globe never reaches high
-   enough there to need this in the first place. */
+   looked heavier here than the equivalent hint elsewhere on the page. */
 @media (max-width: 640px) {
   .scroll-cue svg,
   .scroll-cue span {
     background: rgba(255, 255, 255, 0.55);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+  }
+
+  /* Mobile's globe sits lower (bottom: 6%) but has grown enough since that
+     note was written that the icon's box is now fully inside its circle
+     too (measured, not assumed) — same fix, same reasoning as the base
+     rule above, just within the no-blur mobile treatment. */
+  .scroll-cue svg {
+    background: rgba(255, 255, 255, 0.75);
   }
 }
 
@@ -984,15 +1067,36 @@
   transition: transform 0.25s var(--ease), background 0.25s ease;
 }
 
+/* Real hit target is half a 40px circle (mobile: half of 32px) sitting at
+   the viewport edge — well under WCAG 2.5.8's 24px minimum. Same
+   invisible-::before pattern .portal-orb already uses elsewhere in this
+   file for the identical small-dot problem: extends the clickable area
+   without changing the visible circle's shape at all. Half of this box
+   is off-screen too (nothing to click there regardless), so only the
+   on-screen extension actually helps, but the symmetric inset is simpler
+   than a one-sided one and costs nothing on the wasted side. */
+.life-pull-btn::before {
+  content: "";
+  position: absolute;
+  inset: -14px;
+}
+
 .life-pull-btn:hover,
 .life-pull-btn:focus-visible {
   transform: translateY(-50%) scale(1.12);
   background: #1a232e;
 }
 
+/* An outward `outline` on a circle that's already half off-screen draws
+   almost entirely into the clipped half — confirmed live, ~82% of the
+   ring rendered off-canvas. box-shadow's inset keyword draws inward from
+   the border box instead, so it's confined to whatever portion of the
+   circle is actually visible, on any viewport. Combined with the resting
+   drop-shadow in one declaration since box-shadow doesn't merge across
+   rules. */
 .life-pull-btn:focus-visible {
-  outline: 2px solid #6ec1ff;
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.22), inset 0 0 0 2px #6ec1ff;
 }
 
 /* Centered within the whole circle (half of which is off-screen) would

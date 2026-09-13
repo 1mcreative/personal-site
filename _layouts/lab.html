@@ -30,6 +30,26 @@
     {{ content }}
   </main>
   {% include footer.html %}
+
+  <!-- Shared modal: every card's "View effect" button opens this same
+       dialog, reparenting that card's real demo node (not a copy) into
+       #lab-modal-stage and its hidden code into #lab-modal-code. Built
+       once here instead of once per card. -->
+  <div id="lab-modal" class="lab-modal" hidden>
+    <div class="lab-modal-backdrop" data-modal-close></div>
+    <div class="lab-modal-panel" role="dialog" aria-modal="true" aria-labelledby="lab-modal-title">
+      <button type="button" class="lab-modal-close" data-modal-close aria-label="Close">&times;</button>
+      <div class="lab-modal-stage" id="lab-modal-stage"></div>
+      <div class="lab-modal-body">
+        <h3 id="lab-modal-title"></h3>
+        <p class="lab-modal-desc" id="lab-modal-desc"></p>
+        <p class="lab-modal-note" id="lab-modal-note" hidden></p>
+        <button type="button" class="lab-modal-get-code" id="lab-modal-get-code">Get code</button>
+        <div class="lab-modal-code" id="lab-modal-code"></div>
+      </div>
+    </div>
+  </div>
+
   <script src="{{ '/assets/js/lab.js' | relative_url }}" defer></script>
 </body>
 </html>
