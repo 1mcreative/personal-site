@@ -175,6 +175,190 @@
     });
   }
 
+  // ---- Card → modal: hide each card's code by default, open the real
+  // demo (and, on request, the real code) in one shared bigger view -----
+  // Runs after initCopyButtons/initTabs so their listeners are already
+  // bound to the actual button/pre elements before this relocates them —
+  // moving a DOM node keeps its listeners, so nothing needs rebinding.
+  var modal, modalStage, modalTitle, modalDesc, modalNote, modalCode, modalGetCodeBtn, modalCloseBtn;
+  var restoreDemo = null;
+  var restoreCode = null;
+  var lastFocused = null;
+
+  function findDemo(card) {
+    var ours = card.querySelector(':scope > .lab-tab-panel[data-tab-panel="ours"]');
+    return (ours || card).querySelector(':scope > .lab-demo');
+  }
+
+  function findNote(card) {
+    var ours = card.querySelector(':scope > .lab-tab-panel[data-tab-panel="ours"]');
+    return (ours || card).querySelector(':scope > .lab-code-note');
+  }
+
+  // Pulls everything that isn't the live demo itself — copy buttons, code
+  // notes, collapsible snippets, and (for the 3 Stock/Ours cards) the tab
+  // switcher and its stock-reference panel — into one hidden bucket per
+  // card. The tab *switcher* is dropped rather than relocated: once its
+  // "ours" panel is split from its demo (which lives in the modal stage,
+  // not the code bucket), toggling back to "ours" inside the modal would
+  // just show an empty shell. Simpler and correct: force the stock panel
+  // permanently visible and stack it under the "ours" actions instead.
+  function bucketCodeFor(card) {
+    var bucket = document.createElement("div");
+    bucket.className = "lab-card-code";
+    bucket.hidden = true;
+
+    var tabsNav = card.querySelector(':scope > .lab-tabs-nav');
+    if (tabsNav) tabsNav.remove();
+
+    // .lab-code-note is deliberately left out of the bucket and stays
+    // visible in the card: on several cards it's not commentary on the
+    // code, it's the ONLY instruction that the demo needs cursor movement,
+    // dragging, or a click to show anything at all (Spotlight Text, Globe,
+    // Life Wipe, ...). Hiding it behind "Get code" made those demos read
+    // as broken rather than just idle.
+    var ours = card.querySelector(':scope > .lab-tab-panel[data-tab-panel="ours"]');
+    var oursScope = ours || card;
+    oursScope
+      .querySelectorAll(':scope > .lab-card-actions, :scope > .lab-code-details')
+      .forEach(function (n) { bucket.appendChild(n); });
+
+    var stock = card.querySelector(':scope > .lab-tab-panel[data-tab-panel="stock"]');
+    if (stock) {
+      stock.hidden = false;
+      bucket.appendChild(stock);
+    }
+
+    if (bucket.childNodes.length) card.appendChild(bucket);
+  }
+
+  function initSellableCards() {
+    document.querySelectorAll(".lab-card").forEach(function (card) {
+      bucketCodeFor(card);
+      var head = card.querySelector(".lab-card-head");
+      if (!head) return;
+      var demo = findDemo(card);
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "lab-view-btn";
+      btn.textContent = demo ? "View effect" : "Get code";
+      btn.addEventListener("click", function () { openLabModal(card); });
+      head.appendChild(btn);
+    });
+  }
+
+  function forceLoadDemo(demo) {
+    if (!demo || !demo.hasAttribute("data-lazy-src")) return;
+    var id = demo.getAttribute("data-demo-id");
+    if (id && loadedScripts[id]) return;
+    if (id) loadedScripts[id] = true;
+    loadDemoScript(demo);
+  }
+
+  function openLabModal(card) {
+    lastFocused = document.activeElement;
+
+    var h3 = card.querySelector(".lab-card-head h3");
+    var desc = card.querySelector(".lab-card-desc");
+    var note = findNote(card);
+    modalTitle.textContent = h3 ? h3.textContent : "";
+    modalDesc.innerHTML = desc ? desc.innerHTML : "";
+    modalNote.innerHTML = note ? note.innerHTML : "";
+    modalNote.hidden = !note;
+
+    modalStage.innerHTML = "";
+    modalStage.classList.remove("lab-modal-stage-dark", "lab-modal-stage-tall");
+    restoreDemo = null;
+    var demo = findDemo(card);
+    if (demo) {
+      forceLoadDemo(demo);
+      restoreDemo = { node: demo, parent: demo.parentNode, next: demo.nextSibling };
+      modalStage.classList.toggle("lab-modal-stage-dark", demo.classList.contains("lab-demo-dark"));
+      modalStage.classList.toggle("lab-modal-stage-tall", demo.classList.contains("lab-demo-tall"));
+      modalStage.appendChild(demo);
+    }
+
+    modalCode.innerHTML = "";
+    restoreCode = null;
+    var codeWrap = card.querySelector(':scope > .lab-card-code');
+    modalGetCodeBtn.hidden = !codeWrap;
+    modalGetCodeBtn.textContent = "Get code";
+    if (codeWrap) {
+      restoreCode = { node: codeWrap, parent: codeWrap.parentNode, next: codeWrap.nextSibling };
+      codeWrap.hidden = true;
+      modalCode.appendChild(codeWrap);
+    }
+
+    modal.hidden = false;
+    document.body.classList.add("lab-modal-open");
+    modalCloseBtn.focus();
+    document.addEventListener("keydown", onModalKeydown);
+  }
+
+  function closeLabModal() {
+    if (modal.hidden) return;
+    if (restoreDemo) {
+      restoreDemo.parent.insertBefore(restoreDemo.node, restoreDemo.next);
+      restoreDemo = null;
+    }
+    if (restoreCode) {
+      restoreCode.node.hidden = true;
+      restoreCode.parent.insertBefore(restoreCode.node, restoreCode.next);
+      restoreCode = null;
+    }
+    modal.hidden = true;
+    document.body.classList.remove("lab-modal-open");
+    document.removeEventListener("keydown", onModalKeydown);
+    if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
+  }
+
+  function onModalKeydown(e) {
+    if (e.key === "Escape") {
+      closeLabModal();
+      return;
+    }
+    if (e.key !== "Tab") return;
+    var focusable = Array.prototype.filter.call(
+      modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'),
+      function (el) { return el.offsetParent !== null && !el.disabled; }
+    );
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
+  function initModal() {
+    modal = document.getElementById("lab-modal");
+    if (!modal) return;
+    modalStage = document.getElementById("lab-modal-stage");
+    modalTitle = document.getElementById("lab-modal-title");
+    modalDesc = document.getElementById("lab-modal-desc");
+    modalNote = document.getElementById("lab-modal-note");
+    modalCode = document.getElementById("lab-modal-code");
+    modalGetCodeBtn = document.getElementById("lab-modal-get-code");
+    modalCloseBtn = modal.querySelector(".lab-modal-close");
+
+    modal.querySelectorAll("[data-modal-close]").forEach(function (el) {
+      el.addEventListener("click", closeLabModal);
+    });
+    modalGetCodeBtn.addEventListener("click", function () {
+      var codeWrap = modalCode.querySelector(".lab-card-code");
+      if (!codeWrap) return;
+      codeWrap.hidden = !codeWrap.hidden;
+      modalGetCodeBtn.textContent = codeWrap.hidden ? "Get code" : "Hide code";
+      if (!codeWrap.hidden) codeWrap.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    });
+
+    initSellableCards();
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initCopyButtons();
     initTabs();
@@ -182,5 +366,6 @@
     initReplay();
     initBlobParallax();
     initSpotlight();
+    initModal();
   });
 })();

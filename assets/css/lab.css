@@ -129,6 +129,13 @@
   display: flex;
   flex-direction: column;
   background: var(--bg);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.lab-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 16px 32px -18px rgba(0, 0, 0, 0.28);
 }
 
 .lab-card-head {
@@ -145,30 +152,29 @@
   font-family: var(--font-display);
 }
 
-.lab-badge {
+.lab-view-btn {
   flex-shrink: 0;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 0.15rem 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.3rem 0.85rem;
   border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
   white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.lab-badge-live {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.lab-badge-deprecated {
-  background: #f1f2f4;
-  color: #5b6572;
-}
-
-.lab-badge-reference {
-  background: #e0e7ff;
-  color: #3730a3;
+.lab-view-btn:hover,
+.lab-view-btn:focus-visible {
+  background: var(--accent);
+  color: #fff;
 }
 
 .lab-card-desc {
@@ -375,9 +381,258 @@
   font-size: 0.8rem;
 }
 
+/* Portal Orb's real CSS only exists inside home.css's own
+   @media (max-width: 640px) block — it's genuinely mobile-only in
+   production, hidden on desktop by a separate plain `display: none`.
+   A real @media query can't be forced to match regardless of viewport,
+   so unlike every other "force it visible" card on this page (which just
+   needs an inline style tweak), demoing this one at any width means
+   duplicating its mobile declarations here, scoped to the demo only. */
+.lab-demo .portal-orb,
+.lab-modal-stage .portal-orb {
+  position: absolute;
+  z-index: 3;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #eaf4ff;
+  box-shadow: 0 0 0 4px rgba(234, 244, 255, 0.08), 0 0 22px 6px rgba(110, 193, 255, 0.65);
+  cursor: pointer;
+  animation: orb-pulse 3.5s ease-in-out infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.lab-demo .portal-orb:hover,
+.lab-modal-stage .portal-orb:hover,
+.lab-demo .portal-orb:focus-visible,
+.lab-modal-stage .portal-orb:focus-visible {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 6px rgba(234, 244, 255, 0.1), 0 0 32px 10px rgba(110, 193, 255, 0.9);
+}
+
+.lab-demo .portal-orb-label,
+.lab-modal-stage .portal-orb-label {
+  position: absolute;
+  right: 50%;
+  bottom: 140%;
+  transform: translate(50%, 6px);
+  white-space: nowrap;
+  background: #1c1430;
+  border: 1px solid rgba(183, 155, 250, 0.35);
+  color: #eaf4ff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.lab-demo .portal-orb:hover .portal-orb-label,
+.lab-modal-stage .portal-orb:hover .portal-orb-label,
+.lab-demo .portal-orb:focus-visible .portal-orb-label,
+.lab-modal-stage .portal-orb:focus-visible .portal-orb-label {
+  opacity: 1;
+  transform: translate(50%, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-demo .portal-orb,
+  .lab-modal-stage .portal-orb {
+    animation: none;
+  }
+}
+
+/* Card → modal: the effect opens bigger here, code stays out of the
+   compact grid entirely until "Get code" is clicked inside this panel. */
+.lab-card-code {
+  margin: var(--space-2);
+}
+
+.lab-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+}
+
+/* `.lab-modal[hidden]` (two selectors, specificity 0-2-0) has to outrank the
+   plain `.lab-modal { display: flex }` rule above it (0-1-0) or the [hidden]
+   attribute does nothing and the modal renders permanently open — the exact
+   "invisible from the CSS alone" class of bug this project has hit before. */
+.lab-modal[hidden] {
+  display: none;
+}
+
+.lab-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 20, 25, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.lab-modal-panel {
+  position: relative;
+  width: 100%;
+  max-width: min(920px, 100%);
+  max-height: min(860px, 100%);
+  overflow-y: auto;
+  background: var(--bg);
+  color: var(--text);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.4);
+}
+
+.lab-modal-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lab-modal-close:hover,
+.lab-modal-close:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lab-modal-stage {
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  background:
+    linear-gradient(45deg, #fafafa 25%, transparent 25%) 0 0 / 16px 16px,
+    linear-gradient(-45deg, #fafafa 25%, transparent 25%) 0 0 / 16px 16px,
+    linear-gradient(45deg, transparent 75%, #fafafa 75%) 0 0 / 16px 16px,
+    linear-gradient(-45deg, transparent 75%, #fafafa 75%) 0 0 / 16px 16px,
+    #ffffff;
+}
+
+/* A flex item's main-axis size defaults to its content's intrinsic width,
+   not "fill the container" — fine for a demo whose content is normal-flow,
+   but most ambient/background effects (canvases, absolutely-positioned
+   hint elements) put nothing in normal flow, so the moved-in .lab-demo
+   collapsed to ~2px wide here even though it filled its card correctly
+   in the grid (a plain block child there, not a row-flex item). Force it
+   to fill the stage explicitly instead of relying on content size. */
+.lab-modal-stage > * {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .lab-modal-stage {
+    min-height: 440px;
+  }
+}
+
+.lab-modal-stage:empty {
+  display: none;
+}
+
+.lab-modal-stage-dark {
+  background: #0f1419;
+}
+
+.lab-modal-stage-tall {
+  min-height: 460px;
+}
+
+.lab-modal-body {
+  padding: var(--space-3);
+}
+
+.lab-modal-body h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  padding-right: 2.5rem;
+}
+
+.lab-modal-desc {
+  color: var(--muted);
+  margin: 0 0 var(--space-3);
+  max-width: none;
+}
+
+.lab-modal-note {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+  margin: -0.5rem 0 var(--space-3);
+}
+
+.lab-modal-get-code {
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  min-height: 44px;
+  padding: 0.55rem 1.3rem;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.lab-modal-get-code:hover,
+.lab-modal-get-code:focus-visible {
+  filter: brightness(1.1);
+}
+
+.lab-modal-code {
+  margin-top: var(--space-3);
+}
+
+.lab-modal-code .lab-card-code {
+  margin: 0;
+}
+
+.lab-modal-code .lab-card-actions,
+.lab-modal-code .lab-code-note {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.lab-modal-code .lab-code-details {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+body.lab-modal-open {
+  overflow: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lab-copy-btn,
-  .lab-btn {
+  .lab-btn,
+  .lab-view-btn,
+  .lab-modal-get-code,
+  .lab-card {
     transition: none;
+  }
+
+  .lab-card:hover {
+    transform: none;
   }
 }
