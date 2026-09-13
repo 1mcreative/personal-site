@@ -1,7 +1,7 @@
 ---
 layout: home
-title: "Bhavesh Nakum"
-description: "Backend engineer by day, Instagram enthusiast by night. Poke around."
+title: "Senior Software Engineer & Backend Architect"
+description: "Bhavesh Nakum: backend engineer by day, Instagram enthusiast by night. Poke around."
 permalink: /
 ---
 
@@ -30,11 +30,11 @@ permalink: /
   <canvas class="pixel-name-canvas" aria-hidden="true"></canvas>
 
   <div class="hero-inner">
-    <h1>Hi, I'm <span class="name-kinetic-wrap"><span class="pixel-name-plain name-kinetic-plain dynamic-weight">Bhavesh</span></span>.</h1>
-    <p class="hero-sub"><span class="hero-sub-text">I write backend systems for a living, and I'm a lot less organized about everything else. Poke around &mdash; there's more here than it looks.</span></p>
+    <h1><span class="hero-greeting">Hi, I'm </span><span class="name-kinetic-wrap"><span class="pixel-name-plain name-kinetic-plain dynamic-weight">Bhavesh</span></span><span class="hero-greeting">.</span></h1>
+    <p class="hero-sub"><span class="hero-sub-text">Backend engineer by day. A lot less order everywhere else. Stick around, there's more to this site than the résumé.</span></p>
   </div>
 
-  <a class="page-corner" href="/life/" aria-label="The Chaos — the personal side">
+  <a class="page-corner" href="/life/" aria-label="The Chaos, the personal side">
     <span class="page-corner-back" aria-hidden="true"></span>
     <span class="page-corner-front" aria-hidden="true"></span>
   </a>
@@ -48,14 +48,14 @@ permalink: /
     <span class="spotlight-bright" aria-hidden="true">I left the interesting parts out of the résumé.</span>
   </a>
 
-  <a class="scroll-cue" href="/resume/">
+  <a class="scroll-cue" href="/resume/" aria-label="Keep going to the résumé">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M12 4v14M6 13l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     <span>keep going</span>
   </a>
 
-  <a class="life-pull-btn" href="/life/" aria-label="Pull to see The Chaos">
+  <a class="life-pull-btn" href="/life/" aria-label="See the personal side of this site">
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M15 4L7 12l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>

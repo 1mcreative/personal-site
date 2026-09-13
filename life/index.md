@@ -1,13 +1,13 @@
 ---
 layout: personal
-title: "Life & Instagram — Bhavesh Nakum"
+title: "Life & Instagram"
 description: "Bhavesh Nakum's personal side: Instagram, photos, and hobbies outside of work."
 permalink: /life/
 ---
 
 <div class="life-intro">
   <h1>Outside of work</h1>
-  <p>This is the other half of the site &mdash; photos, Instagram, and whatever I'm into that has nothing to do with backend systems.</p>
+  <p>This is the other half of the site: photos, Instagram, and whatever I'm into that has nothing to do with backend systems.</p>
 </div>
 
 <div class="social-grid">

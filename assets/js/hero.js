@@ -172,7 +172,31 @@
         var globeEl = document.querySelector(".hero-globe");
         if (globeEl) {
           setTimeout(function () {
-            globeEl.style.setProperty("--globe-zoom", "9");
+            // Was a flat "9" — enough to cover a desktop viewport at the
+            // globe sizes this was tuned against, but not guaranteed at
+            // every combination of viewport size and the globe's own
+            // responsive size (min(66vw, 820px, ...) on desktop,
+            // min(94vw, 430px) on mobile) — reported directly as "make
+            // sure orange covers whole page... display width should not
+            // matter." Computed fresh from real geometry instead, same
+            // "distance to the farthest screen corner" idea .life-wipe
+            // already uses for its own circle-expand transition: half the
+            // scaled element's width needs to reach at least that far.
+            // Measured before any zoom is applied, since --globe-zoom's
+            // transform-origin is the element's own (still-centered) box.
+            var r = globeEl.getBoundingClientRect();
+            var cx = r.left + r.width / 2;
+            var cy = r.top + r.height / 2;
+            var dx = Math.max(cx, window.innerWidth - cx);
+            var dy = Math.max(cy, window.innerHeight - cy);
+            var farthest = Math.sqrt(dx * dx + dy * dy);
+            // 1.08x margin: the formula above already guarantees coverage
+            // exactly to the corner (and a squared-off element clears a
+            // circle of that radius with room to spare — see globe.js's
+            // own comment on the fill quad's ±4 reach), this just buys a
+            // little more room against any remaining edge-pixel rounding.
+            var zoom = (farthest / (r.width / 2)) * 1.08;
+            globeEl.style.setProperty("--globe-zoom", zoom.toFixed(2));
           }, 700);
         }
         setTimeout(finish, 2200);
@@ -184,47 +208,60 @@
     // Whichever axis moves more decides the destination — a wheel
     // gesture that's mostly vertical shouldn't accidentally fire the
     // left-swipe just because deltaX ticked up slightly, and vice versa.
+    // Threshold raised from 4 to 40: at 4, a single light trackpad nudge
+    // (someone just checking "does this page scroll," completely normal
+    // on every other web page) was enough to launch a full multi-second
+    // transition with zero warning — flagged directly by a UX audit as
+    // triggerable from ordinary exploration, not just deliberate intent.
+    // 40 still fires readily on a genuine scroll gesture (a standard
+    // mouse-wheel notch is generally well over 100) while filtering out
+    // the smallest incidental ticks.
     window.addEventListener(
       "wheel",
       function (e) {
         if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-          if (e.deltaX > 4) goToLife();
-        } else if (e.deltaY > 4) {
+          if (e.deltaX > 40) goToLife();
+        } else if (e.deltaY > 40) {
           goToResume();
         }
       },
       { passive: true }
     );
 
-    // .hero-globe has its own drag-to-rotate gesture (globe.js) — a touch
-    // that starts there is someone playing with the globe, not trying to
-    // leave the page, and a drag in either direction (spinning or tilting
-    // it) would otherwise read as exactly one of the swipes below.
-    // Ignoring touches that start on the globe was the actual fix for
-    // "the globe zooms in [when I'm just trying to rotate it]" — reported
-    // after testing on a real phone, not reproducible via this session's
-    // own synthetic touch events (those never touch the globe itself).
+    // .hero-globe used to have its own touch-drag-to-rotate (globe.js),
+    // which meant a touch starting there had to be excluded here or it'd
+    // fire a swipe navigation underneath the drag. That exclusion became
+    // the bug itself, reported as "while scrolling down sometimes user
+    // interacts with globe": a swipe that happened to start over the
+    // globe (a large, centered target) got swallowed with no navigation
+    // at all. globe.js now ignores touch input entirely — mobile just
+    // auto-rotates, see its own onPointerDown — so every touch on the
+    // hero, globe included, is free to be read as a plain swipe here.
     var touchStartX = null;
     var touchStartY = null;
-    var touchOnGlobe = false;
     window.addEventListener(
       "touchstart",
       function (e) {
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
-        touchOnGlobe = !!(e.target && e.target.closest && e.target.closest(".hero-globe"));
       },
       { passive: true }
     );
+    // Threshold raised from 48 to 80 for the same reason as the wheel
+    // check above: an ordinary, non-committal flick (checking whether
+    // the page scrolls, or just an idle touch while reading) can easily
+    // cover 48px without the visitor meaning to navigate anywhere. 80px
+    // is close to a real swipe's typical travel distance, comfortably
+    // past an idle brush.
     window.addEventListener(
       "touchmove",
       function (e) {
-        if (touchStartX === null || touchOnGlobe) return;
+        if (touchStartX === null) return;
         var dx = touchStartX - e.touches[0].clientX;
         var dy = touchStartY - e.touches[0].clientY;
         if (Math.abs(dx) > Math.abs(dy)) {
-          if (dx > 48) goToLife();
-        } else if (dy > 48) {
+          if (dx > 80) goToLife();
+        } else if (dy > 80) {
           goToResume();
         }
       },
