@@ -1,5 +1,5 @@
 title: "Bhavesh Nakum"
-description: "Senior software engineer in Bengaluru — backend architecture, cloud data platforms, and resume. Also: the personal side, Instagram and hobbies."
+description: "Bhavesh Nakum, senior software engineer in Bengaluru. Backend architecture and cloud data platforms on one side of this site; Instagram and hobbies on the other."
 url: "https://bhaveshnakum.com"
 lang: en
 author: "Bhavesh Nakum"
@@ -22,3 +22,4 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - node_modules
+  - coming-soon

@@ -1,24 +1,24 @@
 ---
 layout: lab
-title: "Component Lab — Bhavesh Nakum"
-description: "Every visual element from bhaveshnakum.com — live previews and plug-and-play code, including the ones that got cut."
+title: "Component Lab"
+description: "Every visual element from bhaveshnakum.com: live previews and plug-and-play code, including the ones that got cut."
 permalink: /lab/
 ---
 
 <section class="lab-intro">
   <h1>Component Lab</h1>
   <p>
-    Every effect this site has used while I built it — the ones still live, the ones I tried and cut, and (where I still have it) the original reference component each was adapted from. Each card previews the real thing and has a copy button for the actual code, not a paraphrase of it. Take whatever's useful.
+    Every effect this site has used while I built it: the ones still live, the ones I tried and cut, and (where I still have it) the original reference component each was adapted from. Each card previews the real thing and has a copy button for the actual code, not a paraphrase of it. Take whatever's useful.
   </p>
   <p>
-    Demos marked <strong>Live</strong> ship on the site today. <strong>Deprecated</strong> ones were built, used, then replaced — the code still works, it's just not wired in anymore. <strong>Reference</strong> ones are original pasted components I adapted from and never shipped as-is; shown for the idea, not as something this site runs.
+    Demos marked <strong>Live</strong> ship on the site today. <strong>Deprecated</strong> ones were built, used, then replaced; the code still works, it's just not wired in anymore. <strong>Reference</strong> ones are original pasted components I adapted from and never shipped as-is; shown for the idea, not as something this site runs.
   </p>
 </section>
 
 <section class="lab-section">
   <div class="lab-section-head">
     <h2>Foundations</h2>
-    <p>Colors, type, and spacing — the tokens every other component here reads from.</p>
+    <p>Colors, type, and spacing: the tokens every other component here reads from.</p>
   </div>
   <div class="lab-grid">
 
@@ -27,7 +27,7 @@ permalink: /lab/
         <h3>Color tokens</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">Two fixed palettes, one per side of the site — every component reads <code>--bg</code>/<code>--text</code>/<code>--muted</code>/<code>--accent</code> rather than hardcoding colors, so the same button or hint reads correctly on either theme.</p>
+      <p class="lab-card-desc">Two fixed palettes, one per side of the site: every component reads <code>--bg</code>/<code>--text</code>/<code>--muted</code>/<code>--accent</code> rather than hardcoding colors, so the same button or hint reads correctly on either theme.</p>
       <div class="lab-demo" style="display:block; padding: 1rem;">
         <div class="lab-foundation-swatch"><div class="lab-swatch" style="background:#ffffff"></div><div class="lab-foundation-label">The Grind (light)<code>--bg: #ffffff</code></div></div>
         <div class="lab-foundation-swatch"><div class="lab-swatch" style="background:#14171c"></div><div class="lab-foundation-label">&nbsp;<code>--text: #14171c</code></div></div>
@@ -146,7 +146,7 @@ body {
 <section class="lab-section">
   <div class="lab-section-head">
     <h2>Buttons</h2>
-    <p>Three distinct button identities — the same one always leads to the same place, regardless of which page it's on.</p>
+    <p>Three distinct button identities: the same one always leads to the same place, regardless of which page it's on.</p>
   </div>
   <div class="lab-grid">
 
@@ -155,7 +155,7 @@ body {
         <h3>Offset Button</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">Dashed pill that lifts up-left on hover with a hard offset shadow. Body matches its own page (<code>var(--bg)</code>/<code>var(--text)</code>); the shadow is always the same accent blue — that's the button's fixed "professional" signal on either theme.</p>
+      <p class="lab-card-desc">Dashed pill that lifts up-left on hover with a hard offset shadow. Body matches its own page (<code>var(--bg)</code>/<code>var(--text)</code>); the shadow is always the same accent blue. That's the button's fixed "professional" signal on either theme.</p>
       <div class="lab-demo">
         <a class="offset-btn" href="#" onclick="return false;">
           See the résumé
@@ -239,7 +239,7 @@ body {
         <h3>Keycap Button</h3>
         <span class="lab-badge lab-badge-deprecated">Deprecated</span>
       </div>
-      <p class="lab-card-desc">A rectangular key with a solid offset "lip" standing in for its side wall — hover only glows, never moves; on <code>:active</code> the lip collapses and the key drops, like an actual keypress. Superseded by the Galaxy Button below, but the mechanic's worth keeping.</p>
+      <p class="lab-card-desc">A rectangular key with a solid offset "lip" standing in for its side wall: hover only glows, never moves; on <code>:active</code> the lip collapses and the key drops, like an actual keypress. Superseded by the Galaxy Button below, but the mechanic's worth keeping.</p>
       <div class="lab-demo lab-demo-dark">
         <a class="keycap-btn" href="#" onclick="return false;">The Chaos</a>
       </div>
@@ -300,7 +300,7 @@ body {
         <h3>Galaxy Button</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">Ported from a CodePen "galaxy button": one <code>--active</code> custom property every child reads at once — a dual radial-gradient face, a 3D-tilted star ring (real <code>rotateX</code>/<code>rotateY</code>, not a flat circle), and a two-layer masked spark rim that flips on a stepped timer. Star orbit/drift is randomized per-star by a tiny JS file.</p>
+      <p class="lab-card-desc">Ported from a CodePen "galaxy button": one <code>--active</code> custom property every child reads at once: a dual radial-gradient face, a 3D-tilted star ring (real <code>rotateX</code>/<code>rotateY</code>, not a flat circle), and a two-layer masked spark rim that flips on a stepped timer. Star orbit/drift is randomized per-star by a tiny JS file.</p>
       <div class="lab-demo lab-demo-dark">
         <a class="galaxy-button" href="#" onclick="return false;">
           <span class="galaxy-btn-face">
@@ -533,7 +533,7 @@ body {
 <section class="lab-section">
   <div class="lab-section-head">
     <h2>Text Reveal Effects</h2>
-    <p>Five ways to bring text onto the screen. Stock tabs are the original pasted React/Framer-Motion/GSAP components, condensed where a helper was pure boilerplate (per-prop ref syncing, alternate traversal modes) — the core mechanic is complete and accurate. Ours tabs are the actual vanilla-JS files this site ships.</p>
+    <p>Five ways to bring text onto the screen. Stock tabs are the original pasted React/Framer-Motion/GSAP components, condensed where a helper was pure boilerplate (per-prop ref syncing, alternate traversal modes); the core mechanic is complete and accurate. Ours tabs are the actual vanilla-JS files this site ships.</p>
   </div>
   <div class="lab-grid">
 
@@ -542,7 +542,7 @@ body {
         <h3>Pixel Drift</h3>
         <span class="lab-badge lab-badge-deprecated">Deprecated</span>
       </div>
-      <p class="lab-card-desc">Text sampled into a dense field of colored particles; a cursor over the settled text carves particles outward like a black hole, a stationary cursor = a stationary void. Adapted for the homepage name with the mouse-repulsion cut entirely — kept just the spawn-outside-canvas → converge-to-text formation.</p>
+      <p class="lab-card-desc">Text sampled into a dense field of colored particles; a cursor over the settled text carves particles outward like a black hole, a stationary cursor = a stationary void. Adapted for the homepage name with the mouse-repulsion cut entirely. Kept just the spawn-outside-canvas → converge-to-text formation.</p>
       <div class="lab-tabs-nav">
         <button class="lab-tab-btn lab-tab-btn-active" data-tab="ours">Ours</button>
         <button class="lab-tab-btn" data-tab="stock">Stock reference</button>
@@ -1225,7 +1225,7 @@ export default function ParticleText(props: Record&lt;string, unknown&gt;) {
             <button class="lab-btn" data-replay="appear-text">Replay</button>
           </div>
         </div>
-        <p class="lab-code-note">Shown here: the original inline version (<code>name-kinetic.js</code>). The current full-screen splash (<code>intro-sequence.js</code>) is the same grid mechanic, just built at a bigger scale with the word count computed from the viewport — see the Intro Sequence capstone demo near the bottom of this page.</p>
+        <p class="lab-code-note">Shown here: the original inline version (<code>name-kinetic.js</code>). The current full-screen splash (<code>intro-sequence.js</code>) is the same grid mechanic, just built at a bigger scale with the word count computed from the viewport. See the Intro Sequence capstone demo near the bottom of this page.</p>
         <div class="lab-card-actions">
           <button class="lab-copy-btn" data-copy-url="/assets/js/name-kinetic.js">Copy JS (inline version)</button>
           <button class="lab-copy-btn" data-copy-url="/assets/js/intro-sequence.js">Copy JS (full-screen version)</button>
@@ -1989,7 +1989,7 @@ export default function GlitchCharReveal(props: Record&lt;string, unknown&gt;) {
         <h3>Text Emerge</h3>
         <span class="lab-badge lab-badge-reference">Reference</span>
       </div>
-      <p class="lab-card-desc">Words fade in with a scale+blur, staggered from the center outward — simple, no hover interaction. Offered as the lighter alternative to Scramble Text above; I went with Scramble Text instead, so this one was never shipped. Kept here because the mechanic (GSAP <code>stagger.from</code> with a blur filter) is genuinely useful on its own.</p>
+      <p class="lab-card-desc">Words fade in with a scale+blur, staggered from the center outward. Simple, no hover interaction. Offered as the lighter alternative to Scramble Text above; I went with Scramble Text instead, so this one was never shipped. Kept here because the mechanic (GSAP <code>stagger.from</code> with a blur filter) is genuinely useful on its own.</p>
       <details class="lab-code-details" open style="margin: 0 var(--space-2) var(--space-2);">
         <summary>View original component</summary>
         <pre class="lab-code" id="snippet-text-emerge-stock"><code>{% raw %}// Text Emerge — Originkit
@@ -2139,7 +2139,7 @@ export default function InkdropSpread({
         <h3>Text Fall</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">A canvas particle title: text sampled into a monospace-glyph mask, particles fall/scatter with gravity, then reassemble into the word. Runs on the résumé page's own heading. No stock reference kept for this one — the original pasted source wasn't retained verbatim, so only the shipped version is shown here.</p>
+      <p class="lab-card-desc">A canvas particle title: text sampled into a monospace-glyph mask, particles fall/scatter with gravity, then reassemble into the word. Runs on the résumé page's own heading. No stock reference kept for this one: the original pasted source wasn't retained verbatim, so only the shipped version is shown here.</p>
       <div class="lab-demo lab-demo-dark" data-demo-id="text-fall" data-lazy-src="/assets/js/text-fall.js">
         <template data-demo-template="text-fall">
           <div class="text-fall-heading" role="heading" aria-level="3" style="margin:0;">
@@ -2155,7 +2155,7 @@ export default function InkdropSpread({
           <button class="lab-btn" data-replay="text-fall">Replay</button>
         </div>
       </div>
-      <p class="lab-code-note">Click the canvas to trigger the fall (that's <code>text-fall.js</code>'s own click handler — <code>autoFall</code> also fires it once when the heading scrolls into view).</p>
+      <p class="lab-code-note">Click the canvas to trigger the fall (that's <code>text-fall.js</code>'s own click handler; <code>autoFall</code> also fires it once when the heading scrolls into view).</p>
       <div class="lab-card-actions">
         <button class="lab-copy-btn" data-copy-url="/assets/js/text-fall.js">Copy JS</button>
       </div>
@@ -2167,7 +2167,7 @@ export default function InkdropSpread({
 <section class="lab-section">
   <div class="lab-section-head">
     <h2>Background &amp; Ambient Effects</h2>
-    <p>The homepage's backdrop went through several complete identities before landing on the globe — all of them still work, just unplugged.</p>
+    <p>The homepage's backdrop went through several complete identities before landing on the globe. All of them still work, just unplugged.</p>
   </div>
   <div class="lab-grid">
 
@@ -2245,7 +2245,7 @@ host.addEventListener("pointermove", function (e) {
         <h3>Hero Stars</h3>
         <span class="lab-badge lab-badge-deprecated">Deprecated</span>
       </div>
-      <p class="lab-card-desc">A plain CSS twinkling star field — small saturated dots with a soft glow, positions hand-placed via a Liquid loop rather than randomized (stable across page rebuilds). Superseded by the canvas-based Glitter effect, which covers the same role with actual motion.</p>
+      <p class="lab-card-desc">A plain CSS twinkling star field: small saturated dots with a soft glow, positions hand-placed via a Liquid loop rather than randomized (stable across page rebuilds). Superseded by the canvas-based Glitter effect, which covers the same role with actual motion.</p>
       <div class="lab-demo lab-demo-dark">
         <div class="hero-stars" aria-hidden="true" style="display:block;">
           <span class="hero-star" style="left:8%; top:14%;"></span>
@@ -2319,7 +2319,7 @@ host.addEventListener("pointermove", function (e) {
         <h3>Beyond Horizon</h3>
         <span class="lab-badge lab-badge-deprecated">Deprecated</span>
       </div>
-      <p class="lab-card-desc">A hand-rolled WebGL shader: an ambient glow like a sunrise over a planet's edge, with haze/rim lighting that responds to cursor position. Went through a full dark-theme phase before being remapped to render correctly on a light background — see the file's own comments for the remap math. Replaced by the Globe.</p>
+      <p class="lab-card-desc">A hand-rolled WebGL shader: an ambient glow like a sunrise over a planet's edge, with haze/rim lighting that responds to cursor position. Went through a full dark-theme phase before being remapped to render correctly on a light background. See the file's own comments for the remap math. Replaced by the Globe.</p>
       <div class="lab-demo lab-demo-dark" data-demo-id="beyond-horizon" data-lazy-src="/assets/js/beyond-horizon.js">
         <template data-demo-template="beyond-horizon">
           <div class="hero-glow" aria-hidden="true" style="position:absolute; inset:0;">
@@ -2341,7 +2341,7 @@ host.addEventListener("pointermove", function (e) {
         <h3>Globe</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">A hand-rolled WebGL rotating dot-sphere — no Three.js, by explicit choice. Dots trace real continent shapes from a land mask baked in at build time (Natural Earth data, rasterized once via a Python ray-casting script, no runtime fetch), with a Bengaluru marker in amber. Drag to rotate; momentum decays before auto-rotate resumes.</p>
+      <p class="lab-card-desc">A hand-rolled WebGL rotating dot-sphere, no Three.js, by explicit choice. Dots trace real continent shapes from a land mask baked in at build time (Natural Earth data, rasterized once via a Python ray-casting script, no runtime fetch), with a Bengaluru marker in amber. Drag with a mouse or trackpad to rotate; momentum decays before auto-rotate resumes. Touch doesn't drag it. On the real homepage that used to swallow the swipe gesture that opens the résumé/life pages, so touch input is ignored here and the sphere just auto-rotates on its own.</p>
       <div class="lab-demo lab-demo-tall" data-demo-id="globe" data-lazy-src="/assets/js/globe.js">
         <template data-demo-template="globe">
           <div class="hero-globe" aria-hidden="true" style="position:relative; width:min(70%,320px); left:auto; bottom:auto; transform:none;">
@@ -2355,7 +2355,7 @@ host.addEventListener("pointermove", function (e) {
           <button class="lab-btn" data-replay="globe">Replay</button>
         </div>
       </div>
-      <p class="lab-code-note">On the real site this sits <code>position:absolute</code>, half-clipped by an <code>overflow:hidden</code> hero. Try dragging it here — same drag-to-rotate code, just laid out inline for this card.</p>
+      <p class="lab-code-note">On the real site this sits <code>position:absolute</code>, half-clipped by an <code>overflow:hidden</code> hero. Try dragging it here with a mouse: same drag-to-rotate code, just laid out inline for this card. On a touchscreen it only auto-rotates, same as production.</p>
       <div class="lab-card-actions">
         <button class="lab-copy-btn" data-copy-url="/assets/js/globe.js">Copy JS</button>
       </div>
@@ -2366,11 +2366,11 @@ host.addEventListener("pointermove", function (e) {
         <h3>Hero Hover Glow</h3>
         <span class="lab-badge lab-badge-deprecated">Deprecated</span>
       </div>
-      <p class="lab-card-desc">A radial blue bloom behind the hero content, faded in via <code>:has()</code> whenever the Galaxy Button (further down this page) is hovered or focused — pure CSS, no JS. It was originally a dark dimming effect, inverted into a bloom once the homepage itself went dark for a stretch, then left in place once the Galaxy Button moved off the homepage entirely and into the résumé nav. The selector simply never matches anymore; the CSS is still real and still correct, just permanently dormant on this page.</p>
+      <p class="lab-card-desc">A radial blue bloom behind the hero content, faded in via <code>:has()</code> whenever the Galaxy Button (further down this page) is hovered or focused, pure CSS, no JS. It was originally a dark dimming effect, inverted into a bloom once the homepage itself went dark for a stretch, then left in place once the Galaxy Button moved off the homepage entirely and into the résumé nav. The selector simply never matches anymore; the CSS is still real and still correct, just permanently dormant on this page.</p>
       <div class="lab-demo">
         <div class="hero-hover-glow" style="opacity:1;" aria-hidden="true"></div>
       </div>
-      <p class="lab-code-note">Forced visible here since its real trigger (hovering the Galaxy Button inside <code>.hero</code>) doesn't exist on this page anymore — see the <code>:has()</code> selector in the code below.</p>
+      <p class="lab-code-note">Forced visible here since its real trigger (hovering the Galaxy Button inside <code>.hero</code>) doesn't exist on this page anymore. See the <code>:has()</code> selector in the code below.</p>
       <div class="lab-card-actions">
         <button class="lab-copy-btn" data-copy-target="snippet-hero-hover-glow">Copy CSS</button>
       </div>
@@ -2399,7 +2399,7 @@ host.addEventListener("pointermove", function (e) {
         <h3>Scroll Veil</h3>
         <span class="lab-badge lab-badge-deprecated">Deprecated</span>
       </div>
-      <p class="lab-card-desc">A full-screen radial glow whose opacity tracked <code>--scroll-progress</code>, building visual anticipation as a visitor scrolled toward the (also deprecated) auto-navigate sentinel below the hero. Removed along with that whole scroll-to-enter mechanic once real visitors turned out not to commit to a long deliberate scroll — nothing sets <code>--scroll-progress</code> anymore, so this permanently sits at <code>opacity: 0</code>.</p>
+      <p class="lab-card-desc">A full-screen radial glow whose opacity tracked <code>--scroll-progress</code>, building visual anticipation as a visitor scrolled toward the (also deprecated) auto-navigate sentinel below the hero. Removed along with that whole scroll-to-enter mechanic once real visitors turned out not to commit to a long deliberate scroll. Nothing sets <code>--scroll-progress</code> anymore, so this permanently sits at <code>opacity: 0</code>.</p>
       <div class="lab-demo lab-demo-dark">
         <div class="scroll-veil" style="position:absolute; opacity:0.6;" aria-hidden="true"></div>
       </div>
@@ -2425,7 +2425,7 @@ host.addEventListener("pointermove", function (e) {
 <section class="lab-section">
   <div class="lab-section-head">
     <h2>Hints &amp; Micro-interactions</h2>
-    <p>Small, quiet signals — a lot of iteration on "just barely enough" for each of these.</p>
+    <p>Small, quiet signals: a lot of iteration on "just barely enough" for each of these.</p>
   </div>
   <div class="lab-grid">
 
@@ -2434,14 +2434,14 @@ host.addEventListener("pointermove", function (e) {
         <h3>Spotlight Text</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">A flashlight sweep: text is fully transparent at rest, and a small circle of full brightness follows the cursor via a <code>mask-image</code> radial-gradient tied to <code>--spot-x</code>/<code>--spot-y</code>. Two identical text layers (dim + bright) have to share every font metric — a weight mismatch between them is what "misaligned" looked like the one time it broke.</p>
+      <p class="lab-card-desc">A flashlight sweep: text is fully transparent at rest, and a small circle of full brightness follows the cursor via a <code>mask-image</code> radial-gradient tied to <code>--spot-x</code>/<code>--spot-y</code>. Two identical text layers (dim + bright) have to share every font metric: a weight mismatch between them is what "misaligned" looked like the one time it broke.</p>
       <div class="lab-demo" style="padding:2rem;">
         <a class="spotlight-text spotlight-ready" href="#" onclick="return false;" data-spotlight style="position:static; max-width:none;">
           <span class="spotlight-dim">I left the interesting parts out of the résumé.</span>
           <span class="spotlight-bright" aria-hidden="true">I left the interesting parts out of the résumé.</span>
         </a>
       </div>
-      <p class="lab-code-note">Move your cursor over the text — try the dark-on-white demo card above too; the mask needs zero JS beyond setting <code>--spot-x</code>/<code>--spot-y</code> on pointermove.</p>
+      <p class="lab-code-note">Move your cursor over the text. Try the dark-on-white demo card above too; the mask needs zero JS beyond setting <code>--spot-x</code>/<code>--spot-y</code> on pointermove.</p>
       <div class="lab-card-actions">
         <button class="lab-copy-btn" data-copy-target="snippet-spotlight">Copy HTML + CSS + JS</button>
       </div>
@@ -2536,7 +2536,7 @@ if (matchMedia("(hover: hover)").matches) {
         <h3>Portal Orb</h3>
         <span class="lab-badge lab-badge-deprecated">Deprecated</span>
       </div>
-      <p class="lab-card-desc">A small glowing dot, real link, whose label only appears on hover/focus — the label text is always in the DOM so screen readers announce it regardless of the opacity trick. Visual dot is 16px but the tap target is 44px via an invisible <code>::before</code> overlay. Was the mobile counterpart to Page Corner.</p>
+      <p class="lab-card-desc">A small glowing dot, real link, whose label only appears on hover/focus: the label text is always in the DOM so screen readers announce it regardless of the opacity trick. Visual dot is 16px but the tap target is 44px via an invisible <code>::before</code> overlay. Was the mobile counterpart to Page Corner.</p>
       <div class="lab-demo lab-demo-dark" style="min-height:160px;">
         <a class="portal-orb" href="#" onclick="return false;" style="display:block; position:absolute; left:40%; bottom:40%;">
           <span class="portal-orb-label">Where this leads</span>
@@ -2605,7 +2605,7 @@ if (matchMedia("(hover: hover)").matches) {
         <h3>Scroll Cue</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">A real link (never just a decorative hint — reduced-motion/keyboard/no-JS visitors need this to actually work), styled quietly with a bobbing arrow. The glass backdrop lives on the icon and the text separately, not on one shared pill around both — a follow-up fix after direct feedback that a single wrapper was covering more of the background behind it (the gap between icon and text included) than it needed to.</p>
+      <p class="lab-card-desc">A real link (never just a decorative hint; reduced-motion/keyboard/no-JS visitors need this to actually work), styled quietly with a bobbing arrow. The glass backdrop lives on the icon and the text separately, not on one shared pill around both: a follow-up fix after direct feedback that a single wrapper was covering more of the background behind it (the gap between icon and text included) than it needed to.</p>
       <div class="lab-demo lab-demo-dark">
         <a class="scroll-cue" href="#" onclick="return false;" style="position:static; transform:none;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -2676,7 +2676,7 @@ if (matchMedia("(hover: hover)").matches) {
         <h3>Life Pull Button</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">A small dark circle that bulges seamlessly out of an edge rather than floating near it: the circle's own center sits exactly on the boundary, so only its left half ever renders — the boundary itself does the clipping, no <code>clip-path</code> needed. That silhouette is zero-width at the top and bottom and widest at the vertical middle — exactly the shape I was asked for. This dot is also the exact starting point for the bubble-expand transition below — the two are one continuous idea, not a button plus an unrelated effect.</p>
+      <p class="lab-card-desc">A small dark circle that bulges seamlessly out of an edge rather than floating near it: the circle's own center sits exactly on the boundary, so only its left half ever renders; the boundary itself does the clipping, no <code>clip-path</code> needed. That silhouette is zero-width at the top and bottom and widest at the vertical middle. Exactly the shape I was asked for. This dot is also the exact starting point for the bubble-expand transition below: the two are one continuous idea, not a button plus an unrelated effect.</p>
       <div class="lab-demo">
         <a class="life-pull-btn" href="#" onclick="return false;" style="position:absolute; top:50%; right:-20px; transform:translateY(-50%);" aria-label="Pull to see the next page">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -2684,7 +2684,7 @@ if (matchMedia("(hover: hover)").matches) {
           </svg>
         </a>
       </div>
-      <p class="lab-code-note">This card's own right edge stands in for the viewport's — the dot bulges out of <em>this box</em> the same way it bulges out of the real page.</p>
+      <p class="lab-code-note">This card's own right edge stands in for the viewport's: the dot bulges out of <em>this box</em> the same way it bulges out of the real page.</p>
       <div class="lab-card-actions">
         <button class="lab-copy-btn" data-copy-target="snippet-life-pull-btn">Copy HTML + CSS</button>
       </div>
@@ -2730,7 +2730,7 @@ if (matchMedia("(hover: hover)").matches) {
         <h3>Social Card Hover</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">The only interactive touch on <code>/life/</code> itself, outside the shared cross-page buttons: hovering an Instagram card lifts it 2px and swaps its border to the personal theme's own accent blue. Nothing clever — a plain <code>transform</code> + <code>border-color</code> transition — but it's the one place that page tells you something on the page is actually meant to be clicked, not just read.</p>
+      <p class="lab-card-desc">The only interactive touch on <code>/life/</code> itself, outside the shared cross-page buttons: hovering an Instagram card lifts it 2px and swaps its border to the personal theme's own accent blue. Nothing clever, just a plain <code>transform</code> + <code>border-color</code> transition, but it's the one place that page tells you something on the page is actually meant to be clicked, not just read.</p>
       <div class="lab-demo lab-demo-dark theme-personal" style="padding:1.5rem;">
         <div class="social-card" style="max-width:220px;">
           <h2>Instagram</h2>
@@ -2780,7 +2780,7 @@ if (matchMedia("(hover: hover)").matches) {
         <h3>Dynamic Weight</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">Hovering the name bolds it — genuine variable-font interpolation (not synthetic bolding), which needed Fraunces' loaded weight range widened to 400–900 first. That's the entire trick: one <code>:hover</code> rule, one wider font-weight axis.</p>
+      <p class="lab-card-desc">Hovering the name bolds it: genuine variable-font interpolation (not synthetic bolding), which needed Fraunces' loaded weight range widened to 400–900 first. That's the entire trick: one <code>:hover</code> rule, one wider font-weight axis.</p>
       <div class="lab-demo" style="padding:2rem;">
         <span class="dynamic-weight" style="font-family:'Fraunces',Georgia,serif; font-size:2.5rem; font-weight:700;">Hover me</span>
       </div>
@@ -2818,10 +2818,10 @@ if (matchMedia("(hover: hover)").matches) {
         <h3>Sitewide View Transition</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">Pure CSS — no JS. One <code>@view-transition</code> rule opts every same-origin navigation into the browser's native Cross-Document View Transitions API; the new page wipes up into view rather than a plain cross-fade. Disabled under reduced motion automatically. This exact rule is already active on the lab page you're reading right now.</p>
+      <p class="lab-card-desc">Pure CSS, no JS. One <code>@view-transition</code> rule opts every same-origin navigation into the browser's native Cross-Document View Transitions API; the new page wipes up into view rather than a plain cross-fade. Disabled under reduced motion automatically. This exact rule is already active on the lab page you're reading right now.</p>
       <div class="lab-demo" style="display:block; padding:1.5rem; text-align:center;">
         <a class="offset-btn" href="/resume/">
-          See it — go to /resume/
+          See it: go to /resume/
           <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -2861,7 +2861,7 @@ if (matchMedia("(hover: hover)").matches) {
         <h3>Dissolve ("Thanos Snap")</h3>
         <span class="lab-badge lab-badge-deprecated">Deprecated</span>
       </div>
-      <p class="lab-card-desc">Click the folded corner, the page fades to black, and a canvas of small squares — sampled per real content element, not one uniform grid — blows apart to the left before the actual navigation fires. Built after being deferred for months, then cut once I actually saw it running: the fuller version wasn't what I wanted after all.</p>
+      <p class="lab-card-desc">Click the folded corner, the page fades to black, and a canvas of small squares (sampled per real content element, not one uniform grid) blows apart to the left before the actual navigation fires. Built after being deferred for months, then cut once I actually saw it running: the fuller version wasn't what I wanted after all.</p>
       <div class="lab-demo" style="padding:0; min-height:260px;" data-demo-id="dissolve">
         <template data-demo-template="dissolve">
           <iframe src="/lab-dissolve-demo.html" style="width:100%; height:260px; border:0; display:block;" title="Dissolve transition demo"></iframe>
@@ -2871,7 +2871,7 @@ if (matchMedia("(hover: hover)").matches) {
           <button class="lab-btn" data-replay="dissolve">Replay</button>
         </div>
       </div>
-      <p class="lab-code-note"><code>dissolve.js</code> toggles a <code>.dissolving</code> class on <code>&lt;html&gt;</code> itself — the fade spans the whole document, which is why this demo runs in its own iframe rather than inline on this page.</p>
+      <p class="lab-code-note"><code>dissolve.js</code> toggles a <code>.dissolving</code> class on <code>&lt;html&gt;</code> itself: the fade spans the whole document, which is why this demo runs in its own iframe rather than inline on this page.</p>
       <div class="lab-card-actions">
         <button class="lab-copy-btn" data-copy-url="/assets/js/dissolve.js">Copy JS</button>
       </div>
@@ -2882,7 +2882,7 @@ if (matchMedia("(hover: hover)").matches) {
         <h3>Globe: Focus-Zoom-to-Marker</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">An exit transition built into the Globe (above): spin the sphere to bring a specific marker to front-center — solved analytically from its lat/lng, not searched — then zoom the camera into it until its color fills the screen. A double-<code>requestAnimationFrame</code> guard makes sure the final frame actually paints before anything navigates (a real Chrome-only bug: it didn't wait for this without that guard). Two later fixes keep the huge marker crisp instead of blurry: the fragment shader's soft edge tightens as the marker grows (a fixed fraction of a tiny dot's radius is invisible, but the same fraction of a screen-filling circle is a visible soft ring), and the canvas itself renders at 4x its normal resolution for the duration of the zoom, since the CSS scale that blows the whole element up to cover the viewport otherwise has to stretch a much lower-resolution source than it needs to.</p>
+      <p class="lab-card-desc">An exit transition built into the Globe (above): spin the sphere to bring a specific marker to front-center (solved analytically from its lat/lng, not searched), then zoom the camera into it until its color fills the screen. A double-<code>requestAnimationFrame</code> guard makes sure the final frame actually paints before anything navigates (a real Chrome-only bug: it didn't wait for this without that guard). Two later fixes keep the huge marker crisp instead of blurry: the fragment shader's soft edge tightens as the marker grows (a fixed fraction of a tiny dot's radius is invisible, but the same fraction of a screen-filling circle is a visible soft ring), and the canvas itself renders at 4x its normal resolution for the duration of the zoom, since the CSS scale that blows the whole element up to cover the viewport otherwise has to stretch a much lower-resolution source than it needs to.</p>
       <div class="lab-demo" style="padding:1.5rem; text-align:center;">
         <button class="lab-btn" style="position:static;" id="lab-globe-zoom-btn">Zoom to marker (on the Globe demo above ↑)</button>
       </div>
@@ -2935,7 +2935,7 @@ window.globeFocusMarker = function (callback) {
         <h3>Resume Wipe</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">A real full-viewport cover for the white handoff at the end of the Globe zoom above — not a fade on the globe's own canvas. Fading only the canvas used to reveal everything else still sitting in the hero (headline, subhead, glitter, the pull button, copyright) untouched, which showed up as "the landing page again for half a second" between the amber zoom and the actual navigation. This sits above everything else on the page and fades to opaque white on its own, so nothing is left showing through underneath it.</p>
+      <p class="lab-card-desc">A real full-viewport cover for the white handoff at the end of the Globe zoom above, not a fade on the globe's own canvas. Fading only the canvas used to reveal everything else still sitting in the hero (headline, subhead, glitter, the pull button, copyright) untouched, which showed up as "the landing page again for half a second" between the amber zoom and the actual navigation. This sits above everything else on the page and fades to opaque white on its own, so nothing is left showing through underneath it.</p>
       <div class="lab-demo lab-demo-dark" style="padding:1.5rem; text-align:center;">
         <button class="lab-btn" style="position:static;" id="lab-resume-wipe-btn">Fade to white</button>
         <div class="resume-wipe" id="lab-resume-wipe" aria-hidden="true" style="position:absolute;"></div>
@@ -2994,7 +2994,7 @@ setTimeout(function () {
         <h3>Life Wipe: Dot-to-Bubble</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">Click the Life Pull Button (above) or swipe left on the real homepage, and a circle grows from that exact dot until it covers the whole screen, then navigates. One <code>clip-path: circle()</code>, not a multi-property choreography: the center point never moves, so only the radius needs to animate, computed by hand as the distance from that center to whichever screen corner is farthest away — the same idea as <code>clip-path</code>'s own <code>farthest-corner</code> keyword, worked out manually since a transition needs two real numbers to interpolate between, not a keyword on one end. An earlier version split a rectangular sweep across several <code>@property</code>-registered custom properties for independent timing; on a browser without <code>@property</code> support that silently stopped animating at all, reported directly as "the transition is very fast and unable to see it happening." A single circle radius needs no such registration.</p>
+      <p class="lab-card-desc">Click the Life Pull Button (above) or swipe left on the real homepage, and a circle grows from that exact dot until it covers the whole screen, then navigates. One <code>clip-path: circle()</code>, not a multi-property choreography: the center point never moves, so only the radius needs to animate, computed by hand as the distance from that center to whichever screen corner is farthest away, the same idea as <code>clip-path</code>'s own <code>farthest-corner</code> keyword, worked out manually since a transition needs two real numbers to interpolate between, not a keyword on one end. An earlier version split a rectangular sweep across several <code>@property</code>-registered custom properties for independent timing; on a browser without <code>@property</code> support that silently stopped animating at all, reported directly as "the transition is very fast and unable to see it happening." A single circle radius needs no such registration.</p>
       <div class="lab-demo lab-demo-dark">
         <a class="life-pull-btn" href="#" onclick="return false;" id="lab-life-wipe-btn" style="position:absolute; top:50%; right:-20px; transform:translateY(-50%);" aria-label="Expand">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -3044,7 +3044,7 @@ setTimeout(function () {
           });
         })();
       </script>
-      <p class="lab-code-note">Click the dot to expand, click again to collapse — the real site expands once and navigates instead of collapsing back.</p>
+      <p class="lab-code-note">Click the dot to expand, click again to collapse: the real site expands once and navigates instead of collapsing back.</p>
       <div class="lab-card-actions">
         <button class="lab-copy-btn" data-copy-target="snippet-life-wipe">Copy the trigger snippet</button>
       </div>
@@ -3099,7 +3099,7 @@ function goToLife() {
         <h3>Intro Sequence</h3>
         <span class="lab-badge lab-badge-live">Live</span>
       </div>
-      <p class="lab-card-desc">The name appears alone, full-screen, via the Appear Text grid mechanic — sized dynamically so 100+ copies fit the actual viewport, not a fixed count. Once it settles and holds, the splash fades away and everything underneath — already fully rendered, just hidden behind an opaque overlay the whole time — is revealed together: the globe (its dots grow in from tiny), and the subhead's own Scramble Text reveal, triggered at that exact moment. This is the real homepage, in an iframe, not a re-implementation.</p>
+      <p class="lab-card-desc">The name appears alone, full-screen, via the Appear Text grid mechanic: sized dynamically so 100+ copies fit the actual viewport, not a fixed count. Once it settles and holds, the splash fades away and everything underneath (already fully rendered, just hidden behind an opaque overlay the whole time) is revealed together: the globe (its dots grow in from tiny), and the subhead's own Scramble Text reveal, triggered at that exact moment. This is the real homepage, in an iframe, not a re-implementation.</p>
       <div class="lab-demo" style="padding:0; min-height:520px;" data-demo-id="intro-sequence">
         <template data-demo-template="intro-sequence">
           <iframe src="/lab-intro-demo.html" style="width:100%; height:520px; border:0; display:block;" title="Full intro sequence demo"></iframe>

@@ -1,6 +1,6 @@
 ---
 layout: professional
-title: "Resume — Bhavesh Nakum"
+title: "Resume"
 description: "Bhavesh Nakum's resume: Senior Software Engineer at eBay — backend architecture, distributed systems, and big data platforms."
 permalink: /resume/
 ---

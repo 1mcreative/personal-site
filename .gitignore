@@ -4,4 +4,4 @@ _site/
 .sass-cache/
 .bundle/
 vendor/
-.impeccable/hook.cache.json
+.impeccable/
