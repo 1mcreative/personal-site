@@ -58,18 +58,22 @@ permalink: /life/
 
   <div class="youtube-channels">
     <a class="youtube-channel-card" href="https://www.youtube.com/@1mcreative372" rel="me noopener" target="_blank">
-      <span class="youtube-channel-icon" aria-hidden="true">{% include youtube-glyph.svg %}</span>
-      <span class="youtube-channel-body">
-        <span class="youtube-channel-label">YouTube</span>
-        <span class="youtube-channel-name">1mCreative</span>
+      <span class="youtube-channel-head">
+        <span class="youtube-channel-icon" aria-hidden="true">{% include youtube-glyph.svg %}</span>
+        <span class="youtube-channel-body">
+          <span class="youtube-channel-label">YouTube</span>
+          <span class="youtube-channel-name">1mCreative</span>
+        </span>
       </span>
       <span class="youtube-channel-cta">Visit channel</span>
     </a>
     <a class="youtube-channel-card" href="https://www.youtube.com/@redfilms3721" rel="me noopener" target="_blank">
-      <span class="youtube-channel-icon" aria-hidden="true">{% include youtube-glyph.svg %}</span>
-      <span class="youtube-channel-body">
-        <span class="youtube-channel-label">Second channel</span>
-        <span class="youtube-channel-name">RED FILMS</span>
+      <span class="youtube-channel-head">
+        <span class="youtube-channel-icon" aria-hidden="true">{% include youtube-glyph.svg %}</span>
+        <span class="youtube-channel-body">
+          <span class="youtube-channel-label">Second channel</span>
+          <span class="youtube-channel-name">RED FILMS</span>
+        </span>
       </span>
       <span class="youtube-channel-cta">Visit channel</span>
     </a>
