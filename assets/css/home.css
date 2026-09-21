@@ -1306,6 +1306,28 @@
   }
 }
 
+/* .hero-weather-chip (assets/js/weather.js): the only .hero-status chip
+   that's ever absent — it doesn't exist in the markup at all, only
+   appended once a real fetch succeeds, so it needs its own fade-in
+   rather than being visible from first paint like the clock chip above.
+   Skips the fade under reduced motion (added already-visible instead, in
+   JS terms indistinguishable from a plain opacity:1 element the moment
+   this class lands). */
+.hero-weather-chip {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.hero-weather-chip.hero-status-chip-in {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-weather-chip {
+    transition: none;
+  }
+}
+
 /* .hero-clock-time (assets/js/hero.js): the visitor's own local time, read
    straight off their browser's own clock/locale — no geolocation prompt,
    nothing sent anywhere, just Intl formatting the time zone the browser
