@@ -26,30 +26,32 @@ permalink: /life/
   </a>
 </nav>
 
-<div class="social-grid" id="instagram">
-  <a class="social-card" href="https://www.instagram.com/1mcreative" rel="me noopener" target="_blank">
-    <span class="social-card-head">
-      <span class="social-icon" aria-hidden="true">{% include instagram-glyph.svg %}</span>
-      <span class="social-card-body">
-        <span class="social-label">Instagram</span>
-        <span class="social-handle">@1mcreative</span>
+<section class="life-section" id="instagram">
+  <div class="social-grid">
+    <a class="social-card" href="https://www.instagram.com/1mcreative" rel="me noopener" target="_blank">
+      <span class="social-card-head">
+        <span class="social-icon" aria-hidden="true">{% include instagram-glyph.svg %}</span>
+        <span class="social-card-body">
+          <span class="social-label">Instagram</span>
+          <span class="social-handle">@1mcreative</span>
+        </span>
       </span>
-    </span>
-    <span class="social-tagline">Photos, reels, whatever I'm doing that day.</span>
-    <span class="social-cta">View profile</span>
-  </a>
-  <a class="social-card" href="https://www.instagram.com/straightforkward" rel="me noopener" target="_blank">
-    <span class="social-card-head">
-      <span class="social-icon" aria-hidden="true">{% include instagram-glyph.svg %}</span>
-      <span class="social-card-body">
-        <span class="social-label">Second account</span>
-        <span class="social-handle">@straightforkward</span>
+      <span class="social-tagline">Photos, reels, whatever I'm doing that day.</span>
+      <span class="social-cta">View profile</span>
+    </a>
+    <a class="social-card" href="https://www.instagram.com/straightforkward" rel="me noopener" target="_blank">
+      <span class="social-card-head">
+        <span class="social-icon" aria-hidden="true">{% include instagram-glyph.svg %}</span>
+        <span class="social-card-body">
+          <span class="social-label">Second account</span>
+          <span class="social-handle">@straightforkward</span>
+        </span>
       </span>
-    </span>
-    <span class="social-tagline">Random stuff that doesn't fit the main feed.</span>
-    <span class="social-cta">View profile</span>
-  </a>
-</div>
+      <span class="social-tagline">Random stuff that doesn't fit the main feed.</span>
+      <span class="social-cta">View profile</span>
+    </a>
+  </div>
+</section>
 
 <section class="life-section" id="youtube">
   <h2>YouTube</h2>
@@ -150,6 +152,12 @@ permalink: /life/
 </section>
 
 <section class="life-section" id="album">
-  <h2>Photo album</h2>
-  <p class="coming-later">Same here — a real gallery's coming.</p>
+  <div class="album-placeholder">
+    <span class="album-placeholder-icon" aria-hidden="true">{% include album-glyph.svg %}</span>
+    <h2>Photo album</h2>
+    <p class="coming-later">Same here — a real gallery's coming.</p>
+    <div class="album-placeholder-grid" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
 </section>

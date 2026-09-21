@@ -1,34 +1,60 @@
-// Load sequence for /life/: black, then the Black Hole background alone,
-// then the nav and content — per explicit request. The veil (an opaque
-// black div, z-index above everything) starts covering the whole page;
-// black-hole-lite.js has been baking/rendering underneath it the entire
-// time regardless, so "reveal the background" is just fading the veil out,
-// not waiting on the canvas to become ready. Nav/content start at
-// opacity:0 independently of the veil and fade in afterward, so the
-// three-stage order (black / background alone / everything) holds even
-// though the veil's own fade only ever covers one layer.
+// Load sequence for /life/, per direct request: blank screen, then the
+// Black Hole grows in from a dot, then content appears one piece at a
+// time — nav, then the heading, then the subhead, then everything else —
+// instead of it all arriving together. black-hole-lite.js has been baking/
+// rendering underneath the veil the entire time regardless, so "grows from
+// a dot" is a pure CSS transform on .life-hero (see personal.css), not
+// something coordinated with the canvas itself.
 //
-// All the hiding CSS is scoped under body.js-intro (added synchronously in
-// personal.html, before this deferred script even runs) specifically so a
-// no-JS visitor never sees a permanently black screen — this file only
-// ever adds/removes classes on elements that start effectively inert
-// without it.
+// All the hiding/scaling CSS is scoped under body.js-intro (added
+// synchronously in personal.html, before this deferred script even runs)
+// specifically so a no-JS visitor never sees a permanently black screen or
+// a stuck tiny dot — this file only ever adds classes to elements that
+// start effectively inert without that class present at all.
 (function () {
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   var veil = document.querySelector(".life-intro-veil");
+  var hero = document.querySelector(".life-hero");
   var header = document.querySelector(".site-header");
-  var main = document.querySelector("main#main");
-  if (!veil || !header || !main) return;
+  var h1 = document.querySelector(".life-hero-inner h1");
+  var p = document.querySelector(".life-hero-inner p");
+  var rest = Array.prototype.slice.call(document.querySelectorAll(".section-nav, .life-section"));
+  if (!veil || !hero || !header) return;
 
   var HOLD_MS = 250; // pure black, giving the canvas a moment to bake its first real frame
-  var CONTENT_DELAY_MS = 350; // how far into the veil's own fade the content starts appearing
+  var GROW_MS = 1100; // must match .life-hero's own transition duration in personal.css
+  var STAGGER_MS = 200; // gap between each piece of content appearing
 
-  setTimeout(function () {
-    veil.classList.add("is-hidden");
-    setTimeout(function () {
+  function runSequence(steps) {
+    var i = 0;
+    function next() {
+      if (i >= steps.length) return;
+      var step = steps[i++];
+      setTimeout(function () {
+        step[1]();
+        next();
+      }, step[0]);
+    }
+    next();
+  }
+
+  runSequence([
+    [HOLD_MS, function () {
+      veil.classList.add("is-hidden");
+      hero.classList.add("is-grown");
+    }],
+    [GROW_MS, function () {
       header.classList.add("is-visible");
-      main.classList.add("is-visible");
-    }, CONTENT_DELAY_MS);
-  }, HOLD_MS);
+    }],
+    [STAGGER_MS, function () {
+      if (h1) h1.classList.add("is-visible");
+    }],
+    [STAGGER_MS, function () {
+      if (p) p.classList.add("is-visible");
+    }],
+    [STAGGER_MS, function () {
+      rest.forEach(function (el) { el.classList.add("is-visible"); });
+    }]
+  ]);
 })();
