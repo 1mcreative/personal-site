@@ -1,5 +1,5 @@
 <footer class="site-footer">
-  <p>&copy; {{ 'now' | date: "%Y" }} Bhavesh Nakum.
+  <p>&copy; {{ 'now' | date: "%Y" }} Bhavesh Nakum &middot; <a href="/lab/"{% if page.url == '/lab/' %} aria-current="page"{% endif %}>Component Lab</a>
     <a href="mailto:{{ site.email }}" class="contact-btn" data-contact-open>Contact me</a>
   </p>
 </footer>
@@ -23,7 +23,7 @@
       </svg>
       Get in touch
     </h2>
-    <p class="contact-modal-sub">Comments, feedback, appreciation, bug reports — whatever's on your mind.</p>
+    <p class="contact-modal-sub">Comments, feedback, appreciation, bug reports: whatever's on your mind.</p>
     <form class="contact-form" data-contact-form>
       <label class="contact-field">
         <span>Name <em>(optional)</em></span>

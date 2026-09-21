@@ -1,19 +1,24 @@
+---
+permalink: /questions/
+sitemap: false
+title: "Interview Questions"
+description: "A growing set of interview question notes from Bhavesh Nakum's engineering career. More detail is coming soon."
+---
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Interview Questions | Bhavesh Nakum</title>
-    <link rel="stylesheet" href="../style.css" />
+    {% include head.html %}
+    <meta name="robots" content="noindex, follow">
+    <link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
   </head>
   <body>
     <header>
       <h1>Interview questions</h1>
       <nav>
-        <a href="../index.html">Home</a>
-        <a href="../resume/">Resume</a>
-        <a href="../life/">Instagram &amp; hobbies</a>
-        <a href="../interviews/">Interview experience</a>
+        <a href="{{ '/' | relative_url }}">Home</a>
+        <a href="{{ '/resume/' | relative_url }}">Resume</a>
+        <a href="{{ '/life/' | relative_url }}">Instagram &amp; hobbies</a>
+        <a href="{{ '/interviews/' | relative_url }}">Interview experience</a>
         <a href="./" aria-current="page">Interview questions</a>
       </nav>
     </header>

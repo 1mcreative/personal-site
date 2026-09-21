@@ -148,7 +148,7 @@
 
     if (!emailjsReady()) {
       if (openMailtoFallback()) {
-        setStatus("Opening your email app with this message ready to go — hit send there and it'll reach me directly.");
+        setStatus("Opening your email app with this message ready to go. Hit send there and it'll reach me directly.");
       } else {
         setStatus("This form isn't connected to anything yet, and there's no email link on the page to fall back to either.", "error");
       }
@@ -161,13 +161,14 @@
 
     window.emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, form)
       .then(function () {
-        setStatus("Thanks — got it. I'll get back to you soon.");
+        setStatus("Thanks, got it. I'll get back to you soon.");
+        if (typeof gtag === "function") gtag("event", "contact_form_submit");
         form.reset();
         closeTimer = setTimeout(close, 1800);
       })
       .catch(function () {
         if (openMailtoFallback()) {
-          setStatus("That didn't go through, so I opened your email app instead — hit send there and it'll still reach me.", "error");
+          setStatus("That didn't go through, so I opened your email app instead. Hit send there and it'll still reach me.", "error");
         } else {
           setStatus("Something went wrong sending that. Try again in a moment.", "error");
         }

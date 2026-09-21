@@ -1,7 +1,7 @@
 ---
 layout: professional
-title: "Resume"
-description: "Bhavesh Nakum's resume: Senior Software Engineer at eBay — backend architecture, distributed systems, and big data platforms."
+title: "Resume - Senior Software Engineer"
+description: "Bhavesh Nakum's resume: Senior Software Engineer at eBay, working on backend architecture, distributed systems, and big data platforms."
 permalink: /resume/
 ---
 
@@ -45,7 +45,7 @@ permalink: /resume/
 
 <section class="resume-section">
   <h2>Summary</h2>
-  <p>Senior Software Engineer with 8+ years of experience designing, developing, and operating high-performance backend systems, distributed microservices, and large-scale data platforms in Java and Python. Deep expertise across event-driven architecture (Apache Kafka, Apache Flink), big data processing (Apache Spark, Apache Airflow, Hive, HDFS), and multi-tenant, multi-region SaaS platform design with a strong focus on high availability, fault tolerance, and secure API development (OAuth, OWASP). Hands-on experience designing AI agent-driven workflows &mdash; including an agentic system that generates data schemas from natural-language chat input and a self-service, automated data consumption layer &mdash; alongside daily use of AI-augmented development tools (Cursor, Claude Code, GitHub Copilot, Qodo Merge) across coding, design, PR review, and testing. Skilled in cloud-native engineering across Microsoft Azure, Google Cloud Platform, and AWS, with hands-on experience in Kubernetes, Docker, and CI/CD pipeline automation. Proven technical leader with a track record of architecting production systems end-to-end, mentoring engineering teams, participating in technical hiring, and collaborating cross-functionally with product, data science, and business stakeholders across e-commerce, healthcare, and enterprise IT environments.</p>
+  <p>Senior Software Engineer with 8+ years of experience designing, developing, and operating high-performance backend systems, distributed microservices, and large-scale data platforms in Java and Python. Deep expertise across event-driven architecture (Apache Kafka, Apache Flink), big data processing (Apache Spark, Apache Airflow, Hive, HDFS), and multi-tenant, multi-region SaaS platform design with a strong focus on high availability, fault tolerance, and secure API development (OAuth, OWASP). Hands-on experience designing AI agent-driven workflows (including an agentic system that generates data schemas from natural-language chat input and a self-service, automated data consumption layer), alongside daily use of AI-augmented development tools (Cursor, Claude Code, GitHub Copilot, Qodo Merge) across coding, design, PR review, and testing. Skilled in cloud-native engineering across Microsoft Azure, Google Cloud Platform, and AWS, with hands-on experience in Kubernetes, Docker, and CI/CD pipeline automation. Proven technical leader with a track record of architecting production systems end-to-end, mentoring engineering teams, participating in technical hiring, and collaborating cross-functionally with product, data science, and business stakeholders across e-commerce, healthcare, and enterprise IT environments.</p>
 </section>
 
 <section class="resume-section">
@@ -59,7 +59,7 @@ permalink: /resume/
     <ul>
       <li><strong>Data Platform Ownership:</strong> Member of eBay's core Data team, owning end-to-end design, development, and maintenance of real-time and batch data pipelines across the eBay platform; responsible for reliable delivery of eBay Live feature data to downstream data consumers using Apache Flink, Apache Kafka, SQL, and Hadoop.</li>
       <li><strong>AI Agent-Driven Schema Onboarding:</strong> Designed and implemented an AI agent workflow within the team's data consumption layer that automatically generates data schemas from natural-language chat input and user-provided data, replacing manual schema-definition forms and streamlining the onboarding of new datasets.</li>
-      <li><strong>Self-Service Automated Data Consumption:</strong> Built an automated data consumption layer enabling downstream consumers to write and run their own SQL queries to extract data on a batch, scheduled, or on-demand basis &mdash; eliminating the need for the data management platform team to manually author extraction queries and pipelines for each consumer request.</li>
+      <li><strong>Self-Service Automated Data Consumption:</strong> Built an automated data consumption layer enabling downstream consumers to write and run their own SQL queries to extract data on a batch, scheduled, or on-demand basis, eliminating the need for the data management platform team to manually author extraction queries and pipelines for each consumer request.</li>
       <li><strong>AI-Augmented Development:</strong> Use Cursor and Claude Code for coding, PR reviews, design, and testing as part of daily engineering practice.</li>
     </ul>
   </div>
@@ -171,10 +171,10 @@ permalink: /resume/
 <section class="resume-section">
   <h2>Additional highlights</h2>
   <ul>
-    <li><strong>Agentic AI System Design:</strong> Hands-on experience designing and shipping an AI agent-driven workflow for automated data schema generation and a self-service, automated data consumption layer &mdash; moving a previously manual, team-dependent process to a fully automated, consumer-driven path.</li>
+    <li><strong>Agentic AI System Design:</strong> Hands-on experience designing and shipping an AI agent-driven workflow for automated data schema generation and a self-service, automated data consumption layer, moving a previously manual, team-dependent process to a fully automated, consumer-driven path.</li>
     <li><strong>Mentorship &amp; Hiring:</strong> Mentored new hires and junior engineers; participated in hiring and interview panels for vendor and FTE roles.</li>
     <li><strong>AI-Augmented Development:</strong> Practical, day-to-day use of AI coding tools (Cursor, Claude Code, GitHub Copilot, Qodo Merge) and general-purpose LLM tools (Claude, ChatGPT) to accelerate development, elevate code review quality, and support research and technical communication.</li>
-    <li><strong>Legacy &amp; Proprietary System Modernization:</strong> Consistent track record diving into proprietary and legacy systems &mdash; internal release pipelines, Teradata data warehouses, Hadoop platforms &mdash; to understand their inner workings and strategically modernize them.</li>
+    <li><strong>Legacy &amp; Proprietary System Modernization:</strong> Consistent track record diving into proprietary and legacy systems (internal release pipelines, Teradata data warehouses, Hadoop platforms) to understand their inner workings and strategically modernize them.</li>
     <li><strong>Regulated &amp; Enterprise Environments:</strong> Experience delivering technology solutions in compliance-driven settings (HIPAA-regulated healthcare data) and for large enterprise clients (Proximus/Belgium, Bank of America).</li>
     <li><strong>CI/CD:</strong> Automated CI/CD pipelines by integrating functional, integration, end-to-end, and performance testing into the deployment process.</li>
     <li><strong>Engineering Standards:</strong> Passionate about performance optimization, code quality, testability, and technical documentation for high-concurrency, high-throughput production systems.</li>
@@ -184,7 +184,7 @@ permalink: /resume/
 <section class="resume-section">
   <h2>Education &amp; certifications</h2>
   <ul>
-    <li>B.Tech, Computer Engineering &mdash; SVNIT, Surat (2018) &middot; CGPA 7.18/10</li>
+    <li>B.Tech, Computer Engineering &middot; SVNIT, Surat (2018) &middot; CGPA 7.18/10</li>
     <li>Microsoft Certified: Azure Fundamentals</li>
     <li>Apache Airflow Fundamentals</li>
   </ul>

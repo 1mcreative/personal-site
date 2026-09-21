@@ -1,7 +1,7 @@
 ---
 layout: home
 title: "Senior Software Engineer & Backend Architect"
-description: "Bhavesh Nakum: backend engineer by day, Instagram enthusiast by night. Poke around."
+description: "Bhavesh Nakum: Senior Software Engineer in Bengaluru, building backend systems and data platforms at eBay by day, Instagram by night. Poke around."
 permalink: /
 ---
 

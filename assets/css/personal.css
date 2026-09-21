@@ -472,6 +472,16 @@
   margin: 0 0 var(--space-1);
 }
 
+/* Instagram has no .life-section wrapper (predates it, and .social-grid's
+   full-bleed negative-margin breakout depends on its exact position in the
+   flow — wrapping it now risks that math), so this heading gets its own
+   rule instead of reusing .life-section's, replicating just the top
+   spacing .life-section would otherwise provide via its own margin-top. */
+.theme-personal .instagram-heading {
+  font-size: 1.1rem;
+  margin: var(--space-4) 0 var(--space-1);
+}
+
 .theme-personal .coming-later {
   color: var(--muted);
   font-size: 0.9rem;

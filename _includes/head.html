@@ -1,5 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+{% include analytics.html %}
 {% case page.layout %}
   {% when 'professional' %}{% assign theme-color = '#ffffff' %}
   {% when 'personal' %}{% assign theme-color = '#0f1419' %}
@@ -44,7 +45,11 @@
   ]
 }
 </script>
-<link rel="canonical" href="{{ page.url | absolute_url }}">
+<!-- No separate canonical tag here: the SEO tag above already emits one
+     from this same page's URL, and a page should only declare one. (Kept
+     deliberately vague about which tag by name in this comment: Liquid
+     parses tags inside HTML comments too, and spelling it out literally
+     here once caused a duplicate render.) -->
 <link rel="icon" href="{{ '/assets/img/favicon.svg' | relative_url }}" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/sitemap.xml' | absolute_url }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,5 +61,5 @@
      and the wider range still covers the 500/600 used everywhere else. -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ '/assets/css/tokens.css' | relative_url }}">
-<link rel="stylesheet" href="{{ '/assets/css/' | append: page.layout | append: '.css' | relative_url }}">
+{% if page.layout %}<link rel="stylesheet" href="{{ '/assets/css/' | append: page.layout | append: '.css' | relative_url }}">{% endif %}
 {% if page.extra-css %}<link rel="stylesheet" href="{{ page.extra-css | relative_url }}">{% endif %}
