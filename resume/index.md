@@ -1,7 +1,7 @@
 ---
 layout: professional
 title: "Resume - Senior Software Engineer"
-description: "Bhavesh Nakum's resume: Senior Software Engineer at eBay, working on backend architecture, distributed systems, and big data platforms."
+description: "Bhavesh Nakum's resume: Senior Software Engineer at eBay, backend architecture, distributed systems, and big data platforms."
 permalink: /resume/
 ---
 
@@ -51,17 +51,27 @@ permalink: /resume/
 <section class="resume-section">
   <h2>Experience</h2>
 
+  <div class="experience-timeline">
+
   <div class="resume-entry">
     <p class="entry-heading">
       <span>Senior Software Engineer, eBay</span>
       <span class="entry-meta">Bengaluru &middot; Jun 2026 &ndash; Present</span>
     </p>
-    <ul>
-      <li><strong>Data Platform Ownership:</strong> Member of eBay's core Data team, owning end-to-end design, development, and maintenance of real-time and batch data pipelines across the eBay platform; responsible for reliable delivery of eBay Live feature data to downstream data consumers using Apache Flink, Apache Kafka, SQL, and Hadoop.</li>
-      <li><strong>AI Agent-Driven Schema Onboarding:</strong> Designed and implemented an AI agent workflow within the team's data consumption layer that automatically generates data schemas from natural-language chat input and user-provided data, replacing manual schema-definition forms and streamlining the onboarding of new datasets.</li>
-      <li><strong>Self-Service Automated Data Consumption:</strong> Built an automated data consumption layer enabling downstream consumers to write and run their own SQL queries to extract data on a batch, scheduled, or on-demand basis, eliminating the need for the data management platform team to manually author extraction queries and pipelines for each consumer request.</li>
-      <li><strong>AI-Augmented Development:</strong> Use Cursor and Claude Code for coding, PR reviews, design, and testing as part of daily engineering practice.</li>
-    </ul>
+    <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-ebay">
+      <span class="entry-toggle-label">Show details</span>
+      <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="entry-details-wrap">
+      <ul class="entry-details" id="entry-detail-ebay" hidden>
+        <li><strong>Data Platform Ownership:</strong> Member of eBay's core Data team, owning end-to-end design, development, and maintenance of real-time and batch data pipelines across the eBay platform; responsible for reliable delivery of eBay Live feature data to downstream data consumers using Apache Flink, Apache Kafka, SQL, and Hadoop.</li>
+        <li><strong>AI Agent-Driven Schema Onboarding:</strong> Designed and implemented an AI agent workflow within the team's data consumption layer that automatically generates data schemas from natural-language chat input and user-provided data, replacing manual schema-definition forms and streamlining the onboarding of new datasets.</li>
+        <li><strong>Self-Service Automated Data Consumption:</strong> Built an automated data consumption layer enabling downstream consumers to write and run their own SQL queries to extract data on a batch, scheduled, or on-demand basis, eliminating the need for the data management platform team to manually author extraction queries and pipelines for each consumer request.</li>
+        <li><strong>AI-Augmented Development:</strong> Use Cursor and Claude Code for coding, PR reviews, design, and testing as part of daily engineering practice.</li>
+      </ul>
+    </div>
   </div>
 
   <div class="resume-entry">
@@ -69,17 +79,25 @@ permalink: /resume/
       <span>Senior Software Engineer (Lead), Walmart</span>
       <span class="entry-meta">Bengaluru &middot; Apr 2025 &ndash; May 2026</span>
     </p>
-    <ul>
-      <li><strong>Distributed, Event-Driven Architecture:</strong> Architected Java and Spring Boot microservices on a Kafka-based event-driven architecture, processing 5K+ events per second with sub-second latency to power dynamic repricing across millions of SKUs.</li>
-      <li><strong>Multi-Tenant SaaS Platform Design:</strong> Designed the schema and key strategy for a multi-market pricing platform spanning Canada, Mexico, Chile, and additional markets, with configurable tenant-level isolation supporting both database-level separation and tenant-based table partitioning to meet country-specific data compliance requirements.</li>
-      <li><strong>High Availability Architecture:</strong> Deployed database and application infrastructure across 2 active regions and 1 replica region to eliminate single-region outage risk and optimize regional availability and latency.</li>
-      <li><strong>CI/CD, Containerization &amp; Deployment:</strong> Built Docker and Kubernetes-based deployment templates (including Helm) within Walmart's internal release pipeline, packaging code into deployable artifacts and applying blue-green deployment strategy for Kafka-based services and canary deployment for API-based applications, with automated test execution, post-deployment code coverage checks, metrics exposure, and autoscaling-based alerting.</li>
-      <li><strong>Test-Driven Development &amp; Code Quality:</strong> Practiced Test-Driven Development, writing tests before implementation with automated coverage via JUnit, Mockito, and Cucumber; led a structured PR review and merge process for a team of 6 engineers, enforcing design doc adherence, the KISS principle, and a 60/40 positive-to-negative test case ratio.</li>
-      <li><strong>Secure, Well-Architected APIs:</strong> Designed, deployed, and maintained RESTful APIs and Backend-for-Frontend (BFF) services applying OAuth-based authentication and OWASP secure coding practices, tailored to different client application needs.</li>
-      <li><strong>Observability &amp; Cost Optimization:</strong> Designed and delivered a reusable, plug-and-play Micrometer metrics module adopted across engineering teams for self-service observability and custom Grafana alerting; reduced infrastructure cost and improved availability by fine-tuning CPU/memory allocation, enabling autoscaling, and consolidating deployables.</li>
-      <li><strong>AI-Augmented Development:</strong> Used GitHub Copilot for development work and design assistance, and Qodo Merge for automated PR review on GitHub, integrated into daily engineering workflow.</li>
-      <li><strong>Technical Leadership &amp; Collaboration:</strong> Led and mentored a cross-functional team of 6 engineers, participated in hiring and interview panels for vendor and FTE roles, and partnered quarterly with product managers and data scientists to define feature roadmaps and plan cross-functional releases.</li>
-    </ul>
+    <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-walmart-lead">
+      <span class="entry-toggle-label">Show details</span>
+      <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="entry-details-wrap">
+      <ul class="entry-details" id="entry-detail-walmart-lead" hidden>
+        <li><strong>Distributed, Event-Driven Architecture:</strong> Architected Java and Spring Boot microservices on a Kafka-based event-driven architecture, processing 5K+ events per second with sub-second latency to power dynamic repricing across millions of SKUs.</li>
+        <li><strong>Multi-Tenant SaaS Platform Design:</strong> Designed the schema and key strategy for a multi-market pricing platform spanning Canada, Mexico, Chile, and additional markets, with configurable tenant-level isolation supporting both database-level separation and tenant-based table partitioning to meet country-specific data compliance requirements.</li>
+        <li><strong>High Availability Architecture:</strong> Deployed database and application infrastructure across 2 active regions and 1 replica region to eliminate single-region outage risk and optimize regional availability and latency.</li>
+        <li><strong>CI/CD, Containerization &amp; Deployment:</strong> Built Docker and Kubernetes-based deployment templates (including Helm) within Walmart's internal release pipeline, packaging code into deployable artifacts and applying blue-green deployment strategy for Kafka-based services and canary deployment for API-based applications, with automated test execution, post-deployment code coverage checks, metrics exposure, and autoscaling-based alerting.</li>
+        <li><strong>Test-Driven Development &amp; Code Quality:</strong> Practiced Test-Driven Development, writing tests before implementation with automated coverage via JUnit, Mockito, and Cucumber; led a structured PR review and merge process for a team of 6 engineers, enforcing design doc adherence, the KISS principle, and a 60/40 positive-to-negative test case ratio.</li>
+        <li><strong>Secure, Well-Architected APIs:</strong> Designed, deployed, and maintained RESTful APIs and Backend-for-Frontend (BFF) services applying OAuth-based authentication and OWASP secure coding practices, tailored to different client application needs.</li>
+        <li><strong>Observability &amp; Cost Optimization:</strong> Designed and delivered a reusable, plug-and-play Micrometer metrics module adopted across engineering teams for self-service observability and custom Grafana alerting; reduced infrastructure cost and improved availability by fine-tuning CPU/memory allocation, enabling autoscaling, and consolidating deployables.</li>
+        <li><strong>AI-Augmented Development:</strong> Used GitHub Copilot for development work and design assistance, and Qodo Merge for automated PR review on GitHub, integrated into daily engineering workflow.</li>
+        <li><strong>Technical Leadership &amp; Collaboration:</strong> Led and mentored a cross-functional team of 6 engineers, participated in hiring and interview panels for vendor and FTE roles, and partnered quarterly with product managers and data scientists to define feature roadmaps and plan cross-functional releases.</li>
+      </ul>
+    </div>
   </div>
 
   <div class="resume-entry">
@@ -87,11 +105,19 @@ permalink: /resume/
       <span>Software Developer, Walmart</span>
       <span class="entry-meta">Bengaluru &middot; Apr 2022 &ndash; Mar 2025</span>
     </p>
-    <ul>
-      <li><strong>Pipeline Engineering:</strong> Built real-time anomaly detection and repricing pipelines, removing 1M+ mispriced items from the Walmart catalog.</li>
-      <li><strong>Seller Tools:</strong> Developed pricing automation tools for sellers, reducing manual overhead and improving competitiveness.</li>
-      <li><strong>Reliability:</strong> Enhanced system reliability with full-stack alerting and dashboarding for production-grade observability.</li>
-    </ul>
+    <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-walmart-dev">
+      <span class="entry-toggle-label">Show details</span>
+      <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="entry-details-wrap">
+      <ul class="entry-details" id="entry-detail-walmart-dev" hidden>
+        <li><strong>Pipeline Engineering:</strong> Built real-time anomaly detection and repricing pipelines, removing 1M+ mispriced items from the Walmart catalog.</li>
+        <li><strong>Seller Tools:</strong> Developed pricing automation tools for sellers, reducing manual overhead and improving competitiveness.</li>
+        <li><strong>Reliability:</strong> Enhanced system reliability with full-stack alerting and dashboarding for production-grade observability.</li>
+      </ul>
+    </div>
   </div>
 
   <div class="resume-entry">
@@ -99,10 +125,18 @@ permalink: /resume/
       <span>Data Engineer, UnitedHealth Group</span>
       <span class="entry-meta">Hyderabad &middot; Apr 2021 &ndash; Apr 2022</span>
     </p>
-    <ul>
-      <li><strong>ETL Design:</strong> Designed scalable ETL pipelines using Azure (Data Factory, Databricks, Synapse) to ingest and transform healthcare data across supported asset classes and data domains.</li>
-      <li><strong>Automation:</strong> Developed PySpark-based transformation logic and modular Airflow DAGs to accelerate pipeline development while ensuring HIPAA compliance.</li>
-    </ul>
+    <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-uhg">
+      <span class="entry-toggle-label">Show details</span>
+      <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="entry-details-wrap">
+      <ul class="entry-details" id="entry-detail-uhg" hidden>
+        <li><strong>ETL Design:</strong> Designed scalable ETL pipelines using Azure (Data Factory, Databricks, Synapse) to ingest and transform healthcare data across supported asset classes and data domains.</li>
+        <li><strong>Automation:</strong> Developed PySpark-based transformation logic and modular Airflow DAGs to accelerate pipeline development while ensuring HIPAA compliance.</li>
+      </ul>
+    </div>
   </div>
 
   <div class="resume-entry">
@@ -110,11 +144,21 @@ permalink: /resume/
       <span>Systems Engineer, Tata Consultancy Services</span>
       <span class="entry-meta">Hyderabad &middot; Sep 2018 &ndash; Apr 2021</span>
     </p>
-    <ul>
-      <li><strong>Cloud Migration:</strong> Migrated legacy data warehousing platforms to a Hadoop-based Azure ecosystem for Proximus (Belgium).</li>
-      <li><strong>Optimization:</strong> Rewrote HQL queries to optimize performance and reduce compute costs by 25%.</li>
-      <li><strong>Modernization Tools:</strong> Engineered a Python-based tool to convert Teradata SQL to Hive and PySpark scripts using Python and Regex for Bank of America.</li>
-    </ul>
+    <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-tcs">
+      <span class="entry-toggle-label">Show details</span>
+      <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="entry-details-wrap">
+      <ul class="entry-details" id="entry-detail-tcs" hidden>
+        <li><strong>Cloud Migration:</strong> Migrated legacy data warehousing platforms to a Hadoop-based Azure ecosystem for Proximus (Belgium).</li>
+        <li><strong>Optimization:</strong> Rewrote HQL queries to optimize performance and reduce compute costs by 25%.</li>
+        <li><strong>Modernization Tools:</strong> Engineered a Python-based tool to convert Teradata SQL to Hive and PySpark scripts using Python and Regex for Bank of America.</li>
+      </ul>
+    </div>
+  </div>
+
   </div>
 </section>
 
@@ -184,7 +228,7 @@ permalink: /resume/
 <section class="resume-section">
   <h2>Education &amp; certifications</h2>
   <ul>
-    <li>B.Tech, Computer Engineering &middot; SVNIT, Surat (2018) &middot; CGPA 7.18/10</li>
+    <li>B.Tech, Computer Engineering, SVNIT, Surat (2018) &middot; CGPA 7.18/10</li>
     <li>Microsoft Certified: Azure Fundamentals</li>
     <li>Apache Airflow Fundamentals</li>
   </ul>
