@@ -1237,13 +1237,81 @@
   white-space: nowrap;
 }
 
-/* .hero-clock (assets/js/hero.js): the visitor's own local time, read
+/* Status chips — top-left, the one hero corner nothing else claims
+   (.page-corner/.portal-orb, both deprecated, used to own top-right;
+   .spotlight-text sits top-right on desktop; .hero-copyright/.scroll-cue
+   own the bottom). Built to hold more than the clock: per explicit
+   request ("we will add more UI features like this"), .hero-status is a
+   plain flex column so a second chip (weather, next) just stacks below
+   without any layout rework. Each chip shares one pill treatment — same
+   blurred-glass idea as .scroll-cue's own backdrop, sized down to fit a
+   corner instead of straddling the globe. */
+.hero-status {
+  position: absolute;
+  z-index: 2;
+  top: var(--space-3);
+  left: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.hero-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(20, 23, 28, 0.08);
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1;
+  /* Digits update once a minute (assets/js/hero.js) — tabular-nums keeps
+     the pill's width from twitching as e.g. "9:59" becomes "10:00". */
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-status-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+/* A small live-feeling pulse (reused idea, not the same rule, as
+   .portal-orb's own orb-pulse below) — the one deliberately playful touch
+   per "make it fun," since the pill itself is otherwise the same quiet
+   glass treatment used everywhere else on this page. */
+.hero-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  animation: status-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.75); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-status-dot {
+    animation: none;
+  }
+}
+
+/* .hero-clock-time (assets/js/hero.js): the visitor's own local time, read
    straight off their browser's own clock/locale — no geolocation prompt,
    nothing sent anywhere, just Intl formatting the time zone the browser
-   already knows. Empty (and this whole span invisible, since there's
-   nothing inside it) until JS sets its text, same progressive-enhancement
-   shape as every other effect on this page: a no-JS/error visitor just
-   sees the plain copyright line, not a dangling separator. */
+   already knows. Empty until JS sets its text; a no-JS/error visitor
+   still gets a correctly-shaped chip (icon + dot, no dangling text) since
+   nothing about the chip's own layout depends on the span having content. */
 
 @media (prefers-reduced-motion: reduce) {
   .blob {
