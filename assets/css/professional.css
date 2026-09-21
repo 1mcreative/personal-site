@@ -411,10 +411,46 @@
   margin-bottom: var(--space-2);
 }
 
+/* Experience timeline — one continuous spine (::before on the wrapper)
+   with a dot per entry (::before on each .resume-entry) instead of each
+   entry carrying its own disconnected border-left segment. GUTTER below
+   must stay in sync with the two numbers derived from it in .resume-entry
+   and .resume-entry::before (see their own comments) — all three exist
+   because CSS has no "define once, use in three places" for plain values. */
+.experience-timeline {
+  position: relative;
+  padding-left: 24px; /* GUTTER */
+}
+
+.experience-timeline::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 11px; /* GUTTER/2 - dot-line-width/2, i.e. (24/2 - 2/2) */
+  width: 2px;
+  background: var(--border);
+}
+
 .resume-entry {
+  position: relative;
   margin-bottom: var(--space-3);
-  padding-left: var(--space-2);
-  border-left: 2px solid var(--border);
+}
+
+.resume-entry::before {
+  /* Centers a 12px dot on the spine above: spine center sits at 12px from
+     the timeline's own left edge (11px + half the 2px line); .resume-entry
+     itself starts at the timeline's GUTTER (24px), so the dot's left,
+     measured from the entry's own edge, is 12 - 24 - (dot-width/2) = -18px. */
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--accent);
 }
 
 .resume-entry .entry-heading {
@@ -438,13 +474,74 @@
   font-size: 0.9rem;
 }
 
-.resume-entry ul {
+/* Collapsed by default (see assets/js/entry-toggle.js) — only the heading
+   above (title, company, dates) is the "high-level summary" until this is
+   deliberately opened; nothing here auto-expands on hover or scroll. */
+.entry-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.2rem;
+  min-height: 44px;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.entry-toggle:hover,
+.entry-toggle:focus-visible {
+  text-decoration: underline;
+}
+
+.entry-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.entry-chevron {
+  transition: transform 0.25s ease;
+}
+
+.entry-toggle[aria-expanded="true"] .entry-chevron {
+  transform: rotate(180deg);
+}
+
+/* Animates height via the grid 0fr->1fr trick rather than max-height, so
+   entries with very different bullet counts (4 vs. 9) each expand at a
+   speed proportional to their own content instead of sharing one fixed
+   cap and visibly pausing at the end when short. */
+.entry-details-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease;
+}
+
+.resume-entry.is-expanded .entry-details-wrap {
+  grid-template-rows: 1fr;
+}
+
+.entry-details-wrap > .entry-details {
+  overflow: hidden;
+  min-height: 0;
   margin: 0.5rem 0 0;
   padding-left: 1.1rem;
 }
 
-.resume-entry li {
+.entry-details-wrap > .entry-details > li {
   margin-bottom: 0.3rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entry-details-wrap,
+  .entry-chevron {
+    transition-duration: 0.01ms;
+  }
 }
 
 /* Used to go 2-column above 560px via a viewport media query — but this
