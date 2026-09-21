@@ -13,23 +13,23 @@
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // .hero-clock (index.md, styled in home.css): the visitor's own local
-  // time, read straight off their browser — Intl/Date already know the
-  // system time zone with zero permission prompt, nothing sent anywhere.
-  // Locale left as `undefined` (the browser's own default) so 12h-vs-24h
-  // and AM/PM formatting matches whatever the visitor is already used to,
-  // rather than a fixed choice. Not gated on reduceMotion below: updating
-  // a line of text once a minute isn't motion, and a visitor who wants
-  // less animation has no reason to also want a frozen, slowly-wrong
-  // clock.
-  var clockEl = document.querySelector(".hero-clock");
+  // .hero-clock-time (index.md, styled in home.css as one of .hero-status's
+  // chips): the visitor's own local time, read straight off their browser —
+  // Intl/Date already know the system time zone with zero permission
+  // prompt, nothing sent anywhere. Locale left as `undefined` (the
+  // browser's own default) so 12h-vs-24h and AM/PM formatting matches
+  // whatever the visitor is already used to, rather than a fixed choice.
+  // Not gated on reduceMotion below: updating a line of text once a
+  // minute isn't motion, and a visitor who wants less animation has no
+  // reason to also want a frozen, slowly-wrong clock.
+  var clockEl = document.querySelector(".hero-clock-time");
   if (clockEl && window.Intl && Intl.DateTimeFormat) {
     var timeFormatter = new Intl.DateTimeFormat(undefined, {
       hour: "numeric",
       minute: "2-digit",
     });
     var updateClock = function () {
-      clockEl.textContent = " · " + timeFormatter.format(new Date());
+      clockEl.textContent = timeFormatter.format(new Date());
     };
     updateClock();
     // No seconds shown, so once a minute is plenty — aligned to the next
