@@ -27,6 +27,17 @@ permalink: /
 
   <div class="hero-hover-glow" aria-hidden="true"></div>
 
+  <div class="hero-status" aria-hidden="true">
+    <span class="hero-status-chip hero-clock-chip">
+      <span class="hero-status-dot" aria-hidden="true"></span>
+      <svg class="hero-status-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M12 7.5v4.5l3 1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="hero-clock-time"></span>
+    </span>
+  </div>
+
   <canvas class="pixel-name-canvas" aria-hidden="true"></canvas>
 
   <div class="hero-inner">
@@ -65,5 +76,5 @@ permalink: /
 
   <div class="resume-wipe" aria-hidden="true"></div>
 
-  <p class="hero-copyright">&copy; {{ 'now' | date: "%Y" }} Bhavesh Nakum<span class="hero-clock" aria-hidden="true"></span></p>
+  <p class="hero-copyright">&copy; {{ 'now' | date: "%Y" }} Bhavesh Nakum</p>
 </section>
