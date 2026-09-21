@@ -125,46 +125,46 @@ permalink: /resume/
   <h2>Skills</h2>
   <dl class="skills-grid">
     <dt>Languages</dt>
-    <dd>Java, Python, SQL</dd>
+    <dd><span class="skill-pill">Java</span><span class="skill-pill">Python</span><span class="skill-pill">SQL</span></dd>
 
     <dt>Backend Development &amp; APIs</dt>
-    <dd>Spring Boot, RESTful Web Services, Microservices, Backend-for-Frontend (BFF), Distributed Systems, Event-Driven Architecture, Java Concurrency (Threads, Executors, CompletableFuture, Reactive Patterns)</dd>
+    <dd><span class="skill-pill">Spring Boot</span><span class="skill-pill">RESTful Web Services</span><span class="skill-pill">Microservices</span><span class="skill-pill">Backend-for-Frontend (BFF)</span><span class="skill-pill">Distributed Systems</span><span class="skill-pill">Event-Driven Architecture</span><span class="skill-pill">Java Concurrency (Threads, Executors, CompletableFuture, Reactive Patterns)</span></dd>
 
     <dt>Security</dt>
-    <dd>OAuth, OWASP Secure Coding Practices</dd>
+    <dd><span class="skill-pill">OAuth</span><span class="skill-pill">OWASP Secure Coding Practices</span></dd>
 
     <dt>AI Agents &amp; Automation</dt>
-    <dd>Agentic Workflow Design, Automated Schema Generation from Natural Language, Self-Service Data Pipeline Automation</dd>
+    <dd><span class="skill-pill">Agentic Workflow Design</span><span class="skill-pill">Automated Schema Generation from Natural Language</span><span class="skill-pill">Self-Service Data Pipeline Automation</span></dd>
 
     <dt>Big Data &amp; Streaming</dt>
-    <dd>Apache Kafka, Apache Spark, Apache Flink, Apache Airflow, Hive, HDFS, Sqoop</dd>
+    <dd><span class="skill-pill">Apache Kafka</span><span class="skill-pill">Apache Spark</span><span class="skill-pill">Apache Flink</span><span class="skill-pill">Apache Airflow</span><span class="skill-pill">Hive</span><span class="skill-pill">HDFS</span><span class="skill-pill">Sqoop</span></dd>
 
     <dt>Data Modeling &amp; Architecture</dt>
-    <dd>Schema Design, Key Strategy &amp; Partitioning, Grain Definition, Multi-Tenant Data Isolation, NoSQL Data Modeling</dd>
+    <dd><span class="skill-pill">Schema Design</span><span class="skill-pill">Key Strategy &amp; Partitioning</span><span class="skill-pill">Grain Definition</span><span class="skill-pill">Multi-Tenant Data Isolation</span><span class="skill-pill">NoSQL Data Modeling</span></dd>
 
     <dt>Cloud Platforms</dt>
-    <dd>Microsoft Azure (Data Factory, Databricks, Synapse, Key Vault), Google Cloud Platform (DataProc, BigQuery, GCS), AWS (Lambda, S3, SQS)</dd>
+    <dd><span class="skill-pill">Microsoft Azure (Data Factory, Databricks, Synapse, Key Vault)</span><span class="skill-pill">Google Cloud Platform (DataProc, BigQuery, GCS)</span><span class="skill-pill">AWS (Lambda, S3, SQS)</span></dd>
 
     <dt>High Availability &amp; Resilience</dt>
-    <dd>Multi-Region Replication, High Availability, Fault Tolerance, Blue-Green &amp; Canary Deployments, Autoscaling</dd>
+    <dd><span class="skill-pill">Multi-Region Replication</span><span class="skill-pill">High Availability</span><span class="skill-pill">Fault Tolerance</span><span class="skill-pill">Blue-Green &amp; Canary Deployments</span><span class="skill-pill">Autoscaling</span></dd>
 
     <dt>Databases</dt>
-    <dd>PostgreSQL, MySQL, Azure Cosmos DB, Cassandra (Relational &amp; NoSQL)</dd>
+    <dd><span class="skill-pill">PostgreSQL</span><span class="skill-pill">MySQL</span><span class="skill-pill">Azure Cosmos DB</span><span class="skill-pill">Cassandra (Relational &amp; NoSQL)</span></dd>
 
     <dt>CI/CD &amp; DevOps</dt>
-    <dd>Jenkins, Docker, Kubernetes, Helm, Maven, Git, CI/CD Pipeline Automation, Infrastructure Automation, Agile/Scrum/SDLC</dd>
+    <dd><span class="skill-pill">Jenkins</span><span class="skill-pill">Docker</span><span class="skill-pill">Kubernetes</span><span class="skill-pill">Helm</span><span class="skill-pill">Maven</span><span class="skill-pill">Git</span><span class="skill-pill">CI/CD Pipeline Automation</span><span class="skill-pill">Infrastructure Automation</span><span class="skill-pill">Agile/Scrum/SDLC</span></dd>
 
     <dt>Testing &amp; Quality</dt>
-    <dd>JUnit, Mockito, Cucumber, Test-Driven Development (TDD), Unit/Functional/E2E Testing</dd>
+    <dd><span class="skill-pill">JUnit</span><span class="skill-pill">Mockito</span><span class="skill-pill">Cucumber</span><span class="skill-pill">Test-Driven Development (TDD)</span><span class="skill-pill">Unit/Functional/E2E Testing</span></dd>
 
     <dt>Observability &amp; Monitoring</dt>
-    <dd>Grafana, Micrometer, Custom Metrics &amp; Alerting, Monitoring &amp; Dashboarding</dd>
+    <dd><span class="skill-pill">Grafana</span><span class="skill-pill">Micrometer</span><span class="skill-pill">Custom Metrics &amp; Alerting</span><span class="skill-pill">Monitoring &amp; Dashboarding</span></dd>
 
     <dt>AI-Augmented Engineering</dt>
-    <dd>Cursor, Claude Code, GitHub Copilot, Qodo Merge, Claude, ChatGPT (applied to coding, design, PR review, testing, and research)</dd>
+    <dd><span class="skill-pill">Cursor</span><span class="skill-pill">Claude Code</span><span class="skill-pill">GitHub Copilot</span><span class="skill-pill">Qodo Merge</span><span class="skill-pill">Claude</span><span class="skill-pill">ChatGPT</span></dd>
 
     <dt>Familiarity (exposure, non-production depth)</dt>
-    <dd>Snowflake, GraphQL, Hibernate/JPA, Elasticsearch</dd>
+    <dd><span class="skill-pill">Snowflake</span><span class="skill-pill">GraphQL</span><span class="skill-pill">Hibernate/JPA</span><span class="skill-pill">Elasticsearch</span></dd>
   </dl>
 </section>
 

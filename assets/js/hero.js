@@ -13,6 +13,36 @@
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // .hero-clock (index.md, styled in home.css): the visitor's own local
+  // time, read straight off their browser — Intl/Date already know the
+  // system time zone with zero permission prompt, nothing sent anywhere.
+  // Locale left as `undefined` (the browser's own default) so 12h-vs-24h
+  // and AM/PM formatting matches whatever the visitor is already used to,
+  // rather than a fixed choice. Not gated on reduceMotion below: updating
+  // a line of text once a minute isn't motion, and a visitor who wants
+  // less animation has no reason to also want a frozen, slowly-wrong
+  // clock.
+  var clockEl = document.querySelector(".hero-clock");
+  if (clockEl && window.Intl && Intl.DateTimeFormat) {
+    var timeFormatter = new Intl.DateTimeFormat(undefined, {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+    var updateClock = function () {
+      clockEl.textContent = " · " + timeFormatter.format(new Date());
+    };
+    updateClock();
+    // No seconds shown, so once a minute is plenty — aligned to the next
+    // real minute boundary first (rather than a plain setInterval from
+    // page-load instant) so it can't slowly drift out of sync with the
+    // visitor's own system clock over a long visit.
+    var msToNextMinute = 60000 - (Date.now() % 60000);
+    setTimeout(function () {
+      updateClock();
+      setInterval(updateClock, 60000);
+    }, msToNextMinute);
+  }
+
   // Blobs drift a few px toward the cursor — purely decorative, skipped
   // entirely under reduced motion.
   if (!reduceMotion) {

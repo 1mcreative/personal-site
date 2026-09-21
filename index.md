@@ -65,5 +65,5 @@ permalink: /
 
   <div class="resume-wipe" aria-hidden="true"></div>
 
-  <p class="hero-copyright">&copy; {{ 'now' | date: "%Y" }} Bhavesh Nakum</p>
+  <p class="hero-copyright">&copy; {{ 'now' | date: "%Y" }} Bhavesh Nakum<span class="hero-clock" aria-hidden="true"></span></p>
 </section>
