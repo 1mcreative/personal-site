@@ -79,6 +79,13 @@
     label.textContent = "0 " + unit;
     chip.appendChild(label);
 
+    // Hover-reveal detail (see .hero-status-detail in home.css) — same
+    // text as the title tooltip above, now visible on hover too.
+    var detail = document.createElement("span");
+    detail.className = "hero-status-detail";
+    detail.textContent = " · " + (city ? city + " to " : "") + "Bengaluru, India";
+    chip.appendChild(detail);
+
     container.appendChild(chip);
     void chip.offsetWidth;
     chip.classList.add("hero-status-chip-in");

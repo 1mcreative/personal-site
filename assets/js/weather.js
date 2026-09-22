@@ -86,6 +86,15 @@
     label.textContent = Math.round(temp) + "°" + unit;
     chip.appendChild(label);
 
+    // Hover-reveal detail (see .hero-status-detail in home.css) — the
+    // same condition/city text the title tooltip already carried, now
+    // also visible without needing to wait out the browser's own native
+    // tooltip delay.
+    var detail = document.createElement("span");
+    detail.className = "hero-status-detail";
+    detail.textContent = " · " + meta.label + (city ? ", " + city : "");
+    chip.appendChild(detail);
+
     container.appendChild(chip);
     // Flush layout so the fade-in below animates from the CSS's opacity:0
     // start state instead of jumping straight to visible — same
