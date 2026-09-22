@@ -8,6 +8,8 @@ A dual-theme personal site: a bright/white professional side (`/resume/`, called
 
 **Always open a PR once a change is verified working — don't wait to be asked (2026-09-22, explicit standing instruction: "always crete PR and make it ready to merge").** "Ready to merge" means the PR itself has no blockers within reach: branched off current `main` (not a stale base — see the repeated stale-diff lesson logged below), a clean scope, a real description, verified locally first. It does NOT mean actually merging it — `main`'s branch protection requires a human review regardless, and VERSIONING.md's own "Never without a check-in" rule stands: merging is still the user's call, every time.
 
+**Never add Claude as a co-author (2026-09-22, explicit standing instruction: "do not add claude as co aurther in PR or commits").** No `Co-Authored-By: Claude...` trailer on commit messages, no "Generated with Claude Code" line on PR descriptions — this overrides Claude Code's own default attribution behavior, which explicitly defers to a user instruction like this one.
+
 **`main` is what Pages actually serves, as of 2026-09-13 — confirmed via `gh api repos/1mcreative/personal-site/pages`: `{"branch":"main","path":"/"}`.** This reverses an earlier period (2026-09-10 through 2026-09-13) where the live source was `page/life` instead; see the 2026-09-13 tooling-log entry below for the full story of that switch and the branch resync it required. The Pages source has changed more than once on this project already, so re-verify with the `gh api` call above before trusting either claim, rather than assuming this note is still current.
 
 ## Required for any written copy
