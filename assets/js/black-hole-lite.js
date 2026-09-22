@@ -1177,6 +1177,7 @@ fn tonemap(linearColor: vec3f, uv: vec2f) -> vec3f {
   var targets = {};
   var disposed = false;
   var forceBake = true;
+  var firstFrameSignaled = false;
   var canvasVisible = true;
   var documentVisible = !document.hidden;
   var rafHandle = 0;
@@ -1396,6 +1397,16 @@ fn tonemap(linearColor: vec3f, uv: vec2f) -> vec3f {
     });
     runPass(encoder, [{ view: context.getCurrentTexture().createView() }], pipelines.composite, compositeBindGroup);
     device.queue.submit([encoder.finish()]);
+
+    // The bake→shade→composite chain above takes real, variable time on a
+    // cold GPU (well past life-intro.js's own fixed hold delay) — this event
+    // lets that script wait for actual pixels before starting the "grows
+    // from a dot" reveal, instead of racing a guessed timer against however
+    // long this machine's first frame happens to take.
+    if (!firstFrameSignaled) {
+      firstFrameSignaled = true;
+      canvas.dispatchEvent(new CustomEvent("blackhole:ready"));
+    }
   }
 
   function reconcileLoop() {

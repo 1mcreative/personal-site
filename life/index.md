@@ -90,6 +90,7 @@ permalink: /life/
         <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
       </span>
       <span class="video-title">HEYY MAMAA (Nicki Minaj &amp; Afrojack Remix)</span>
+      <span class="video-meta">Kartik Bansal</span>
     </a>
     <a class="video-card" href="https://www.youtube.com/watch?v=wtqYbetLbOs" rel="noopener" target="_blank">
       <span class="video-thumb">
@@ -97,6 +98,7 @@ permalink: /life/
         <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
       </span>
       <span class="video-title">My Way / Let Me Love You</span>
+      <span class="video-meta">Kartik Bansal</span>
     </a>
     <a class="video-card" href="https://www.youtube.com/watch?v=EMF4ibMb98I" rel="noopener" target="_blank">
       <span class="video-thumb">
@@ -104,6 +106,7 @@ permalink: /life/
         <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
       </span>
       <span class="video-title">Cake By The Ocean</span>
+      <span class="video-meta">Kartik Bansal</span>
     </a>
     <a class="video-card" href="https://www.youtube.com/watch?v=aXFeZ1J2B3g" rel="noopener" target="_blank">
       <span class="video-thumb">
@@ -111,6 +114,7 @@ permalink: /life/
         <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
       </span>
       <span class="video-title">Shape of You</span>
+      <span class="video-meta">Kartik Bansal</span>
     </a>
     <a class="video-card" href="https://www.youtube.com/watch?v=4n9hTMowmYk" rel="noopener" target="_blank">
       <span class="video-thumb">
@@ -118,6 +122,7 @@ permalink: /life/
         <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
       </span>
       <span class="video-title">What Do You Mean</span>
+      <span class="video-meta">Kartik Bansal</span>
     </a>
     <a class="video-card" href="https://www.youtube.com/watch?v=wJuUjnG72y4" rel="noopener" target="_blank">
       <span class="video-thumb">
@@ -125,6 +130,7 @@ permalink: /life/
         <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
       </span>
       <span class="video-title">Mega Compilation</span>
+      <span class="video-meta">Kartik Bansal</span>
     </a>
     <a class="video-card" href="https://www.youtube.com/watch?v=LPFDsxn_O8o" rel="noopener" target="_blank">
       <span class="video-thumb">
@@ -132,6 +138,7 @@ permalink: /life/
         <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
       </span>
       <span class="video-title">BAIT</span>
+      <span class="video-meta">Kartik Bansal</span>
     </a>
     <a class="video-card" href="https://www.youtube.com/watch?v=VisrPMqK9r0" rel="noopener" target="_blank">
       <span class="video-thumb">
@@ -139,6 +146,7 @@ permalink: /life/
         <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
       </span>
       <span class="video-title">Lights Out</span>
+      <span class="video-meta">Kartik Bansal</span>
     </a>
     <a class="video-card" href="https://www.youtube.com/watch?v=03jnDh7kMvk" rel="noopener" target="_blank">
       <span class="video-thumb">
@@ -146,6 +154,7 @@ permalink: /life/
         <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
       </span>
       <span class="video-title">Old Skool</span>
+      <span class="video-meta">Kartik Bansal</span>
     </a>
     <a class="video-card" href="https://www.youtube.com/watch?v=qvF-QaE9Cfo" rel="noopener" target="_blank">
       <span class="video-thumb">
@@ -153,6 +162,7 @@ permalink: /life/
         <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
       </span>
       <span class="video-title">Hymn for the Weekend</span>
+      <span class="video-meta">Kartik Bansal</span>
     </a>
   </div>
 </section>
