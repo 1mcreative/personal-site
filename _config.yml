@@ -5,6 +5,22 @@ lang: en
 author: "Bhavesh Nakum"
 email: "bhaveshnakumcoed@gmail.com"
 
+# Analytics: empty by default so nothing renders, and no data goes
+# anywhere, until a real Measurement ID is pasted in. See SEO-PLAYBOOK.md.
+google_analytics: ""  # GA4 Measurement ID, e.g. "G-XXXXXXXXXX"
+
+# Search-engine verification, read natively by jekyll-seo-tag's own {% seo %}
+# tag (no custom code needed). Left commented out rather than set to "":
+# jekyll-seo-tag's own check only tests whether the key is present, not
+# whether it's non-blank, so an empty string here would still emit an
+# empty (harmless but sloppy) <meta> tag. Uncomment and fill in once you
+# have real codes — see SEO-PLAYBOOK.md for where to get them.
+# webmaster_verifications:
+#   google: ""  # Search Console HTML-tag verification code
+#   bing: ""    # Bing Webmaster Tools verification code
+
+# image: "/assets/img/og-image.png"  # uncomment once a real 1200x630 social-share image exists at this path
+
 markdown: kramdown
 kramdown:
   input: GFM
@@ -19,6 +35,7 @@ exclude:
   - CLAUDE.md
   - DESIGN.md
   - VERSIONING.md
+  - SEO-PLAYBOOK.md
   - Gemfile
   - Gemfile.lock
   - node_modules

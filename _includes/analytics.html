@@ -1,0 +1,26 @@
+{% if site.google_analytics and site.google_analytics != "" %}
+<!-- GA4. Renders nothing at all until site.google_analytics (_config.yml)
+     holds a real Measurement ID — an unconfigured site should never send
+     pageviews to nobody's dashboard. Enhanced Measurement (on by default
+     for new GA4 properties) already auto-tracks outbound link clicks, the
+     résumé PDF download, and scroll depth with zero code here — see
+     SEO-PLAYBOOK.md. The listener below covers what Enhanced Measurement
+     doesn't: mailto:/tel: clicks, which GA4 treats as same-origin rather
+     than "outbound." It's a no-op if gtag isn't defined, so this file is
+     safe to include unconditionally from any page, themed or not. -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics }}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '{{ site.google_analytics }}');
+
+  document.addEventListener('click', function (event) {
+    var link = event.target.closest && event.target.closest('a[href^="mailto:"], a[href^="tel:"]');
+    if (!link) return;
+    gtag('event', 'contact_click', {
+      method: link.href.indexOf('mailto:') === 0 ? 'email' : 'phone'
+    });
+  });
+</script>
+{% endif %}

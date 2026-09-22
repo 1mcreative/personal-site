@@ -618,8 +618,9 @@
 
 .theme-personal .youtube-channel-card {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
   flex: 1 1 240px;
   background: color-mix(in srgb, var(--surface) 45%, transparent);
   backdrop-filter: blur(22px) saturate(150%);
@@ -630,6 +631,21 @@
   text-decoration: none;
   color: var(--text);
   transition: border-color var(--speed) var(--ease), transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
+}
+
+/* Icon + label/name only, its own row — keeping .youtube-channel-cta out
+   of this flex row (instead of a --space-2-separated third sibling in it,
+   the original layout) is the actual fix, not a style tweak: a CTA with
+   flex-shrink:0 sharing a row with a shrinkable text column squeezed that
+   column down to ~20px on a real narrow card (confirmed via
+   getBoundingClientRect(), not assumed), wrapping "RED FILMS" onto lines
+   that sat directly under "Visit channel ↗". Same structural fix
+   .social-card already uses for the identical icon+text+CTA shape. */
+.theme-personal .youtube-channel-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
 }
 
 .theme-personal .youtube-channel-card:hover,
@@ -671,13 +687,15 @@
 }
 
 .theme-personal .youtube-channel-cta {
-  margin-left: auto;
-  flex-shrink: 0;
+  margin-top: var(--space-1);
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--border);
+  width: 100%;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text);
   opacity: 0.75;
-  transition: opacity var(--speed) var(--ease);
+  transition: opacity var(--speed) var(--ease), transform var(--speed) var(--ease);
 }
 
 .theme-personal .youtube-channel-cta::after {
@@ -688,6 +706,7 @@
 .theme-personal .youtube-channel-card:hover .youtube-channel-cta,
 .theme-personal .youtube-channel-card:focus-visible .youtube-channel-cta {
   opacity: 1;
+  transform: translateX(2px);
 }
 
 .theme-personal .video-grid-intro {

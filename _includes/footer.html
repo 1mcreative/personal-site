@@ -2,6 +2,9 @@
   <p>&copy; {{ 'now' | date: "%Y" }} Bhavesh Nakum.
     <a href="mailto:{{ site.email }}" class="contact-btn" data-contact-open>Contact me</a>
   </p>
+  {% unless page.layout == "lab" %}
+  <p class="footer-dev-note">Curious how this is built? The <a href="/lab/">Component Lab</a> has every effect, live and copyable.</p>
+  {% endunless %}
 </footer>
 
 <!-- Contact modal — shared across every page that includes footer.html, not
@@ -23,7 +26,7 @@
       </svg>
       Get in touch
     </h2>
-    <p class="contact-modal-sub">Comments, feedback, appreciation, bug reports — whatever's on your mind.</p>
+    <p class="contact-modal-sub">Comments, feedback, appreciation, bug reports: whatever's on your mind.</p>
     <form class="contact-form" data-contact-form>
       <label class="contact-field">
         <span>Name <em>(optional)</em></span>
