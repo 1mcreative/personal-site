@@ -23,13 +23,23 @@
   // minute isn't motion, and a visitor who wants less animation has no
   // reason to also want a frozen, slowly-wrong clock.
   var clockEl = document.querySelector(".hero-clock-time");
+  var clockDetailEl = document.querySelector(".hero-clock-detail");
   if (clockEl && window.Intl && Intl.DateTimeFormat) {
     var timeFormatter = new Intl.DateTimeFormat(undefined, {
       hour: "numeric",
       minute: "2-digit",
     });
+    // The full weekday + date, revealed on hover only (see .hero-status-
+    // detail in home.css) — real extra info, not just a bigger clock.
+    var dateFormatter = new Intl.DateTimeFormat(undefined, {
+      weekday: "long",
+      month: "short",
+      day: "numeric",
+    });
     var updateClock = function () {
-      clockEl.textContent = timeFormatter.format(new Date());
+      var now = new Date();
+      clockEl.textContent = timeFormatter.format(now);
+      if (clockDetailEl) clockDetailEl.textContent = " · " + dateFormatter.format(now);
     };
     updateClock();
     // No seconds shown, so once a minute is plenty — aligned to the next

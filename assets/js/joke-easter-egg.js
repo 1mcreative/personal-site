@@ -1,9 +1,10 @@
 // Joke easter egg — a hidden feature, not advertised anywhere on the page
-// itself: press "J" and a small one-liner joke appears right at the
-// cursor, per direct request. Homepage-only, matching this project's
-// existing easter eggs (the console.log message, the since-removed
-// Konami code) — nothing here shows unless you go looking for it or
-// stumble onto the key by accident.
+// itself: press "J" and a small one-liner joke appears, attached to the
+// cursor, and follows it until you click anywhere to dismiss it. per
+// direct request. Homepage-only, matching this project's existing
+// easter eggs (the console.log message, the since-removed Konami code)
+// — nothing here shows unless you go looking for it or stumble onto the
+// key by accident.
 //
 // Jokes come from JokeAPI (v2.jokeapi.dev), filtered to `type=single` —
 // genuinely one-liners, not the setup/punchline two-part jokes the same
@@ -11,15 +12,12 @@
 // nsfw, religious, political, racist, sexist, or explicit. Free,
 // keyless, CORS-enabled: no backend here to keep a secret key in, so
 // only a keyless API is actually safe to wire in this way.
-//
-// Appears wherever the cursor happens to be at the moment "J" is
-// pressed, not a cursor-follower — stays put once shown so the text
-// doesn't shift under your eyes while reading it.
 (function () {
   var lastX = 0;
   var lastY = 0;
   var bubble = null;
-  var hideTimer = null;
+  var rafId = null;
+  var safetyTimer = null;
   var fetchToken = 0;
 
   document.addEventListener("mousemove", function (e) {
@@ -33,16 +31,52 @@
     return tag === "INPUT" || tag === "TEXTAREA" || el.isContentEditable;
   }
 
+  function positionBubble() {
+    if (!bubble) return;
+    var rect = bubble.getBoundingClientRect();
+    var x = lastX + 16;
+    var y = lastY + 20;
+    if (x + rect.width > window.innerWidth - 8) x = lastX - rect.width - 16;
+    if (y + rect.height > window.innerHeight - 8) y = lastY - rect.height - 20;
+    x = Math.max(8, x);
+    y = Math.max(8, y);
+    bubble.style.left = x + "px";
+    bubble.style.top = y + "px";
+  }
+
+  // Re-clamps every frame while visible so it keeps flipping correctly
+  // if the cursor drifts near a different edge mid-follow, not just
+  // once at spawn.
+  function followLoop() {
+    if (!bubble) {
+      rafId = null;
+      return;
+    }
+    positionBubble();
+    rafId = requestAnimationFrame(followLoop);
+  }
+
   function removeBubble() {
-    if (hideTimer) {
-      clearTimeout(hideTimer);
-      hideTimer = null;
+    if (safetyTimer) {
+      clearTimeout(safetyTimer);
+      safetyTimer = null;
+    }
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
     }
     if (bubble) {
       bubble.remove();
       bubble = null;
     }
   }
+
+  // Click anywhere dismisses it — the bubble itself is pointer-events:
+  // none (see home.css), so this never blocks the click from also
+  // reaching whatever's actually underneath the cursor.
+  document.addEventListener("click", function () {
+    removeBubble();
+  });
 
   function showJoke(text) {
     removeBubble();
@@ -59,20 +93,15 @@
     document.body.appendChild(el);
     bubble = el;
 
-    var rect = el.getBoundingClientRect();
-    var x = lastX + 16;
-    var y = lastY + 20;
-    if (x + rect.width > window.innerWidth - 8) x = lastX - rect.width - 16;
-    if (y + rect.height > window.innerHeight - 8) y = lastY - rect.height - 20;
-    x = Math.max(8, x);
-    y = Math.max(8, y);
-    el.style.left = x + "px";
-    el.style.top = y + "px";
-
+    positionBubble();
     void el.offsetWidth;
     el.classList.add("joke-bubble-in");
 
-    hideTimer = setTimeout(removeBubble, 4500);
+    rafId = requestAnimationFrame(followLoop);
+    // A generous fallback only — click is the real dismiss now, this
+    // just guarantees it doesn't linger forever if a visitor wanders
+    // off without ever clicking again.
+    safetyTimer = setTimeout(removeBubble, 20000);
   }
 
   function fetchJoke() {

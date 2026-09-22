@@ -35,6 +35,7 @@ permalink: /
         <path d="M12 7.5v4.5l3 1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <span class="hero-clock-time"></span>
+      <span class="hero-status-detail hero-clock-detail"></span>
     </span>
   </div>
 
