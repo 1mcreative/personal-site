@@ -796,6 +796,18 @@ html:has(body.theme-personal) {
   transition: transform var(--speed) var(--ease), z-index 0s var(--speed);
 }
 
+/* Real YouTube Shorts are vertical, not 16:9 — reusing .video-card wholesale
+   (same hover-preview JS, same metadata reveal) but with its own narrower
+   width and a matching aspect-ratio override, rather than a parallel
+   duplicate component. */
+.theme-personal .video-card.is-short {
+  width: 140px;
+}
+
+.theme-personal .video-card.is-short .video-thumb {
+  aspect-ratio: 9 / 16;
+}
+
 /* Netflix-style hover pop: the card itself grows and lifts above its row
    neighbors, not just an inner element, so the preview and metadata below
    have real room to expand into rather than being squeezed into the

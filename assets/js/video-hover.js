@@ -17,7 +17,9 @@
   var INTENT_MS = 450; // avoids loading an embed for every card the cursor merely passes over
 
   cards.forEach(function (card) {
-    var match = card.href.match(/[?&]v=([^&]+)/);
+    // Regular videos carry the id in ?v=; Shorts (see the .is-short cards)
+    // use /shorts/<id> instead, with no query string at all.
+    var match = card.href.match(/[?&]v=([^&]+)/) || card.href.match(/\/shorts\/([^/?&]+)/);
     var videoId = match && match[1];
     if (!videoId) return;
 
