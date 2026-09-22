@@ -1402,3 +1402,40 @@ html.dissolving .hero > * {
   transition: opacity 0.45s ease;
   opacity: 0;
 }
+
+/* .joke-bubble (assets/js/joke-easter-egg.js) — the hidden "press J"
+   easter egg. Positioned in JS via inline left/top (spawns at the
+   cursor, edge-clamped there), so this only sets appearance and the
+   fade transition. pointer-events:none since it's pure feedback, never
+   something to click or hover. */
+.joke-bubble {
+  position: fixed;
+  z-index: 500;
+  max-width: 260px;
+  padding: 0.55rem 0.85rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(20, 23, 28, 0.1);
+  box-shadow: 0 6px 20px rgba(20, 23, 28, 0.12);
+  color: var(--text);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.joke-bubble.joke-bubble-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .joke-bubble {
+    transition: opacity 0.15s ease;
+    transform: none;
+  }
+}
