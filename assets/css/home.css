@@ -1282,6 +1282,24 @@
   color: var(--accent);
 }
 
+/* Fixed visual order (clock, weather, distance) regardless of which
+   chip's own async chain actually finishes first — weather.js needs a
+   second network hop after location resolves (Open-Meteo), distance.js
+   doesn't, so without this the distance chip would routinely beat
+   weather into the DOM and the stack would reorder itself unpredictably
+   between page loads. */
+.hero-clock-chip {
+  order: 1;
+}
+
+.hero-weather-chip {
+  order: 2;
+}
+
+.hero-distance-chip {
+  order: 3;
+}
+
 /* A small live-feeling pulse (reused idea, not the same rule, as
    .portal-orb's own orb-pulse below) — the one deliberately playful touch
    per "make it fun," since the pill itself is otherwise the same quiet
@@ -1306,24 +1324,26 @@
   }
 }
 
-/* .hero-weather-chip (assets/js/weather.js): the only .hero-status chip
-   that's ever absent — it doesn't exist in the markup at all, only
-   appended once a real fetch succeeds, so it needs its own fade-in
-   rather than being visible from first paint like the clock chip above.
-   Skips the fade under reduced motion (added already-visible instead, in
-   JS terms indistinguishable from a plain opacity:1 element the moment
-   this class lands). */
-.hero-weather-chip {
+/* .hero-status-chip-dynamic (assets/js/weather.js, assets/js/distance.js):
+   shared fade-in for every .hero-status chip that isn't guaranteed to
+   exist — unlike the clock (always-present markup, since Intl/Date can't
+   fail), these only get appended once a real fetch succeeds, so they
+   need a fade-in rather than being visible from first paint. One shared
+   class now that a second chip needs the identical treatment, rather
+   than repeating it per chip class. Skips the fade under reduced motion
+   (added already-visible instead, in JS terms indistinguishable from a
+   plain opacity:1 element the moment this class lands). */
+.hero-status-chip-dynamic {
   opacity: 0;
   transition: opacity 0.4s ease;
 }
 
-.hero-weather-chip.hero-status-chip-in {
+.hero-status-chip-dynamic.hero-status-chip-in {
   opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-weather-chip {
+  .hero-status-chip-dynamic {
     transition: none;
   }
 }
