@@ -7,7 +7,7 @@ email: "bhaveshnakumcoed@gmail.com"
 
 # Analytics: empty by default so nothing renders, and no data goes
 # anywhere, until a real Measurement ID is pasted in. See SEO-PLAYBOOK.md.
-google_analytics: ""  # GA4 Measurement ID, e.g. "G-XXXXXXXXXX"
+google_analytics: "G-V5VCNVVCJT"  # GA4 Measurement ID
 
 # Search-engine verification, read natively by jekyll-seo-tag's own {% seo %}
 # tag (no custom code needed). Left commented out rather than set to "":
