@@ -59,7 +59,18 @@
      homepage name — Fraunces is a variable font, so this is genuine
      weight interpolation on the one loaded file, not synthetic bolding,
      and the wider range still covers the 500/600 used everywhere else. -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,500&display=swap" rel="stylesheet">
+<!-- font-display was swap, which lets the browser show a fallback font
+     immediately and then reflow to Fraunces/Inter whenever they finish
+     loading — invisible to a visitor since the homepage's intro splash
+     covers the screen while that happens, but Cumulative Layout Shift
+     doesn't know about z-index: it still counts the real heading
+     reflowing underneath. optional removes the mid-render swap entirely:
+     the browser decides once, in the first ~100ms, whether to use the
+     fallback or the web font for this render, and never swaps again after
+     that — a slow/first-time visitor may see the fallback font for that
+     one page view (the real font is typically cached by their next visit),
+     traded for eliminating the CLS-causing reflow. -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,500&display=optional" rel="stylesheet">
 <link rel="stylesheet" href="{{ '/assets/css/tokens.css' | relative_url }}">
 {% if page.layout %}<link rel="stylesheet" href="{{ '/assets/css/' | append: page.layout | append: '.css' | relative_url }}">{% endif %}
 {% if page.extra-css %}<link rel="stylesheet" href="{{ page.extra-css | relative_url }}">{% endif %}
