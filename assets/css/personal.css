@@ -291,14 +291,33 @@ html:has(body.theme-personal) {
   height: 100svh;
   z-index: 0;
   overflow: hidden;
+  /* Same reasoning as .life-hero-canvas just below: this wrapper is purely
+     decorative (already aria-hidden) and nothing needs it as a pointer
+     target, but being a fixed, full-viewport element left as a hit-target
+     by default, it was next in line to reproduce the identical scroll-stuck
+     issue the canvas itself had. */
+  pointer-events: none;
 }
 
+/* pointer-events: none — the canvas doesn't actually need to receive
+   pointer input itself: black-hole-lite.js's hover-follow reads
+   window-level pointermove (not the canvas's own), and click-effects.js
+   listens on document, not the canvas. Left as a real hit-target (the
+   default), this position:fixed, full-viewport element was the reason a
+   scroll gesture over most of the empty hero/section background — anywhere
+   without text or a card directly under the cursor — genuinely failed to
+   scroll the page at all, confirmed directly: the wheel event fired (a
+   window-level listener saw it) but body.scrollTop never moved, while the
+   identical gesture over a text element a few pixels away worked every
+   time. Removing it as a hit-target removes that ambiguity outright rather
+   than working around a specific browser's resolution of it. */
 .theme-personal .life-hero-canvas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   display: block;
+  pointer-events: none;
 }
 
 .theme-personal main#main {
@@ -767,14 +786,24 @@ html:has(body.theme-personal) {
    content itself needs) is deliberate headroom for the hover scale-up
    below — .social-card hit exactly this bug once already (a hover lift
    clipped clean off by the row's own overflow-y: hidden, since it had no
-   slack above the resting card); this row gets that slack from the start. */
+   slack above the resting card); this row gets that slack from the start.
+   One playlist-style row now holds all 24 videos across both of the user's
+   own channels plus the Kartik Bansal edits — previously three separate
+   rows (each its own thumbnail grid) pushed #youtube's real height to
+   1261px against a 768px viewport, confirmed directly via
+   getBoundingClientRect(): with no snap point inside that overflow, a
+   scroll gesture landing anywhere in the extra ~500px had nothing to catch
+   it, which is what actually read as "stuck." One compact row, uniform
+   card size, real metadata always visible instead of gated behind hover —
+   the same fix closes the overflow, the sizing-consistency request, and
+   the "channel name should travel with the card" request together. */
 .theme-personal .video-grid {
   display: flex;
   gap: var(--space-2);
   margin-top: var(--space-2);
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  padding: var(--space-2) var(--space-3) var(--space-2) var(--nav-clearance);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--nav-clearance);
   scroll-padding-left: var(--nav-clearance);
   overflow-x: auto;
   overflow-y: visible;
@@ -787,35 +816,28 @@ html:has(body.theme-personal) {
   display: none;
 }
 
+/* Every card — regardless of source (RED FILMS' 16:9 event films, 1mCreative's
+   vertical Shorts, Kartik Bansal's dance edits) — gets the identical box.
+   YouTube's own hqdefault.jpg is the same flat 480x360 raster for a Short
+   as for a long-form video (confirmed directly, not assumed), so cropping
+   every thumbnail into one shared 16:9 frame via object-fit:cover isn't
+   losing anything format-specific — there was never a "true vertical"
+   source image to begin with. */
 .theme-personal .video-card {
   flex: 0 0 auto;
-  width: 220px;
+  width: 160px;
   scroll-snap-align: start;
   text-decoration: none;
   color: var(--text);
   transition: transform var(--speed) var(--ease), z-index 0s var(--speed);
 }
 
-/* Real YouTube Shorts are vertical, not 16:9 — reusing .video-card wholesale
-   (same hover-preview JS, same metadata reveal) but with its own narrower
-   width and a matching aspect-ratio override, rather than a parallel
-   duplicate component. */
-.theme-personal .video-card.is-short {
-  width: 140px;
-}
-
-.theme-personal .video-card.is-short .video-thumb {
-  aspect-ratio: 9 / 16;
-}
-
-/* Netflix-style hover pop: the card itself grows and lifts above its row
-   neighbors, not just an inner element, so the preview and metadata below
-   have real room to expand into rather than being squeezed into the
-   original 220px/16:9 footprint. Gated to hover-capable pointers (see
-   video-hover.js) — a touch tap just opens the real YouTube link, same as
-   before, since there's no hover intent to detect there. */
+/* Netflix-style hover pop, toned down from an earlier, larger-card version
+   of this same idea — a compact playlist row doesn't need (or have vertical
+   room for) a dramatic scale-up, and a smaller one reduces how much
+   headroom .video-grid has to reserve against clipping. */
 .theme-personal .video-card.is-hover-active {
-  transform: scale(1.18);
+  transform: scale(1.08);
   z-index: 5;
 }
 
@@ -882,36 +904,34 @@ html:has(body.theme-personal) {
   opacity: 0;
 }
 
+/* Playlist-style: title truncated to one line rather than wrapping, so
+   every card is the same height regardless of how long its real title is —
+   the full text is still the link's accessible name either way. */
 .theme-personal .video-title {
-  display: block;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
   margin-top: var(--space-1);
   font-size: 0.85rem;
   font-weight: 600;
   line-height: 1.3;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
-  transition: opacity var(--speed) var(--ease);
 }
 
 /* Real metadata only — YouTube's oEmbed endpoint (the same one this site's
    titles were fetched from, see CLAUDE.md) has no description field, so
    there's no genuine "caption" to show beyond title + who the video is
-   actually for. .video-meta carries that real author_name, invisible at
-   rest and revealed with the title on hover, instead of a fabricated
-   blurb. */
+   actually for. Always visible now, like a real YouTube playlist row's own
+   channel-name line — per direct feedback that channel identity needs to
+   travel with each card, not live only in a separate row label or the
+   channel-card links at the top of the section. */
 .theme-personal .video-meta {
   display: block;
   margin-top: 2px;
   font-size: 0.75rem;
   color: var(--muted);
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
-  opacity: 0;
-  max-height: 0;
-  transition: opacity var(--speed) var(--ease);
-}
-
-.theme-personal .video-card.is-hover-active .video-meta {
-  opacity: 1;
-  max-height: none;
 }
 
 /* Left-edge jump nav — bare floating icons, deliberately no pill/background
