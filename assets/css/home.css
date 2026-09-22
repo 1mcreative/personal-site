@@ -1313,13 +1313,19 @@
 
 /* .hero-status-detail: the hover-reveal line each chip appends (see
    hero.js/weather.js/distance.js) — collapsed to nothing at rest,
-   expanding open on hover/focus via max-width since `width:auto` can't
-   itself be transitioned. A real interaction, not just a hover color
+   revealed on hover/focus. A real interaction, not just a hover color
    change: the clock reveals the full weekday and date, weather reveals
    the condition and city, distance reveals visitor-city-to-Bengaluru —
    genuinely more info, not decoration. Touch visitors simply never
    trigger :hover, so they always see the compact resting state; nothing
-   here needs a separate touch fallback. */
+   here needs a separate touch fallback.
+   Only `opacity` animates — `max-width` toggles instantly instead of
+   transitioning (a single one-time reflow on hover/unhover, not a
+   per-frame one across the transition's duration), since width/
+   max-width are layout properties and animating them frame-by-frame
+   causes real layout thrash; there's no `width:auto`-transitionable or
+   transform-only equivalent for "reveal more text," so this is the
+   narrowest fix rather than a `transform`/`opacity`-only rewrite. */
 .hero-status-detail {
   display: inline-block;
   max-width: 0;
@@ -1328,18 +1334,12 @@
   white-space: nowrap;
   color: var(--muted);
   font-weight: 400;
-  transition: max-width 0.35s ease, opacity 0.25s ease;
+  transition: opacity 0.25s ease;
 }
 
 .hero-status-chip:hover .hero-status-detail {
   max-width: 220px;
   opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-status-detail {
-    transition: opacity 0.25s ease;
-  }
 }
 
 /* Fixed visual order (clock, weather, distance) regardless of which
