@@ -1,14 +1,18 @@
 // Shared visitor-location resolver — used by both weather.js and
 // distance.js so one page load only ever runs one location lookup, not
-// two independent ones (which would mean either two separate permission
-// prompts or two redundant IP-lookup calls, depending on which path each
-// consumer happened to take on its own).
+// two independent ones.
 //
-// Tries the browser's own Geolocation API first (exact coordinates, but
-// shows a real permission prompt), falling back to the same silent,
-// approximate IP-based lookup (ipwho.is) weather.js used on its own
-// before this file existed — per direct instruction: "if user has given
-// exact location that take that or based on network/browser location."
+// Never actively prompts for location. Per explicit correction (2026-09-
+// 22): "do not ask for location access, if it already given to browser
+// take it or else take browser/network location" — the browser's exact
+// Geolocation API is only used when permission was already granted some
+// other way (checked via the Permissions API, which reads the current
+// state without showing any UI of its own); anything else — not yet
+// decided, denied, or the Permissions API itself unsupported — goes
+// straight to the same silent, approximate IP-based lookup (ipwho.is)
+// weather.js used on its own before this file existed. A visitor who has
+// never been asked never sees a popup.
+//
 // Memoizes the result: the first caller triggers the actual lookup,
 // every later caller in the same page load just gets queued and
 // notified once settled, rather than starting a second lookup of its
@@ -64,15 +68,7 @@
       });
   }
 
-  function start() {
-    if (started) return;
-    started = true;
-
-    if (!window.navigator || !navigator.geolocation) {
-      viaIp();
-      return;
-    }
-
+  function useGeolocation() {
     navigator.geolocation.getCurrentPosition(
       function (pos) {
         settle({
@@ -85,12 +81,49 @@
         });
       },
       function () {
-        // Denied, unavailable, or timed out — fall back silently, same
-        // progressive-enhancement shape as every other effect here.
+        // Permission was already "granted" going in, so this shouldn't
+        // normally fire — but a real device/OS-level location failure is
+        // still possible. Fall back the same way as everywhere else.
         viaIp();
       },
       { timeout: 6000, maximumAge: 5 * 60 * 1000 }
     );
+  }
+
+  function start() {
+    if (started) return;
+    started = true;
+
+    if (!window.navigator || !navigator.geolocation) {
+      viaIp();
+      return;
+    }
+
+    if (!navigator.permissions || !navigator.permissions.query) {
+      // No Permissions API to check first — calling getCurrentPosition
+      // directly here risks a real prompt, which is exactly what this
+      // file must never do. Skip straight to the IP fallback instead.
+      viaIp();
+      return;
+    }
+
+    navigator.permissions
+      .query({ name: "geolocation" })
+      .then(function (status) {
+        if (status.state === "granted") {
+          useGeolocation();
+        } else {
+          // "prompt" (not yet decided) or "denied" — either way, never
+          // trigger the popup ourselves.
+          viaIp();
+        }
+      })
+      .catch(function () {
+        // Some browsers (a real Safari gap in places) support
+        // navigator.permissions but reject a "geolocation" query
+        // specifically — same reasoning, don't risk a prompt.
+        viaIp();
+      });
   }
 
   window.resolveVisitorLocation = function (callback) {
