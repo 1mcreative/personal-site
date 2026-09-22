@@ -1,3 +1,18 @@
+/* html normally has overflow:visible, and per the CSS Overflow spec, a root
+   element with overflow:visible propagates its BODY child's own overflow up
+   to the viewport instead of leaving it on body — meaning a plain
+   `body { overflow-y: auto }` doesn't make body a real scroll container at
+   all, it just relabels the viewport's own scroll with body's value, and
+   scroll-snap-type set on body then governs nothing a real scroll gesture
+   ever touches. Confirmed directly (not assumed): a real scroll left
+   document.body.scrollTop at 0 while window.scrollY moved. html:has() stops
+   the propagation so body becomes the actual scrolling box its own rules
+   below already assume it is. Scoped via :has() rather than a bare `html`
+   rule so this never touches any other page's normal document scroll. */
+html:has(body.theme-personal) {
+  overflow: hidden;
+}
+
 /* Personal theme — dark, relaxed, life-and-Instagram-first. */
 .theme-personal {
   --bg: #0f1419;
@@ -22,10 +37,10 @@
      into view completely rather than resting at some arbitrary partial
      scroll position — per direct feedback that sections were reading as
      one overlapping continuous wall of content instead of distinct areas.
-     scroll-snap-type has to live on the actual scrolling box; body is that
-     box here (html/body carry no other overflow rule on this page), so
-     body itself becomes the scroll container instead of the viewport at
-     large. position:fixed children (.life-hero, .site-header, .section-nav)
+     scroll-snap-type has to live on the actual scrolling box — body, made
+     real by the html:has() rule above; without it this height/overflow
+     pair looks correct in computed style but never receives real scroll
+     input. position:fixed children (.life-hero, .site-header, .section-nav)
      are unaffected — overflow alone doesn't change their containing block,
      confirmed directly after wiring this up, not just assumed. */
   height: 100vh;
@@ -75,7 +90,6 @@
   transform: scale(1);
 }
 
-.theme-personal.js-intro .site-header,
 .theme-personal.js-intro .life-hero-inner h1,
 .theme-personal.js-intro .life-hero-inner p {
   opacity: 0;
@@ -83,11 +97,28 @@
   transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
 }
 
-.theme-personal.js-intro .site-header.is-visible,
 .theme-personal.js-intro .life-hero-inner h1.is-visible,
 .theme-personal.js-intro .life-hero-inner p.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* .site-header needs its own fade-in-from-below, same as h1/p above, but it
+   already carries a load-bearing transform of its own (translateX(-50%) for
+   horizontal centering, set on the base .site-header rule below) — a plain
+   "transform: translateY(...)" here would win on specificity and silently
+   replace that centering transform outright, since a later/more-specific
+   rule's transform doesn't merge with an earlier one's, it replaces it. Both
+   halves are composed into one transform value at each stage instead. */
+.theme-personal.js-intro .site-header {
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+  transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
+}
+
+.theme-personal.js-intro .site-header.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 /* "Everything else" (section-nav, plus every .life-section — Instagram/
@@ -114,13 +145,19 @@
     transform: none;
   }
 
-  .theme-personal.js-intro .site-header,
   .theme-personal.js-intro .life-hero-inner h1,
   .theme-personal.js-intro .life-hero-inner p,
   .theme-personal.js-intro .section-nav,
   .theme-personal.js-intro .life-section {
     opacity: 1;
     transform: none;
+  }
+
+  /* Not transform: none — .site-header's own centering transform (below)
+     still applies under reduced motion, only the slide-in half is dropped. */
+  .theme-personal.js-intro .site-header {
+    opacity: 1;
+    transform: translateX(-50%);
   }
 }
 
@@ -340,7 +377,13 @@
   gap: var(--space-2);
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  padding: 0 var(--space-3) var(--space-1) var(--nav-clearance);
+  /* Top padding beyond what the cards themselves need is deliberate
+     headroom for the hover lift below — this row's own overflow-y:hidden
+     was silently clipping the top ~3px of a hovered card (border, gradient
+     highlight line) off, since a card resting flush against the row's own
+     edge has nowhere to go when it lifts. Confirmed directly, not just
+     reasoned about: the reported "highlight line gets cut off" bug. */
+  padding: var(--space-2) var(--space-3) var(--space-1) var(--nav-clearance);
   /* Real box padding alone isn't enough here: with scroll-snap-type active,
      a leading padding whose size doesn't match scroll-padding isn't a valid
      snap position, so the browser silently jumps scrollLeft to the padding
@@ -350,7 +393,7 @@
      correct resting/snap position, so scrollLeft correctly stays at 0. */
   scroll-padding-left: var(--nav-clearance);
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: visible;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -720,17 +763,21 @@
    comment for why the padding is paired with a matching scroll-padding —
    a scroll-snap container silently jumps scrollLeft to an unmirrored
    leading padding otherwise), kept separate so this row and the Instagram
-   one can change independently. */
+   one can change independently. Extra top/bottom padding (beyond what the
+   content itself needs) is deliberate headroom for the hover scale-up
+   below — .social-card hit exactly this bug once already (a hover lift
+   clipped clean off by the row's own overflow-y: hidden, since it had no
+   slack above the resting card); this row gets that slack from the start. */
 .theme-personal .video-grid {
   display: flex;
   gap: var(--space-2);
   margin-top: var(--space-2);
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  padding: 0 var(--space-3) var(--space-1) var(--nav-clearance);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--nav-clearance);
   scroll-padding-left: var(--nav-clearance);
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: visible;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -746,6 +793,30 @@
   scroll-snap-align: start;
   text-decoration: none;
   color: var(--text);
+  transition: transform var(--speed) var(--ease), z-index 0s var(--speed);
+}
+
+/* Real YouTube Shorts are vertical, not 16:9 — reusing .video-card wholesale
+   (same hover-preview JS, same metadata reveal) but with its own narrower
+   width and a matching aspect-ratio override, rather than a parallel
+   duplicate component. */
+.theme-personal .video-card.is-short {
+  width: 140px;
+}
+
+.theme-personal .video-card.is-short .video-thumb {
+  aspect-ratio: 9 / 16;
+}
+
+/* Netflix-style hover pop: the card itself grows and lifts above its row
+   neighbors, not just an inner element, so the preview and metadata below
+   have real room to expand into rather than being squeezed into the
+   original 220px/16:9 footprint. Gated to hover-capable pointers (see
+   video-hover.js) — a touch tap just opens the real YouTube link, same as
+   before, since there's no hover intent to detect there. */
+.theme-personal .video-card.is-hover-active {
+  transform: scale(1.18);
+  z-index: 5;
 }
 
 .theme-personal .video-thumb {
@@ -756,6 +827,7 @@
   overflow: hidden;
   border: 1px solid var(--border);
   background: var(--bg);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   transition: border-color var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
 }
 
@@ -764,6 +836,22 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: opacity var(--speed) var(--ease);
+}
+
+/* The live preview iframe (added/removed by video-hover.js on hover intent,
+   never present in the static markup) sits over the poster image rather
+   than replacing it, so there's always an instant frame to show before the
+   embed has actually loaded — removing the iframe on hover-out just lets
+   the still image show through again, real playback stops immediately
+   since the iframe itself is gone, not just visually hidden. */
+.theme-personal .video-thumb iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: none;
 }
 
 .theme-personal .video-play {
@@ -777,14 +865,21 @@
 }
 
 .theme-personal .video-card:hover .video-thumb,
-.theme-personal .video-card:focus-visible .video-thumb {
+.theme-personal .video-card:focus-visible .video-thumb,
+.theme-personal .video-card.is-hover-active .video-thumb {
   border-color: #ff0000;
-  box-shadow: 0 10px 30px -12px rgba(255, 0, 0, 0.35);
+  box-shadow: 0 16px 36px -14px rgba(255, 0, 0, 0.45);
 }
 
 .theme-personal .video-card:hover .video-play,
 .theme-personal .video-card:focus-visible .video-play {
   opacity: 1;
+}
+
+/* Once a real preview starts playing, the static play-button overlay would
+   just sit on top of it doing nothing useful — hide it for that state. */
+.theme-personal .video-card.is-hover-active .video-play {
+  opacity: 0;
 }
 
 .theme-personal .video-title {
@@ -794,6 +889,29 @@
   font-weight: 600;
   line-height: 1.3;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  transition: opacity var(--speed) var(--ease);
+}
+
+/* Real metadata only — YouTube's oEmbed endpoint (the same one this site's
+   titles were fetched from, see CLAUDE.md) has no description field, so
+   there's no genuine "caption" to show beyond title + who the video is
+   actually for. .video-meta carries that real author_name, invisible at
+   rest and revealed with the title on hover, instead of a fabricated
+   blurb. */
+.theme-personal .video-meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  max-height: 0;
+  transition: opacity var(--speed) var(--ease);
+}
+
+.theme-personal .video-card.is-hover-active .video-meta {
+  opacity: 1;
+  max-height: none;
 }
 
 /* Left-edge jump nav — bare floating icons, deliberately no pill/background
