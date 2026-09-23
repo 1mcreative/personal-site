@@ -1,5 +1,5 @@
 // /questions/ page: faceted filtering (company / round / tech stack) plus
-// a per-card "Show my answer" disclosure. No-ops entirely on any other
+// a per-card "Show details" disclosure. No-ops entirely on any other
 // page, same as every other script this layout loads unconditionally
 // (text-fall.js, galaxy-button.js, etc.) — safe to include sitewide.
 (function () {
@@ -76,7 +76,7 @@
 
   apply();
 
-  // Per-card "Show my answer" disclosure — same disclosure shape as
+  // Per-card "Show details" disclosure — same disclosure shape as
   // .entry-toggle on /resume/ (real <button>, aria-expanded, the `hidden`
   // attribute timed around the CSS grid-collapse transition so it comes
   // off before the open animation starts and goes back on only after the
@@ -94,7 +94,7 @@
     btn.addEventListener("click", function () {
       var expanding = btn.getAttribute("aria-expanded") !== "true";
       btn.setAttribute("aria-expanded", String(expanding));
-      if (label) label.textContent = expanding ? "Hide my answer" : "Show my answer";
+      if (label) label.textContent = expanding ? "Hide details" : "Show details";
 
       if (expanding) {
         answer.hidden = false;

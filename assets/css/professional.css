@@ -847,11 +847,88 @@
   max-width: none;
 }
 
+/* Rendered via `{{ q.problem | markdownify }}` (_data/interview_questions.yml)
+   — plain paragraph/list/inline-code content, so this just resets the
+   default <p>/<ul> margins to sit tightly under .question-text instead of
+   the wider spacing kramdown's own output would otherwise carry. */
+.question-problem {
+  margin-bottom: 0.6rem;
+  color: var(--text);
+}
+
+.question-problem p,
+.question-problem ul,
+.question-answer-text p,
+.question-answer-text ul,
+.question-example p,
+.question-example ul {
+  margin: 0 0 0.5rem;
+  max-width: none;
+}
+
+.question-problem :last-child,
+.question-answer-text :last-child,
+.question-example :last-child,
+.question-note :last-child {
+  margin-bottom: 0;
+}
+
+.question-problem code,
+.question-example code,
+.question-answer-text code,
+.question-note code {
+  padding: 0.1em 0.35em;
+  background: var(--surface);
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
 .question-card-stack {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
   margin-bottom: 0.4rem;
+}
+
+/* Fenced ``` blocks in `example`/`answer` (the ASCII tree/elevation
+   diagrams, the cost matrix, the JSON input) — monospace and `pre` so
+   the hand-aligned spacing survives, dark like assets/css/lab.css's own
+   .lab-code so a code block reads as one consistent "this is source
+   data" treatment sitewide rather than inventing a second style. */
+.question-example pre {
+  margin: 0 0 0.6rem;
+  padding: 0.9rem;
+  overflow-x: auto;
+  background: #12161c;
+  color: #d6dde5;
+  border-radius: var(--radius);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.question-example pre code {
+  padding: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+.question-note {
+  padding-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.question-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.88rem;
 }
 
 .questions-empty {
