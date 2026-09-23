@@ -123,10 +123,80 @@
       });
   }
 
+  // A hint for desktop visitors who haven't found this on their own —
+  // shows once, 10s after page load, then fades out on its own; pressing
+  // J (the exact thing it suggests) dismisses it immediately too, since
+  // there's no point telling someone to do what they just did. Gated to
+  // real mouse/desktop use the same way spotlight-text already is
+  // (hover:hover + pointer:fine) — a keyboard-shortcut nudge means
+  // nothing to a touch-only visitor. Shown at most once per browser
+  // session (sessionStorage), so a reload or an already-discovered
+  // easter egg doesn't get nagged about again.
+  var HINT_SESSION_KEY = "jokeHintSeen";
+  var HINT_DELAY_MS = 10000;
+  var HINT_VISIBLE_MS = 6000;
+  var hintEl = null;
+  var hintFadeTimer = null;
+
+  function markHintSeen() {
+    try {
+      sessionStorage.setItem(HINT_SESSION_KEY, "1");
+    } catch (e) {
+      // sessionStorage unavailable (private mode, disabled) — fine, the
+      // hint might just show again next reload, not worth guarding harder.
+    }
+  }
+
+  function dismissHint() {
+    if (hintFadeTimer) {
+      clearTimeout(hintFadeTimer);
+      hintFadeTimer = null;
+    }
+    if (!hintEl) return;
+    var el = hintEl;
+    hintEl = null;
+    el.classList.remove("joke-hint-in");
+    setTimeout(function () {
+      el.remove();
+    }, 400);
+  }
+
+  function showHint() {
+    if (hintEl) return;
+    var el = document.createElement("div");
+    el.className = "joke-hint";
+    el.setAttribute("aria-hidden", "true");
+    // The "J" badge is this file's own static markup, not user/network
+    // data, so innerHTML here is safe the same way the joke icons are.
+    el.innerHTML = 'Press <kbd class="joke-hint-key">J</kbd> for something fun';
+    document.body.appendChild(el);
+    hintEl = el;
+    void el.offsetWidth;
+    el.classList.add("joke-hint-in");
+    hintFadeTimer = setTimeout(dismissHint, HINT_VISIBLE_MS);
+  }
+
+  if (window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    var hintAlreadySeen = false;
+    try {
+      hintAlreadySeen = sessionStorage.getItem(HINT_SESSION_KEY) === "1";
+    } catch (e) {
+      hintAlreadySeen = false;
+    }
+    if (!hintAlreadySeen) {
+      setTimeout(function () {
+        showHint();
+        markHintSeen();
+      }, HINT_DELAY_MS);
+    }
+  }
+
   document.addEventListener("keydown", function (e) {
     if (e.key !== "j" && e.key !== "J") return;
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     if (isTypingTarget(document.activeElement)) return;
+    dismissHint();
+    markHintSeen();
     fetchJoke();
   });
 })();
