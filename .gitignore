@@ -5,3 +5,8 @@ _site/
 .bundle/
 vendor/
 .impeccable/
+
+# Written transiently by scripts/fetch-instagram.js, read once by the
+# GitHub Actions workflow to push refreshed tokens to Secrets, then
+# deleted — must never be committed even by accident.
+scripts/refreshed-tokens.json
