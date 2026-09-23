@@ -983,14 +983,29 @@ html:has(body.theme-personal) {
   pointer-events: none;
 }
 
+/* A small centered badge, not a full-thumbnail scrim — visible by default,
+   not gated behind :hover/:focus-visible. That gate meant touch visitors
+   never saw any "this is a video" cue at all (neither state a tap can
+   trigger), confirmed directly: computed opacity read 0 at rest with
+   nothing to reveal it on a touch device. Real platforms (YouTube, Vimeo)
+   all show a persistent play affordance on thumbnails for the same reason. */
 .theme-personal .video-play {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgba(0, 0, 0, 0.25);
-  opacity: 0;
-  transition: opacity var(--speed) var(--ease);
+  background: rgba(0, 0, 0, 0.55);
+  transition: transform var(--speed) var(--ease), background var(--speed) var(--ease), opacity var(--speed) var(--ease);
+}
+
+.theme-personal .video-play svg {
+  width: 14px;
+  height: 14px;
 }
 
 .theme-personal .video-card:hover .video-thumb,
@@ -1002,22 +1017,28 @@ html:has(body.theme-personal) {
 
 .theme-personal .video-card:hover .video-play,
 .theme-personal .video-card:focus-visible .video-play {
-  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.15);
+  background: rgba(0, 0, 0, 0.75);
 }
 
-/* Once a real preview starts playing, the static play-button overlay would
-   just sit on top of it doing nothing useful — hide it for that state. */
+/* Once a real preview starts playing, the static play badge would just sit
+   on top of it doing nothing useful — hide it for that state only, not
+   the plain hover state above it. */
 .theme-personal .video-card.is-hover-active .video-play {
   opacity: 0;
 }
 
-/* Playlist-style: title truncated to one line rather than wrapping, so
-   every card is the same height regardless of how long its real title is —
-   the full text is still the link's accessible name either way. */
+/* Playlist-style: clamped to a fixed line count (not unbounded wrapping),
+   so every card is still the same height regardless of how long its real
+   title is — the full text is still the link's accessible name either way.
+   Two lines, not one: several real titles here only differ in their last
+   few words ("SPARSH 2K18 Pre-Movie" vs "SPARSH 2K18 Theme Teaser"), and a
+   single-line clamp truncated both down to the identical "SPARSH 2K18...",
+   reading as duplicate cards at a glance. */
 .theme-personal .video-title {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   overflow: hidden;
   margin-top: var(--space-1);
   font-size: 0.85rem;
