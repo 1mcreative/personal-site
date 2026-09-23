@@ -3,13 +3,7 @@ layout: professional
 title: "Interview Questions"
 description: "Real interview questions Bhavesh Nakum has been asked, filterable by company, interview round, and tech stack."
 permalink: /questions/
-noindex: true
-sitemap: false
 ---
-<!-- noindex + sitemap: false above match this site's own placeholder-page
-     convention (see SEO-PLAYBOOK.md) while _data/interview_questions.yml
-     still only holds sample entries. Once real questions replace the
-     samples there, delete both lines so this page gets indexed. -->
 
 <header class="questions-header">
   <h1>Interview questions</h1>
@@ -70,18 +64,28 @@ sitemap: false
       <span class="question-tag question-tag-round">{{ q.round }}</span>
     </div>
     <p class="question-text">{{ q.question }}</p>
+    {% if q.problem %}<div class="question-problem">{{ q.problem | markdownify }}</div>{% endif %}
     <div class="question-card-stack">
       {% for tech in q.techstack %}<span class="skill-pill">{{ tech }}</span>{% endfor %}
     </div>
-    {% if q.answer %}
+    {% if q.example or q.note or q.answer or q.links %}
     <button type="button" class="question-toggle" aria-expanded="false" aria-controls="q-answer-{{ forloop.index }}">
-      <span class="entry-toggle-label">Show my answer</span>
+      <span class="entry-toggle-label">Show details</span>
       <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
     <div class="question-answer-wrap">
-      <p class="question-answer" id="q-answer-{{ forloop.index }}" hidden>{{ q.answer }}</p>
+      <div class="question-answer" id="q-answer-{{ forloop.index }}" hidden>
+        {% if q.example %}<div class="question-example">{{ q.example | markdownify }}</div>{% endif %}
+        {% if q.answer %}<div class="question-answer-text">{{ q.answer | markdownify }}</div>{% endif %}
+        {% if q.note %}<div class="question-note">{{ q.note | markdownify }}</div>{% endif %}
+        {% if q.links %}
+        <ul class="question-links">
+          {% for link in q.links %}<li><a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.text }}</a></li>{% endfor %}
+        </ul>
+        {% endif %}
+      </div>
     </div>
     {% endif %}
   </article>
