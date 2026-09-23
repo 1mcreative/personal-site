@@ -29,30 +29,19 @@ permalink: /life/
 <section class="life-section" id="instagram">
   <h2>Instagram</h2>
 
-  <div class="social-grid">
-    <a class="social-card" href="https://www.instagram.com/1mcreative" rel="me noopener" target="_blank">
-      <span class="social-card-head">
-        <span class="social-icon" aria-hidden="true">{% include instagram-glyph.svg %}</span>
-        <span class="social-card-body">
-          <span class="social-label">Instagram</span>
-          <span class="social-handle">@1mcreative</span>
-        </span>
-      </span>
-      <span class="social-tagline">Photos, reels, whatever I'm doing that day.</span>
-      <span class="social-cta">View profile</span>
-    </a>
-    <a class="social-card" href="https://www.instagram.com/straightforkward" rel="me noopener" target="_blank">
-      <span class="social-card-head">
-        <span class="social-icon" aria-hidden="true">{% include instagram-glyph.svg %}</span>
-        <span class="social-card-body">
-          <span class="social-label">Second account</span>
-          <span class="social-handle">@straightforkward</span>
-        </span>
-      </span>
-      <span class="social-tagline">Random stuff that doesn't fit the main feed.</span>
-      <span class="social-cta">View profile</span>
-    </a>
+  <div class="ig-feed" id="ig-feed">
+    <div class="ig-feed-loading" id="ig-feed-loading" aria-hidden="true">
+      <span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+    </div>
+    <div class="ig-feed-grid" id="ig-feed-grid" hidden></div>
+    <p class="ig-feed-error" id="ig-feed-error" hidden>Couldn't load the latest posts right now.</p>
   </div>
+
+  <p class="ig-feed-links">
+    <a href="https://www.instagram.com/1mcreative" rel="me noopener" target="_blank">@1mcreative</a>
+    <a href="https://www.instagram.com/straightforkward" rel="me noopener" target="_blank">@straightforkward</a>
+  </p>
 </section>
 
 <section class="life-section" id="youtube">
