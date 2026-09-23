@@ -1257,6 +1257,30 @@
   gap: var(--space-1);
 }
 
+/* .hero-bored-trigger: the homepage's own Slice Blade trigger — .bored-
+   trigger's shared styling (tokens.css) reused here with its own fixed
+   position, since the homepage has no footer.html to hold the inline
+   version everywhere else on the site does. Top-right mirrors .hero-
+   status's own top-left corner — the one spot nothing else here claims
+   now that .page-corner/.portal-orb (which used to own it) are both
+   deprecated. Persistent, not timed like .joke-hint below, per the
+   explicit "make sure users sees it" ask — margin-left:0 overrides the
+   footer version's inline spacing, irrelevant to a standalone button. */
+.hero-bored-trigger {
+  position: absolute;
+  z-index: 2;
+  top: var(--space-3);
+  right: var(--space-3);
+  margin-left: 0;
+}
+
+@media (max-width: 640px) {
+  .hero-bored-trigger {
+    padding: 0.4em 0.7em;
+    font-size: 0.78em;
+  }
+}
+
 /* Bolder, more present treatment than the original quiet pill, per
    direct feedback that the chips "look boring... make it interactive
    more visible." Solid-er glass, a real shadow, darker text, a hint of

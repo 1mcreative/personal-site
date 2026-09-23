@@ -522,3 +522,106 @@ p {
     transition-duration: 0.01ms;
   }
 }
+
+/* Slice Blade trigger + modal — shared across every page via
+   footer.html (plus its own homepage-specific trigger in home.css,
+   since the homepage has no footer at all by deliberate design). Per
+   explicit request the trigger has to actually be noticed, not just
+   technically present, so unlike .contact-btn's quiet inline-text
+   treatment this is a solid, standalone pill with a small idle wiggle
+   on its icon — still built from this component set's own established
+   pieces (the accent gradient/lift already used by .contact-submit),
+   not an unrelated new visual language. Modal shell mirrors
+   .contact-modal's own structure and transitions exactly; only the
+   panel's own sizing differs, since a game needs real canvas room
+   instead of a form's fixed narrow width. */
+.bored-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-left: 0.6em;
+  padding: 0.45em 0.9em;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, white));
+  color: #fff !important;
+  font: inherit;
+  font-size: 0.85em;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--accent) 60%, transparent);
+  transition: transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
+}
+
+.bored-trigger:hover,
+.bored-trigger:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -4px color-mix(in srgb, var(--accent) 75%, transparent);
+}
+
+.bored-trigger-icon {
+  display: inline-flex;
+  animation: bored-trigger-wiggle 2.6s ease-in-out infinite;
+}
+
+@keyframes bored-trigger-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-16deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bored-trigger-icon {
+    animation: none;
+  }
+}
+
+.slice-blade-panel {
+  width: min(900px, 100%);
+  max-height: min(80vh, 720px);
+}
+
+.slice-blade-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.slice-blade-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: 0;
+  padding-right: 3.5rem;
+  font-size: 1.15rem;
+}
+
+.slice-blade-title svg {
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.slice-blade-sub {
+  margin: 0 0 var(--space-2);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.slice-blade-host {
+  position: relative;
+  width: 100%;
+  height: min(60vh, 560px);
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--bg);
+  touch-action: none;
+}
+
+.slice-blade-host canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
