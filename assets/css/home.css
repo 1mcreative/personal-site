@@ -1245,7 +1245,13 @@
    plain flex column so a second chip (weather, next) just stacks below
    without any layout rework. Each chip shares one pill treatment — same
    blurred-glass idea as .scroll-cue's own backdrop, sized down to fit a
-   corner instead of straddling the globe. */
+   corner instead of straddling the globe.
+   Row instead of column from tablet width up: a 3-tall stack reads much
+   heavier than the single .hero-bored-trigger pill sitting opposite it
+   top-right, which is the actual "unbalanced" thing about this corner —
+   a single-line cluster matches that pill's own shape and weight instead
+   of towering over it. Stays a column below 768px, where three chips
+   side by side wouldn't fit next to each other on a phone width. */
 .hero-status {
   position: absolute;
   z-index: 2;
@@ -1255,6 +1261,13 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-1);
+}
+
+@media (min-width: 768px) {
+  .hero-status {
+    flex-direction: row;
+    align-items: center;
+  }
 }
 
 /* .hero-bored-trigger: the homepage's own Slice Blade trigger — .bored-
@@ -1309,7 +1322,15 @@
   /* Digits update once a minute (assets/js/hero.js) — tabular-nums keeps
      the pill's width from twitching as e.g. "9:59" becomes "10:00". */
   font-variant-numeric: tabular-nums;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  /* transform gets the same overshoot curve as .offset-btn/.contact-modal-
+     panel elsewhere on this site (reused, not invented) — a little spring
+     on the one truly interactive hover in this corner. box-shadow/
+     background stay on the plain ease; bouncing a shadow reads as a glitch,
+     not playful. */
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.25s ease,
+    background 0.25s ease;
 }
 
 .hero-status-chip:hover {
