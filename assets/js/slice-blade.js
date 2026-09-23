@@ -203,7 +203,7 @@
 
   var engine = null; // built once, first time the modal opens
 
-  function buildEngine(host, canvas) {
+  function buildEngine(host, canvas, scoreEl, livesEl) {
     var ctx = canvas.getContext("2d");
     var w = 0;
     var h = 0;
@@ -213,6 +213,26 @@
     var hovering = false;
     var stroke = [];
     var wantRestart = false;
+    var hudScore = null;
+    var hudLives = 0;
+    var hudLivesSet = 0;
+
+    // Real HTML text, not canvas-drawn — see the comment above paint()'s
+    // old HUD code for why. Only touches the DOM when a value actually
+    // changed, not every frame.
+    function updateHud() {
+      if (scoreEl && hudScore !== world.score) {
+        hudScore = world.score;
+        scoreEl.textContent = "Score " + hudScore;
+      }
+      if (livesEl && (hudLives !== world.lives || hudLivesSet !== world.livesSet)) {
+        hudLives = world.lives;
+        hudLivesSet = world.livesSet;
+        var out = "";
+        for (var li = 0; li < hudLivesSet; li++) out += li < hudLives ? "●" : "○";
+        livesEl.textContent = out;
+      }
+    }
     var running = false;
     var colors = themeColors();
 
@@ -479,6 +499,8 @@
       var px = gpx();
       var u = Math.min(w, h);
 
+      updateHud();
+
       ctx.globalAlpha = 1;
       ctx.fillStyle = colors.background;
       ctx.fillRect(0, 0, w, h);
@@ -535,18 +557,14 @@
         ctx.lineJoin = "miter";
       }
 
-      // Score / lives HUD — not in the reference (which relied on a
-      // surrounding page for this), added since the game stands alone
-      // in a modal here with nothing else showing the player's state.
-      ctx.globalAlpha = 1;
-      var hp = Math.max(3, Math.round(u * 0.03));
-      ctx.fillStyle = colors.ink;
-      drawText(ctx, "SCORE " + world.score, 14, 14, hp);
-      var livesStr = "";
-      for (var li = 0; li < world.livesSet; li++) livesStr += li < world.lives ? "X" : "-";
-      ctx.fillStyle = colors.accent;
-      drawText(ctx, livesStr, w - 14 - textWidth(livesStr, hp), 14, hp);
-
+      // Score / lives HUD is real HTML now (see updateHud below), not
+      // drawn here — the bitmap font that looks good big and chunky for
+      // the falling letters read as broken, illegible, and prone to
+      // overlapping itself at the small size a HUD needs, especially on
+      // a narrow mobile canvas. GAME OVER below stays canvas-drawn on
+      // purpose: it's meant to look like a big dramatic bitmap moment,
+      // shown once, centered, not a small always-on readout competing
+      // with the falling pieces for space.
       if (world.over) {
         var bp2 = Math.max(4, Math.min(10, Math.round(w / 150)));
         var s = "GAME OVER";
@@ -652,6 +670,8 @@
   var panel = modal.querySelector(".slice-blade-panel");
   var host = modal.querySelector("[data-slice-blade-host]");
   var canvas = modal.querySelector("[data-slice-blade-canvas]");
+  var scoreEl = modal.querySelector("[data-slice-blade-score]");
+  var livesEl = modal.querySelector("[data-slice-blade-lives]");
   var openers = document.querySelectorAll("[data-slice-blade-open]");
   var closers = modal.querySelectorAll("[data-slice-blade-close]");
   var lastFocused = null;
@@ -694,7 +714,7 @@
     document.body.style.overflow = "hidden";
     document.addEventListener("keydown", onKeydown);
 
-    if (!engine) engine = buildEngine(host, canvas);
+    if (!engine) engine = buildEngine(host, canvas, scoreEl, livesEl);
     // Canvas can't measure a real size while [hidden] — start once the
     // panel is actually visible, same reflow-then-act pattern used
     // throughout this codebase for exactly this class of bug.
