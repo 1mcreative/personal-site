@@ -65,6 +65,7 @@ permalink: /resume/
       <span>Senior Software Engineer, eBay</span>
       <span class="entry-meta">Bengaluru &middot; Jun 2026 &ndash; Present</span>
     </p>
+    <p class="entry-summary">Owns eBay's real-time data pipelines, plus the team's AI schema generator and self-service data layer.</p>
     <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-ebay">
       <span class="entry-toggle-label">Show details</span>
       <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -86,6 +87,7 @@ permalink: /resume/
       <span>Senior Software Engineer (Lead), Walmart</span>
       <span class="entry-meta">Bengaluru &middot; Apr 2025 &ndash; May 2026</span>
     </p>
+    <p class="entry-summary">Led 6 engineers building Kafka-based pricing microservices across multiple countries.</p>
     <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-walmart-lead">
       <span class="entry-toggle-label">Show details</span>
       <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -112,6 +114,7 @@ permalink: /resume/
       <span>Software Developer, Walmart</span>
       <span class="entry-meta">Bengaluru &middot; Apr 2022 &ndash; Mar 2025</span>
     </p>
+    <p class="entry-summary">Built repricing and anomaly-detection pipelines that pulled over 1M mispriced items off the Walmart catalog.</p>
     <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-walmart-dev">
       <span class="entry-toggle-label">Show details</span>
       <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -132,6 +135,7 @@ permalink: /resume/
       <span>Data Engineer, UnitedHealth Group</span>
       <span class="entry-meta">Hyderabad &middot; Apr 2021 &ndash; Apr 2022</span>
     </p>
+    <p class="entry-summary">Built HIPAA-compliant ETL pipelines on Azure Data Factory and Databricks for healthcare data.</p>
     <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-uhg">
       <span class="entry-toggle-label">Show details</span>
       <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -151,6 +155,7 @@ permalink: /resume/
       <span>Systems Engineer, Tata Consultancy Services</span>
       <span class="entry-meta">Hyderabad &middot; Sep 2018 &ndash; Apr 2021</span>
     </p>
+    <p class="entry-summary">Migrated legacy data warehouses to Azure and cut query costs 25%.</p>
     <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-tcs">
       <span class="entry-toggle-label">Show details</span>
       <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -167,6 +172,67 @@ permalink: /resume/
   </div>
 
   </div>
+</section>
+
+<section class="resume-section">
+  <h2>Projects</h2>
+
+  <div class="experience-timeline">
+
+  <div class="resume-entry">
+    <p class="entry-heading">
+      <span>Real-Time Emotion-to-Emoji Detector</span>
+      <span class="entry-meta">SVNIT, Surat &middot; Final Year Project, 2018</span>
+    </p>
+    <p class="entry-summary">Built a browser tool that reads your facial expression through the webcam and shows a matching emoji.</p>
+    <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-emoji-project">
+      <span class="entry-toggle-label">Show details</span>
+      <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="entry-details-wrap">
+      <ul class="entry-details" id="entry-detail-emoji-project" hidden>
+        <li><strong>Live capture:</strong> Captures your face live through the webcam, right in the browser, no app or upload required.</li>
+        <li><strong>Expression detection:</strong> Reads the expression and picks a matching emoji: happy, sad, angry, surprised, fearful, disgusted, or neutral.</li>
+        <li class="entry-demo-item">
+          <div class="emoji-demo" data-state="idle">
+            <div class="emoji-demo-stage">
+              <video class="emoji-demo-video" playsinline muted aria-hidden="true"></video>
+              <span class="emoji-demo-placeholder" aria-hidden="true">&#x1F642;</span>
+              <span class="emoji-demo-emoji" aria-hidden="true"></span>
+            </div>
+            <p class="emoji-demo-status">Turn your camera on and it'll guess how you're feeling.</p>
+            <div class="emoji-demo-actions">
+              <button type="button" class="offset-btn emoji-demo-start">
+                <span class="emoji-demo-start-label">Try it now</span>
+                <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <button type="button" class="offset-btn emoji-demo-stop" hidden>Stop camera</button>
+            </div>
+            <p class="emoji-demo-note">Runs entirely in your browser. Nothing leaves your device.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  </div>
+</section>
+
+<section class="resume-section">
+  <h2>Additional highlights</h2>
+  <ul>
+    <li><strong>Agentic AI System Design:</strong> Hands-on experience designing and shipping an AI agent-driven workflow for automated data schema generation and a self-service, automated data consumption layer, moving a previously manual, team-dependent process to a fully automated, consumer-driven path.</li>
+    <li><strong>Mentorship &amp; Hiring:</strong> Mentored new hires and junior engineers; participated in hiring and interview panels for vendor and FTE roles.</li>
+    <li><strong>AI-Augmented Development:</strong> Practical, day-to-day use of AI coding tools (Cursor, Claude Code, GitHub Copilot, Qodo Merge) and general-purpose LLM tools (Claude, ChatGPT) to accelerate development, elevate code review quality, and support research and technical communication.</li>
+    <li><strong>Legacy &amp; Proprietary System Modernization:</strong> Consistent track record diving into proprietary and legacy systems (internal release pipelines, Teradata data warehouses, Hadoop platforms) to understand their inner workings and strategically modernize them.</li>
+    <li><strong>Regulated &amp; Enterprise Environments:</strong> Experience delivering technology solutions in compliance-driven settings (HIPAA-regulated healthcare data) and for large enterprise clients (Proximus/Belgium, Bank of America).</li>
+    <li><strong>CI/CD:</strong> Automated CI/CD pipelines by integrating functional, integration, end-to-end, and performance testing into the deployment process.</li>
+    <li><strong>Engineering Standards:</strong> Passionate about performance optimization, code quality, testability, and technical documentation for high-concurrency, high-throughput production systems.</li>
+  </ul>
 </section>
 
 </div>
@@ -217,19 +283,6 @@ permalink: /resume/
     <dt>Familiarity (exposure, non-production depth)</dt>
     <dd><span class="skill-pill">Snowflake</span><span class="skill-pill">GraphQL</span><span class="skill-pill">Hibernate/JPA</span><span class="skill-pill">Elasticsearch</span></dd>
   </dl>
-</section>
-
-<section class="resume-section">
-  <h2>Additional highlights</h2>
-  <ul>
-    <li><strong>Agentic AI System Design:</strong> Hands-on experience designing and shipping an AI agent-driven workflow for automated data schema generation and a self-service, automated data consumption layer, moving a previously manual, team-dependent process to a fully automated, consumer-driven path.</li>
-    <li><strong>Mentorship &amp; Hiring:</strong> Mentored new hires and junior engineers; participated in hiring and interview panels for vendor and FTE roles.</li>
-    <li><strong>AI-Augmented Development:</strong> Practical, day-to-day use of AI coding tools (Cursor, Claude Code, GitHub Copilot, Qodo Merge) and general-purpose LLM tools (Claude, ChatGPT) to accelerate development, elevate code review quality, and support research and technical communication.</li>
-    <li><strong>Legacy &amp; Proprietary System Modernization:</strong> Consistent track record diving into proprietary and legacy systems (internal release pipelines, Teradata data warehouses, Hadoop platforms) to understand their inner workings and strategically modernize them.</li>
-    <li><strong>Regulated &amp; Enterprise Environments:</strong> Experience delivering technology solutions in compliance-driven settings (HIPAA-regulated healthcare data) and for large enterprise clients (Proximus/Belgium, Bank of America).</li>
-    <li><strong>CI/CD:</strong> Automated CI/CD pipelines by integrating functional, integration, end-to-end, and performance testing into the deployment process.</li>
-    <li><strong>Engineering Standards:</strong> Passionate about performance optimization, code quality, testability, and technical documentation for high-concurrency, high-throughput production systems.</li>
-  </ul>
 </section>
 
 <section class="resume-section">

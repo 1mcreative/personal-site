@@ -503,9 +503,23 @@
   font-size: 0.9rem;
 }
 
-/* Collapsed by default (see assets/js/entry-toggle.js) — only the heading
-   above (title, company, dates) is the "high-level summary" until this is
-   deliberately opened; nothing here auto-expands on hover or scroll.
+/* One always-visible line of real substance per entry, so a collapsed
+   entry reads as more than a title and a button — the two-column balance
+   fix (moving Additional Highlights into .resume-main) closed the height
+   gap, but a visitor scanning the timeline before opening anything still
+   needs something to read. Full sentence, body-text color (not --muted
+   like entry-meta) so it carries real weight rather than reading as a
+   second metadata line. */
+.resume-entry .entry-summary {
+  margin: 0.35rem 0 0;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Collapsed by default (see assets/js/entry-toggle.js) — the heading and
+   summary above are the "high-level summary" until this is deliberately
+   opened; nothing here auto-expands on hover or scroll.
    .question-toggle (/questions/, assets/js/interview-questions.js) shares
    every rule below it: same disclosure component, different page. */
 .entry-toggle,
@@ -595,6 +609,136 @@
   .question-answer-wrap,
   .entry-chevron {
     transition-duration: 0.01ms;
+  }
+}
+
+/* Emotion-to-Emoji demo, inside the Projects entry's expanded details. A real
+   camera + face-api.js expression model, not a video or a screenshot — see
+   assets/js/emoji-detector.js. Lives as the last <li> in .entry-details so it
+   inherits the exact same hidden/collapse mechanics as the text bullets above
+   it (one accessibility surface, not a second one to keep in sync); the
+   bullet marker is stripped since a whole interactive widget reading as one
+   list item is a layout choice, not literal list content. */
+.entry-demo-item {
+  list-style: none;
+  margin-top: 0.5rem;
+}
+
+.emoji-demo {
+  max-width: 320px;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.emoji-demo-stage {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.emoji-demo-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Mirrored so it reads like a mirror, not a security feed. */
+  transform: scaleX(-1);
+  display: none;
+}
+
+.emoji-demo-placeholder {
+  font-size: 2.25rem;
+  opacity: 0.5;
+}
+
+.emoji-demo-emoji {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  font-size: 2rem;
+  line-height: 1;
+  display: none;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+
+.emoji-demo[data-state="running"] .emoji-demo-video,
+.emoji-demo[data-state="running"] .emoji-demo-emoji {
+  display: block;
+}
+
+.emoji-demo[data-state="running"] .emoji-demo-placeholder {
+  display: none;
+}
+
+.emoji-demo-status {
+  position: relative;
+  margin: 0.75rem 0 0;
+  padding-left: 0;
+  min-height: 1.2em;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.emoji-demo[data-state="loading"] .emoji-demo-status {
+  padding-left: 1rem;
+}
+
+.emoji-demo[data-state="loading"] .emoji-demo-status::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.4em;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: emoji-demo-pulse 1s ease-in-out infinite;
+}
+
+/* Reuses the contact form's own established error color (tokens.css
+   .contact-status[data-state="error"]) rather than inventing a new hue. */
+.emoji-demo[data-state="error"] .emoji-demo-status {
+  color: #e0575b;
+}
+
+@keyframes emoji-demo-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.emoji-demo-actions {
+  margin-top: 0.75rem;
+}
+
+.emoji-demo .offset-btn {
+  padding: 0.5rem 1.1rem;
+  min-height: 44px;
+  font-size: 0.85rem;
+}
+
+.emoji-demo-note {
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emoji-demo-status::before {
+    animation-duration: 0.01ms;
   }
 }
 
