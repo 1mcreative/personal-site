@@ -411,6 +411,35 @@
   margin-bottom: var(--space-2);
 }
 
+/* FAQ (AEO): native details/summary, no JS needed to expand/collapse and
+   nothing to break if it fails to load. */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--space-2);
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: var(--space-1) 0;
+}
+
+.faq-item summary::marker {
+  color: var(--accent);
+}
+
+.faq-item p {
+  margin-top: var(--space-1);
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
 /* Experience timeline — one continuous spine (::before on the wrapper)
    with a dot per entry (::before on each .resume-entry) instead of each
    entry carrying its own disconnected border-left segment. GUTTER below

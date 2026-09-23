@@ -2,6 +2,7 @@
 layout: lab
 title: "Component Lab"
 description: "Every visual element from bhaveshnakum.com: live previews and plug-and-play code, including the ones that got cut."
+image: "/assets/img/og-image.svg"
 permalink: /lab/
 ---
 

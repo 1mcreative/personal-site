@@ -1,7 +1,8 @@
 ---
 layout: personal
 title: "Life & Instagram"
-description: "Bhavesh Nakum's personal side: Instagram, photos, and hobbies outside of work."
+description: "Bhavesh Nakum's personal side: Instagram, travel videos, and hobbies outside of work. Two Instagram accounts and two YouTube channels of travel shorts and edited videos."
+image: "/assets/img/og-image.svg"
 permalink: /life/
 ---
 

@@ -1,0 +1,8 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#14171c"/>
+  <rect x="0" y="0" width="10" height="630" fill="#1d4ed8"/>
+  <text x="90" y="300" font-family="Georgia, 'Times New Roman', serif" font-size="88" font-weight="700" fill="#f5f7fa">Bhavesh Nakum</text>
+  <text x="90" y="360" font-family="Arial, Helvetica, sans-serif" font-size="34" fill="#6ec1ff">Senior Software Engineer &amp; Backend Architect</text>
+  <text x="90" y="410" font-family="Arial, Helvetica, sans-serif" font-size="26" fill="#9aa8b8">Backend systems &#183; Distributed data pipelines &#183; Cloud platforms</text>
+  <text x="90" y="560" font-family="Arial, Helvetica, sans-serif" font-size="24" fill="#5b6572">bhaveshnakum.com</text>
+</svg>
