@@ -625,3 +625,46 @@ p {
   height: 100%;
   cursor: crosshair;
 }
+
+/* Real HTML score/lives readout, not drawn on the canvas — per direct
+   feedback that the canvas-drawn version ("SCORE n" in the same bitmap
+   font as the falling letters) read as too big and overlapped both
+   itself and the pieces behind it, worst on a narrow mobile canvas
+   where there was never enough width for both blocks of text at once.
+   Small pills using the same "text over moving content" recipe
+   .hero-status-chip already proved on the homepage, just built from
+   this component set's own theme-agnostic tokens (--surface/--border)
+   instead of home.css's own --muted, since this modal has to look
+   native on every theme, not just the homepage's. */
+.slice-blade-hud {
+  position: absolute;
+  top: var(--space-1);
+  left: var(--space-1);
+  right: var(--space-1);
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-1);
+  pointer-events: none;
+}
+
+.slice-blade-hud-chip {
+  display: inline-flex;
+  padding: 0.3em 0.7em;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.slice-blade-hud-lives {
+  color: var(--accent);
+  letter-spacing: 0.15em;
+}
