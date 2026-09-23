@@ -40,6 +40,16 @@ permalink: /
     </span>
   </div>
 
+  <button type="button" class="bored-trigger hero-bored-trigger" data-slice-blade-open aria-label="Getting bored? Play a quick slicing game">
+    <span class="bored-trigger-icon" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M5 19L19 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M13 5h6v6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    Getting bored?
+  </button>
+
   <canvas class="pixel-name-canvas" aria-hidden="true"></canvas>
 
   <div class="hero-inner">
