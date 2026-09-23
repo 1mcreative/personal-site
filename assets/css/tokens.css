@@ -52,6 +52,20 @@
   --speed: 0.18s;
 }
 
+/* Themed text selection — every theme's own --bg happens to be the right
+   contrast partner for its own --accent (white bg on home/professional
+   pairs with their deep-blue accent the same way .bored-trigger's white-
+   on-accent text already does; personal's near-black bg pairs with its
+   light-blue accent the same way), so one generic rule works correctly
+   across all three themes with no per-theme override. Cascades down from
+   whichever body.theme-* class the page has, same as every other custom
+   property here — cheap, sitewide, and otherwise left to the browser
+   default blue that belongs to no design system. */
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
 * {
   box-sizing: border-box;
 }
