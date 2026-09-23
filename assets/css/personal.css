@@ -554,6 +554,113 @@ html:has(body.theme-personal) {
   transform: translateX(2px);
 }
 
+/* Live Instagram feed (assets/js/instagram-feed.js, via Behold.so) — replaces
+   the two static handle cards above (.social-card, kept for /lab/'s own
+   demo, not deleted) with real photo content, per direct feedback that the
+   old cards "marketed the ID, not the content." Merges both accounts'
+   posts into one grid sorted by real timestamp rather than two separately
+   labeled rows, matching the same consistency preference the YouTube
+   section's own redesign already established. */
+.theme-personal .ig-feed-grid,
+.theme-personal .ig-feed-loading {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+/* This project has hit this exact bug once already on .lab-modal: a bare
+   [hidden] attribute selector loses to any class selector on specificity,
+   so instagram-feed.js's "loadingEl.hidden = true" was correctly setting
+   the attribute while this file's own "display: grid" above just kept
+   winning — confirmed directly, not assumed, via a real screenshot still
+   showing the skeleton after the JS reported it hidden. Class+attribute
+   forces this to actually win. */
+.theme-personal .ig-feed-grid[hidden],
+.theme-personal .ig-feed-loading[hidden] {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .theme-personal .ig-feed-grid,
+  .theme-personal .ig-feed-loading {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .theme-personal .ig-feed-grid,
+  .theme-personal .ig-feed-loading {
+    grid-template-columns: 1fr;
+  }
+}
+
+.theme-personal .ig-feed-loading span {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  background: var(--surface);
+  animation: ig-feed-pulse 1.4s ease-in-out infinite;
+}
+.theme-personal .ig-feed-loading span:nth-child(2) { animation-delay: 0.1s; }
+.theme-personal .ig-feed-loading span:nth-child(3) { animation-delay: 0.2s; }
+.theme-personal .ig-feed-loading span:nth-child(4) { animation-delay: 0.15s; }
+.theme-personal .ig-feed-loading span:nth-child(5) { animation-delay: 0.25s; }
+.theme-personal .ig-feed-loading span:nth-child(6) { animation-delay: 0.05s; }
+
+@keyframes ig-feed-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-personal .ig-feed-loading span {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+.theme-personal .ig-feed-item {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.theme-personal .ig-feed-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s var(--ease);
+}
+
+.theme-personal .ig-feed-item:hover img,
+.theme-personal .ig-feed-item:focus-visible img {
+  transform: scale(1.06);
+}
+
+.theme-personal .ig-feed-error {
+  text-align: center;
+  padding: var(--space-4) 0;
+  color: var(--muted);
+}
+
+/* Small, always-visible regardless of feed state — losing a direct path to
+   the real profiles (not just a specific post) would be a real regression
+   from what the handle cards used to guarantee. */
+.theme-personal .ig-feed-links {
+  margin-top: var(--space-2);
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.theme-personal .ig-feed-links a {
+  margin: 0 var(--space-1);
+}
+
 /* Click effects (sniper reticle) — see assets/js/click-effects.js. Fixed
    overlay so it works anywhere on the page, not just over the intro/cards. */
 .theme-personal .click-fx-layer {
