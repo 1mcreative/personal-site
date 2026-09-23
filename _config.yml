@@ -19,7 +19,18 @@ google_analytics: "G-V5VCNVVCJT"  # GA4 Measurement ID
 #   google: ""  # Search Console HTML-tag verification code
 #   bing: ""    # Bing Webmaster Tools verification code
 
-# image: "/assets/img/og-image.png"  # uncomment once a real 1200x630 social-share image exists at this path
+# og:image: NOT settable here. jekyll-seo-tag's `image` reads only from a
+# page's own front matter (site.image is never merged in -- confirmed by
+# reading the gem's own drop.rb) -- set `image:` per page instead (see
+# index.md, resume/index.md, life/index.md, lab.md). assets/img/og-image.svg
+# is the shared asset all of them point at.
+#
+# It's SVG, not PNG, since no image-rasterizing tool was available to
+# produce a real raster file. Slack/Discord/iMessage-style previews
+# generally render SVG og:image fine; Twitter/X and Facebook's scrapers are
+# known to be unreliable with it and may show no preview at all. This is a
+# real, partial fix, not a complete one -- swap in a real 1200x630 PNG at
+# the same path on every page below for full compatibility once one exists.
 
 markdown: kramdown
 kramdown:

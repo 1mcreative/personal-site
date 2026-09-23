@@ -2,6 +2,7 @@
 layout: professional
 title: "Resume - Senior Software Engineer"
 description: "Bhavesh Nakum's resume: Senior Software Engineer at eBay, backend architecture, distributed systems, and big data platforms."
+image: "/assets/img/og-image.svg"
 permalink: /resume/
 ---
 
@@ -236,3 +237,84 @@ permalink: /resume/
 
 </div>
 </div>
+
+<section class="resume-section" id="faq">
+  <h2>Frequently asked questions</h2>
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>Who is Bhavesh Nakum?</summary>
+      <p>Bhavesh Nakum is a Senior Software Engineer based in Bengaluru, India, currently working on eBay's core Data team.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What does Bhavesh Nakum do?</summary>
+      <p>He designs and builds backend systems and distributed data pipelines, with hands-on work in event-driven architecture (Apache Kafka, Apache Flink), big data processing, and AI agent-driven workflows.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Where has Bhavesh Nakum worked?</summary>
+      <p>eBay, Walmart (as Senior Software Engineer, Lead), UnitedHealth Group, and Tata Consultancy Services, spanning backend engineering, data engineering, and cloud migration work since 2018.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Is Bhavesh Nakum a lead developer?</summary>
+      <p>Yes. At Walmart he led and mentored a cross-functional team of 6 engineers as Senior Software Engineer (Lead), and continues to take on technical leadership and mentoring responsibilities.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What technologies does Bhavesh Nakum work with?</summary>
+      <p>Java, Python, Spring Boot, Apache Kafka, Apache Flink, Apache Spark, Kubernetes, Docker, and cloud platforms including Microsoft Azure, Google Cloud Platform, and AWS.</p>
+    </details>
+  </div>
+</section>
+
+<!-- FAQPage schema, matching the visible Q&A above word-for-word (required
+     for Google's FAQ rich-result guidelines, not just present anywhere on
+     the page). AEO gap flagged in the site audit: the facts already existed
+     on this page, just never formatted as direct answers to explicit
+     questions — this section and schema are that formatting change, not
+     new claims. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Who is Bhavesh Nakum?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Bhavesh Nakum is a Senior Software Engineer based in Bengaluru, India, currently working on eBay's core Data team."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does Bhavesh Nakum do?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "He designs and builds backend systems and distributed data pipelines, with hands-on work in event-driven architecture (Apache Kafka, Apache Flink), big data processing, and AI agent-driven workflows."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where has Bhavesh Nakum worked?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "eBay, Walmart (as Senior Software Engineer, Lead), UnitedHealth Group, and Tata Consultancy Services, spanning backend engineering, data engineering, and cloud migration work since 2018."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is Bhavesh Nakum a lead developer?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. At Walmart he led and mentored a cross-functional team of 6 engineers as Senior Software Engineer (Lead), and continues to take on technical leadership and mentoring responsibilities."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What technologies does Bhavesh Nakum work with?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Java, Python, Spring Boot, Apache Kafka, Apache Flink, Apache Spark, Kubernetes, Docker, and cloud platforms including Microsoft Azure, Google Cloud Platform, and AWS."
+      }
+    }
+  ]
+}
+</script>
