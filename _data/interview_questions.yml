@@ -1,0 +1,53 @@
+# Interview question log for /questions/. Each entry below becomes one
+# card on the page, and every field drives one of the page's filters
+# (Company, Round, Tech Stack) automatically — the filter chip lists are
+# generated from whatever values you use here, nothing to wire up by hand.
+#
+# Fields:
+#   company    - string, required
+#   round      - string, required. Free text, but reuse the same handful
+#                of names (Phone Screen, Technical Round 1/2, System
+#                Design, Hiring Manager, Onsite) so the round filter
+#                doesn't end up with ten near-duplicate chips.
+#   techstack  - list of strings, required. Tag everything a question
+#                actually touched — a system-design question might
+#                reasonably carry 3-4 tags.
+#   question   - string, required.
+#   answer     - string, optional. Your own approach/notes, shown behind
+#                a "Show my answer" toggle on the card. Leave the field
+#                out entirely if you don't want a toggle on that card.
+#
+# The three entries below are placeholders (company names say so) so the
+# filters have real data to demo. Replace them with real questions as you
+# collect them, in any order — the page doesn't sort by date. Once you've
+# added your first real entry, delete the sample ones and flip `noindex`/
+# `sitemap` back on in questions/index.html (see the comment there).
+
+- company: "Sample Company A"
+  round: "Phone Screen"
+  techstack: ["Java", "Spring Boot"]
+  question: "How would you design a rate limiter for a public REST API?"
+  answer: "Talked through token bucket vs. sliding window, whether to enforce it at the gateway or the service, and how to make the limit configurable per client."
+
+- company: "Sample Company A"
+  round: "System Design"
+  techstack: ["Apache Kafka", "Distributed Systems"]
+  question: "Design an event-driven pricing pipeline that can reprice millions of items with sub-second latency."
+  answer: "Covered partitioning strategy, consumer group scaling, idempotency, and how to keep one slow downstream consumer from blocking the rest of the pipeline."
+
+- company: "Sample Company B"
+  round: "Technical Round 1"
+  techstack: ["Python", "Apache Airflow", "SQL"]
+  question: "Walk through how you'd back-fill a broken daily ETL job for the last 30 days without double-counting."
+  answer: "Idempotent DAG runs keyed by execution date, a dry-run/validation step before writing, and how to avoid overlapping the back-fill with the still-running live schedule."
+
+- company: "Sample Company B"
+  round: "Hiring Manager"
+  techstack: ["Distributed Systems", "Leadership"]
+  question: "Tell me about a time you disagreed with a technical decision on your team. What did you do?"
+
+- company: "Sample Company C"
+  round: "Onsite"
+  techstack: ["Kubernetes", "Docker"]
+  question: "Your service's pods keep getting OOMKilled under load, but only in production, not staging. How do you debug it?"
+  answer: "Compared resource requests/limits and real usage between environments first, then talked through checking for a memory leak vs. just under-provisioned limits, and what I'd change in the rollout to catch this earlier next time."

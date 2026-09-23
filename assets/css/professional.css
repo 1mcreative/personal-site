@@ -476,8 +476,11 @@
 
 /* Collapsed by default (see assets/js/entry-toggle.js) — only the heading
    above (title, company, dates) is the "high-level summary" until this is
-   deliberately opened; nothing here auto-expands on hover or scroll. */
-.entry-toggle {
+   deliberately opened; nothing here auto-expands on hover or scroll.
+   .question-toggle (/questions/, assets/js/interview-questions.js) shares
+   every rule below it: same disclosure component, different page. */
+.entry-toggle,
+.question-toggle {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -494,11 +497,14 @@
 }
 
 .entry-toggle:hover,
-.entry-toggle:focus-visible {
+.entry-toggle:focus-visible,
+.question-toggle:hover,
+.question-toggle:focus-visible {
   text-decoration: underline;
 }
 
-.entry-toggle:focus-visible {
+.entry-toggle:focus-visible,
+.question-toggle:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 4px;
@@ -508,7 +514,8 @@
   transition: transform 0.25s ease;
 }
 
-.entry-toggle[aria-expanded="true"] .entry-chevron {
+.entry-toggle[aria-expanded="true"] .entry-chevron,
+.question-toggle[aria-expanded="true"] .entry-chevron {
   transform: rotate(180deg);
 }
 
@@ -516,13 +523,21 @@
    entries with very different bullet counts (4 vs. 9) each expand at a
    speed proportional to their own content instead of sharing one fixed
    cap and visibly pausing at the end when short. */
-.entry-details-wrap {
+.entry-details-wrap,
+.question-answer-wrap {
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.35s ease;
 }
 
 .resume-entry.is-expanded .entry-details-wrap {
+  grid-template-rows: 1fr;
+}
+
+/* .question-answer-wrap has no wrapping .resume-entry-style parent to key
+   off, so assets/js/interview-questions.js toggles this class directly on
+   the wrap instead of on an ancestor. */
+.question-answer-wrap.is-expanded {
   grid-template-rows: 1fr;
 }
 
@@ -537,8 +552,18 @@
   margin-bottom: 0.3rem;
 }
 
+.question-answer-wrap > .question-answer {
+  overflow: hidden;
+  min-height: 0;
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .entry-details-wrap,
+  .question-answer-wrap,
   .entry-chevron {
     transition-duration: 0.01ms;
   }
@@ -640,4 +665,168 @@
   .emerge-pending {
     transition: none;
   }
+}
+
+/* ---------------------------------------------------------------------
+   /questions/ — interview question log with faceted filters (company /
+   round / tech stack), driven by assets/js/interview-questions.js.
+   Reuses this page's own tokens (--bg/--surface/--text/--muted/--accent/
+   --border) and .skill-pill for the per-card tech tags, same as
+   everything else on this theme.
+   --------------------------------------------------------------------- */
+
+.questions-header {
+  margin-bottom: var(--space-3);
+}
+
+.questions-intro {
+  color: var(--muted);
+}
+
+.questions-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.filter-group-label {
+  flex-shrink: 0;
+  width: 90px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Same pill shape as .skill-pill, but interactive: a real toggle button
+   (aria-pressed), so it needs this project's own ≥44px touch-target floor
+   — met via min-height/padding rather than font-size, so the label stays
+   readable. */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.4rem 0.85rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color var(--speed) var(--ease), border-color var(--speed) var(--ease), color var(--speed) var(--ease);
+}
+
+.filter-chip:hover {
+  border-color: var(--accent);
+}
+
+.filter-chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.filter-chip[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.filter-reset {
+  align-self: flex-start;
+  padding: 0.3rem 0.2rem;
+  min-height: 44px;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filter-reset:hover,
+.filter-reset:focus-visible {
+  text-decoration: underline;
+}
+
+.questions-count {
+  margin: 0 0 var(--space-2);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.questions-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.question-card {
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.question-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.question-tag {
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.question-tag-company {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+}
+
+.question-tag-round {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.question-text {
+  margin: 0 0 0.6rem;
+  font-weight: 600;
+  max-width: none;
+}
+
+.question-card-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.4rem;
+}
+
+.questions-empty {
+  padding: var(--space-3) 0;
+  color: var(--muted);
+  text-align: center;
 }
