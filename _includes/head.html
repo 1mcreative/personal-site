@@ -8,6 +8,7 @@
 {% endcase %}
 <meta name="theme-color" content="{{ theme-color }}">
 {% seo %}
+{% if page.noindex %}<meta name="robots" content="noindex, follow">{% endif %}
 <!-- A dedicated Person schema, separate from jekyll-seo-tag's own thin
      WebSite/WebPage block above: this is what actually lets a search
      engine's Knowledge Graph or an AI assistant answering "who is Bhavesh

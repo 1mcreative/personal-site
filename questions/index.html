@@ -1,29 +1,91 @@
 ---
-permalink: /questions/
-sitemap: false
+layout: professional
 title: "Interview Questions"
-description: "A growing set of interview question notes from Bhavesh Nakum's engineering career. More detail is coming soon."
+description: "Real interview questions Bhavesh Nakum has been asked, filterable by company, interview round, and tech stack."
+permalink: /questions/
+noindex: true
+sitemap: false
 ---
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    {% include head.html %}
-    <meta name="robots" content="noindex, follow">
-    <link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
-  </head>
-  <body>
-    <header>
-      <h1>Interview questions</h1>
-      <nav>
-        <a href="{{ '/' | relative_url }}">Home</a>
-        <a href="{{ '/resume/' | relative_url }}">Resume</a>
-        <a href="{{ '/life/' | relative_url }}">Instagram &amp; hobbies</a>
-        <a href="{{ '/interviews/' | relative_url }}">Interview experience</a>
-        <a href="./" aria-current="page">Interview questions</a>
-      </nav>
-    </header>
-    <main>
-      <p>Host interview question sets here.</p>
-    </main>
-  </body>
-</html>
+<!-- noindex + sitemap: false above match this site's own placeholder-page
+     convention (see SEO-PLAYBOOK.md) while _data/interview_questions.yml
+     still only holds sample entries. Once real questions replace the
+     samples there, delete both lines so this page gets indexed. -->
+
+<header class="questions-header">
+  <h1>Interview questions</h1>
+  <p class="questions-intro">Questions I've actually been asked, across different companies and interview rounds, tagged by the tech they touched. Filter by whatever you're prepping for.</p>
+</header>
+
+{% assign entries = site.data.interview_questions %}
+{% assign companies = entries | map: "company" | uniq | sort %}
+{% assign rounds = entries | map: "round" | uniq | sort %}
+
+{% assign tech_raw = "" %}
+{% for q in entries %}
+  {% for t in q.techstack %}
+    {% assign tech_raw = tech_raw | append: t | append: "///" %}
+  {% endfor %}
+{% endfor %}
+{% assign techstacks = tech_raw | split: "///" | uniq | sort %}
+
+<div class="questions-filters" data-questions-filters>
+  <div class="filter-group" role="group" aria-label="Filter by company">
+    <span class="filter-group-label">Company</span>
+    <div class="filter-chips">
+      {% for company in companies %}
+      <button type="button" class="filter-chip" data-filter-group="company" data-filter-value="{{ company | escape }}" aria-pressed="false">{{ company }}</button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="filter-group" role="group" aria-label="Filter by round">
+    <span class="filter-group-label">Round</span>
+    <div class="filter-chips">
+      {% for round in rounds %}
+      <button type="button" class="filter-chip" data-filter-group="round" data-filter-value="{{ round | escape }}" aria-pressed="false">{{ round }}</button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="filter-group" role="group" aria-label="Filter by tech stack">
+    <span class="filter-group-label">Tech stack</span>
+    <div class="filter-chips">
+      {% for tech in techstacks %}
+      <button type="button" class="filter-chip" data-filter-group="techstack" data-filter-value="{{ tech | escape }}" aria-pressed="false">{{ tech }}</button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <button type="button" class="filter-reset" data-filter-reset hidden>Clear filters</button>
+</div>
+
+<p class="questions-count" data-questions-count aria-live="polite"></p>
+
+<div class="questions-list" data-questions-list>
+  {% for q in entries %}
+  {% assign tech_joined = q.techstack | join: "///" %}
+  <article class="question-card" data-company="{{ q.company | escape }}" data-round="{{ q.round | escape }}" data-techstack="{{ tech_joined | escape }}">
+    <div class="question-card-meta">
+      <span class="question-tag question-tag-company">{{ q.company }}</span>
+      <span class="question-tag question-tag-round">{{ q.round }}</span>
+    </div>
+    <p class="question-text">{{ q.question }}</p>
+    <div class="question-card-stack">
+      {% for tech in q.techstack %}<span class="skill-pill">{{ tech }}</span>{% endfor %}
+    </div>
+    {% if q.answer %}
+    <button type="button" class="question-toggle" aria-expanded="false" aria-controls="q-answer-{{ forloop.index }}">
+      <span class="entry-toggle-label">Show my answer</span>
+      <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="question-answer-wrap">
+      <p class="question-answer" id="q-answer-{{ forloop.index }}" hidden>{{ q.answer }}</p>
+    </div>
+    {% endif %}
+  </article>
+  {% endfor %}
+</div>
+
+<p class="questions-empty" data-questions-empty hidden>No questions match these filters.</p>
