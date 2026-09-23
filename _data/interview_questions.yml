@@ -1,53 +1,161 @@
 # Interview question log for /questions/. Each entry below becomes one
-# card on the page, and every field drives one of the page's filters
-# (Company, Round, Tech Stack) automatically — the filter chip lists are
-# generated from whatever values you use here, nothing to wire up by hand.
+# card on the page, and company/round/techstack each drive one of the
+# page's filters — the filter chip lists are generated from whatever
+# values exist here, nothing to wire up by hand.
 #
 # Fields:
 #   company    - string, required
 #   round      - string, required. Free text, but reuse the same handful
-#                of names (Phone Screen, Technical Round 1/2, System
-#                Design, Hiring Manager, Onsite) so the round filter
-#                doesn't end up with ten near-duplicate chips.
+#                of names (Phone Screen, CoderPad - Technical Screen,
+#                System Design, Hiring Manager, Onsite) so the round
+#                filter doesn't end up with ten near-duplicate chips.
 #   techstack  - list of strings, required. Tag everything a question
-#                actually touched — a system-design question might
-#                reasonably carry 3-4 tags.
-#   question   - string, required.
-#   answer     - string, optional. Your own approach/notes, shown behind
-#                a "Show my answer" toggle on the card. Leave the field
-#                out entirely if you don't want a toggle on that card.
-#
-# The three entries below are placeholders (company names say so) so the
-# filters have real data to demo. Replace them with real questions as you
-# collect them, in any order — the page doesn't sort by date. Once you've
-# added your first real entry, delete the sample ones and flip `noindex`/
-# `sitemap` back on in questions/index.html (see the comment there).
+#                actually touched.
+#   question   - string, required. Short title for the card.
+#   problem    - Markdown, required. The full problem statement — always
+#                visible on the card (rendered with `| markdownify`, so
+#                `**bold**`/`` `code` `` work as normal Markdown).
+#   example    - Markdown, optional. A worked example/walkthrough —
+#                fenced ``` code blocks render as preformatted blocks,
+#                which is how the ASCII tree/elevation diagrams below
+#                stay aligned. Shown behind the "Show details" toggle
+#                along with `note` and `links`.
+#   note       - Markdown, optional. Any context worth flagging
+#                separately from the problem/example itself — how the
+#                question was captured, a correction, etc.
+#   links      - list of {text, url}, optional. Practice-problem links.
+#   answer     - Markdown, optional. Use this instead of problem/example
+#                for a plain "here's what I was asked, here's how I
+#                answered" entry that doesn't need the fuller structure.
 
-- company: "Sample Company A"
-  round: "Phone Screen"
-  techstack: ["Java", "Spring Boot"]
-  question: "How would you design a rate limiter for a public REST API?"
-  answer: "Talked through token bucket vs. sliding window, whether to enforce it at the gateway or the service, and how to make the limit configurable per client."
+- company: "Goldman Sachs"
+  round: "CoderPad - Technical Screen"
+  techstack: ["DSA", "Tree", "Recursion", "String"]
+  question: "Binary Tree to String Serialization (Custom Format)"
+  problem: |
+    Write a function to convert a binary tree into a specific string representation using pre-order traversal. The format must follow a nested parenthesis structure: `(root, left_subtree, right_subtree)`. If a node is a leaf (or if a child is missing), the format should adapt accordingly based on the provided examples.
+  example: |
+    Given the following binary tree structure:
 
-- company: "Sample Company A"
-  round: "System Design"
-  techstack: ["Apache Kafka", "Distributed Systems"]
-  question: "Design an event-driven pricing pipeline that can reprice millions of items with sub-second latency."
-  answer: "Covered partitioning strategy, consumer group scaling, idempotency, and how to keep one slow downstream consumer from blocking the rest of the pipeline."
+    ```text
+          1
+        /   \
+       2     3
+      /     / \
+     4     5   6
+          /
+         7
+    ```
 
-- company: "Sample Company B"
-  round: "Technical Round 1"
-  techstack: ["Python", "Apache Airflow", "SQL"]
-  question: "Walk through how you'd back-fill a broken daily ETL job for the last 30 days without double-counting."
-  answer: "Idempotent DAG runs keyed by execution date, a dry-run/validation step before writing, and how to avoid overlapping the back-fill with the still-running live schedule."
+    - Input: `root = [1, 2, 3, 4, null, 5, 6, null, null, 7]`
+    - Expected Output: `"(1,(2,4,),(3,(5,7,),6))"`
 
-- company: "Sample Company B"
-  round: "Hiring Manager"
-  techstack: ["Distributed Systems", "Leadership"]
-  question: "Tell me about a time you disagreed with a technical decision on your team. What did you do?"
+    Explanation based on structure:
 
-- company: "Sample Company C"
-  round: "Onsite"
-  techstack: ["Kubernetes", "Docker"]
-  question: "Your service's pods keep getting OOMKilled under load, but only in production, not staging. How do you debug it?"
-  answer: "Compared resource requests/limits and real usage between environments first, then talked through checking for a memory leak vs. just under-provisioned limits, and what I'd change in the rollout to catch this earlier next time."
+    - Node 2's subtree is `(2,4,)` where 4 is the left child and the right child is empty.
+    - Node 5's subtree is `(5,7,)`.
+    - Node 3's subtree is `(3,(5,7,),6)`.
+    - The entire tree wraps into the root 1.
+  note: "Reconstructed from interview notes."
+  links:
+    - text: "LeetCode 606 - Construct String from Binary Tree (Conceptual Match)"
+      url: "https://leetcode.com/problems/construct-string-from-binary-tree/"
+    - text: "LeetCode 297 - Serialize and Deserialize Binary Tree"
+      url: "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/"
+
+- company: "Goldman Sachs"
+  round: "CoderPad - Technical Screen"
+  techstack: ["DSA", "Dynamic Programming", "Bitmasking", "Graph"]
+  question: "Cloud Kitchen (Optimal Delivery Assignment)"
+  problem: |
+    A cloud kitchen has `N` orders and `N` delivery partners. You are given an `N x N` cost matrix where `matrix[i][j]` represents the cost/distance for Delivery Partner `i` to deliver Order `j`. Find the optimal assignment of orders to delivery partners such that exactly one order is assigned to each partner and the total delivery cost is minimized.
+  example: |
+    Input: `N = 3`
+
+    ```text
+    Costs Matrix:      O1  O2  O3
+    D1              [ 10, 20,  5 ]
+    D2              [  6,  7,  8 ]
+    D3              [  9, 10,  2 ]
+    ```
+
+    Output (as recorded in notes): `21`
+
+    Explanation of optimal paths (Approach 1):
+
+    - Delivery Partner 2 takes Order 1 (Cost: 6)
+    - Delivery Partner 3 takes Order 2 (Cost: 10)
+    - Delivery Partner 1 takes Order 3 (Cost: 5)
+    - Total Minimum Cost = 6 + 10 + 5 = 21
+  note: |
+    Correction note: for this matrix, 21 is not the true minimum. The assignment D1 to O1 (10), D2 to O2 (7), D3 to O3 (2) totals 19, which is the optimal answer. Either the matrix or the expected output was likely mis-recorded in the notes; a correct solution to the matrix as written returns 19.
+  links:
+    - text: "LeetCode 1066 - Campus Bikes II (Exact Algorithm Match)"
+      url: "https://leetcode.com/problems/campus-bikes-ii/"
+    - text: "LeetCode 1879 - Minimum XOR Sum of Two Arrays (Bitmask DP Practice)"
+      url: "https://leetcode.com/problems/minimum-xor-sum-of-two-arrays/"
+
+- company: "Goldman Sachs"
+  round: "CoderPad - Technical Screen"
+  techstack: ["DSA", "Hash Table", "Math", "Array"]
+  question: "Best Average Grade"
+  problem: |
+    Given a list of student test scores, find the best average grade. Each student may have more than one test score in the list.
+
+    Complete the `bestAverageGrade` function. It has one parameter, `scores`, which is an array of student test scores. Each element in the array is a two-element array of the form `[student name, test score]` (e.g. `["Bobby", "87"]`). Test scores may be positive or negative integers.
+
+    If you end up with an average grade that is not an integer, use a floor function to return the largest integer less than or equal to the average. Return `0` for an empty input.
+  example: |
+    Input:
+
+    ```json
+    [["Bobby", "87"],
+     ["Charles", "100"],
+     ["Eric", "64"],
+     ["Charles", "22"]]
+    ```
+
+    Expected Output: `87`
+
+    Explanation: the average scores are 87, 61, and 64 for Bobby, Charles, and Eric, respectively. 87 is the highest.
+  note: "Extracted from the interview prompt (heavily tested question)."
+  links:
+    - text: "LeetCode 1086 - High Five (closest conceptual match)"
+      url: "https://leetcode.com/problems/high-five/"
+
+- company: "Goldman Sachs"
+  round: "CoderPad - Technical Screen"
+  techstack: ["DSA", "Array", "Two Pointers", "Dynamic Programming"]
+  question: "Compute Snowpack (Trapping Rain Water)"
+  problem: |
+    Given an array of non-negative integers representing the elevations from the vertical cross-section of a range of hills, determine how many units of snow could be captured between the hills.
+  example: |
+    Input Array: `{0, 1, 3, 0, 1, 2, 0, 4, 2, 0, 3, 0}`
+
+    Elevation map:
+
+    ```text
+                                   ___
+               ___                |   |        ___
+              |   |        ___    |   |___    |   |
+           ___|   |    ___|   |   |   |   |   |   |
+       ___|___|___|___|___|___|___|___|___|___|___|___
+       {0,  1,  3,  0,  1,  2,  0,  4,  2,  0,  3,  0}
+    ```
+
+    Captured snow (`*`):
+
+    ```text
+                                   ___
+               ___                |   |        ___
+              |   | *   *  _*_  * |   |_*_  * |   |
+           ___|   | *  _*_|   | * |   |   | * |   |
+       ___|___|___|_*_|___|___|_*_|___|___|_*_|___|___
+       {0,  1,  3,  0,  1,  2,  0,  4,  2,  0,  3,  0}
+    ```
+
+    Expected Output: `13` (13 units of snow could be captured).
+  note: "Extracted from the interview prompt (heavily tested question)."
+  links:
+    - text: "LeetCode 42 - Trapping Rain Water (exact algorithm match)"
+      url: "https://leetcode.com/problems/trapping-rain-water/"
