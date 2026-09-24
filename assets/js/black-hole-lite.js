@@ -1187,6 +1187,18 @@ fn tonemap(linearColor: vec3f, uv: vec2f) -> vec3f {
   var currentSceneYaw = 0;
   var lastYawAt;
   var resizeFrame = 0;
+
+  // Disk-reveal state for window.blackHoleGrow() — see the function itself
+  // for why this animates shade.diskOuter (the cheap per-frame shading
+  // pass's own visual mask) rather than bake.diskOuter (the expensive
+  // geodesic trace, cached and only re-run on resize). Idle by default —
+  // a caller that never invokes blackHoleGrow() (a reduced-motion visitor,
+  // whose life-intro.js returns before ever calling it) gets the disk at
+  // its true settings.diskRadius from the very first frame, unanimated.
+  var REVEAL_START_RADIUS = 2.5; // below ISCO (3.0): genuinely zero disk pixels, not just a thin one
+  var revealActive = false;
+  var revealStartAt = 0;
+  var revealDurationMs = 0;
   var pendingSize = null;
 
   var BLOOM_STAGES = [
@@ -1379,12 +1391,35 @@ fn tonemap(linearColor: vec3f, uv: vec2f) -> vec3f {
     return currentSceneYaw;
   }
 
+  // Grows the disk from its own center outward — literally, not a CSS
+  // stand-in: bake.diskOuter (the expensive ray-trace geometry, written
+  // once per bake in the pipeline below) stays pinned at the true
+  // settings.diskRadius the whole time, so the lensing itself is correct
+  // from frame one; only shade.diskOuter (the cheap per-frame visual mask,
+  // written below) ramps up, which is why this never needs to re-bake mid
+  // animation the way changing the ray-traced geometry itself would. Below
+  // ISCO nothing of the disk is visible at all — just the dark event
+  // horizon and the lensed starfield behind it — so the opening frames
+  // read as the black hole itself still forming, not a shrunk copy of the
+  // final image being zoomed into.
+  function currentDiskReveal(now) {
+    if (!revealActive) return settings.diskRadius;
+    var progress = revealDurationMs <= 0 ? 1 : Math.min(1, (now - revealStartAt) / revealDurationMs);
+    if (progress >= 1) {
+      revealActive = false;
+      return settings.diskRadius;
+    }
+    var eased = 1 - Math.pow(1 - progress, 3);
+    return REVEAL_START_RADIUS + (settings.diskRadius - REVEAL_START_RADIUS) * eased;
+  }
+
   function drawFrame(now) {
     var runBake = forceBake;
     forceBake = false;
     var t = startTime === 0 ? 0 : (now - startTime) / 1000;
     var sceneYaw = advanceSceneYaw(now);
-    device.queue.writeBuffer(shadeBuf, 0, new Float32Array([canvas.width, canvas.height, t, settings.diskRadius, sceneYaw, settings.centerFade]));
+    var diskReveal = currentDiskReveal(now);
+    device.queue.writeBuffer(shadeBuf, 0, new Float32Array([canvas.width, canvas.height, t, diskReveal, sceneYaw, settings.centerFade]));
 
     var encoder = device.createCommandEncoder();
     if (runBake) {
@@ -1544,6 +1579,17 @@ fn tonemap(linearColor: vec3f, uv: vec2f) -> vec3f {
 
   canvas.style.opacity = "0";
   canvas.style.transition = "opacity 500ms ease";
+
+  // Called by life-intro.js once the veil is ready to lift. Not wired to
+  // fire on its own: a caller that never invokes this (a reduced-motion
+  // visitor, whose life-intro.js returns before reaching this point) gets
+  // the disk at its true, final radius from the first frame — no motion
+  // to skip in the first place, rather than a state to remember to reset.
+  window.blackHoleGrow = function (durationMs) {
+    revealActive = true;
+    revealStartAt = performance.now();
+    revealDurationMs = typeof durationMs === "number" ? durationMs : 1100;
+  };
 
   init().catch(fail);
 })();

@@ -76,20 +76,13 @@ html:has(body.theme-personal) {
   opacity: 0;
 }
 
-/* The "dot" — starts at a near-zero scale (true 0 would stop transform's
-   own transition from having anything to interpolate from in some engines)
-   centered on the viewport, then grows to full size. transform, not width/
-   height, so the canvas's own backing resolution/ResizeObserver never see
-   a size change mid-grow, only a visual one. */
-.theme-personal.js-intro .life-hero {
-  transform: scale(0.015);
-  transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.theme-personal.js-intro .life-hero.is-grown {
-  transform: scale(1);
-}
-
+/* No CSS transform on .life-hero anymore — the "grows from a dot" effect
+   used to be a scale() on this whole wrapper, which visually read as the
+   camera zooming toward a tiny, already-complete copy of the final image
+   rather than the black hole itself forming. window.blackHoleGrow() (see
+   life-intro.js and black-hole-lite.js) now animates the disk's own
+   visual radius inside the shader instead — this element just holds the
+   canvas at its real, constant size throughout. */
 .theme-personal.js-intro .life-hero-inner h1,
 .theme-personal.js-intro .life-hero-inner p {
   opacity: 0;
@@ -121,18 +114,38 @@ html:has(body.theme-personal) {
   transform: translateX(-50%) translateY(0);
 }
 
-/* "Everything else" (section-nav, plus every .life-section — Instagram/
-   YouTube/Album) arrives as one final group once the hero's own pieces have
-   landed, rather than staggering every individual card — reads as "the
-   page has arrived," not a slow reveal of dozens of elements one by one. */
-.theme-personal.js-intro .section-nav,
+/* The .life-section chapters (Instagram/YouTube/Album) settle immediately
+   rather than joining the timed sequence — see life-intro.js's own
+   comment: they're all off-screen for the whole intro, so staging their
+   reveal has nothing to be visible against anyway. */
 .theme-personal.js-intro .life-section {
   opacity: 0;
   transition: opacity 0.6s var(--ease);
 }
 
-.theme-personal.js-intro .section-nav.is-visible,
 .theme-personal.js-intro .life-section.is-visible {
+  opacity: 1;
+}
+
+/* The side nav's own container (text arrives with it, one step) is
+   separate from each icon inside it — per direct request, the three
+   icons reveal in their own order (Instagram, then YouTube, then Album)
+   rather than all arriving as part of the container's own fade. */
+.theme-personal.js-intro .section-nav {
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+}
+
+.theme-personal.js-intro .section-nav.is-visible {
+  opacity: 1;
+}
+
+.theme-personal.js-intro .section-nav-link {
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+
+.theme-personal.js-intro .section-nav-link.is-visible {
   opacity: 1;
 }
 
@@ -141,13 +154,10 @@ html:has(body.theme-personal) {
     display: none;
   }
 
-  .theme-personal.js-intro .life-hero {
-    transform: none;
-  }
-
   .theme-personal.js-intro .life-hero-inner h1,
   .theme-personal.js-intro .life-hero-inner p,
   .theme-personal.js-intro .section-nav,
+  .theme-personal.js-intro .section-nav-link,
   .theme-personal.js-intro .life-section {
     opacity: 1;
     transform: none;
@@ -182,6 +192,25 @@ html:has(body.theme-personal) {
   background: color-mix(in srgb, var(--surface) 32%, transparent);
   backdrop-filter: blur(24px) saturate(150%);
   -webkit-backdrop-filter: blur(24px) saturate(150%);
+}
+
+/* Auto-hides on scroll-down, returns on scroll-up (assets/js/nav-autohide.js)
+   — per direct request for the floating nav. Reuses the same transform
+   transition already declared on .theme-personal.js-intro .site-header
+   below (0.55s) rather than adding a second, lower-specificity one here —
+   js-intro is permanent (added synchronously, never removed), so that
+   higher-specificity rule always wins anyway; a duration set on this base
+   rule would just be dead code. This selector is .js-intro-qualified for
+   the same reason: it makes this rule's specificity (4 classes) match
+   .site-header.is-visible's own (also 4), so source order — this rule
+   comes later — breaks the tie in hidden's favor for a visitor who has
+   both classes at once (finished the intro, then scrolled); without that
+   match, .is-visible would silently win regardless of order and the
+   header would never actually hide. translateX(-50%) is composed into the
+   same transform value for the usual reason: a later rule's transform
+   replaces an earlier one's outright, it doesn't merge with it. */
+.theme-personal.js-intro .site-header.is-nav-hidden {
+  transform: translateX(-50%) translateY(-150%);
 }
 
 .theme-personal .site-header .header-inner {
@@ -254,9 +283,18 @@ html:has(body.theme-personal) {
   }
 }
 
+/* scroll-snap-align: start — without it, this was the one part of the page
+   with no snap point of its own, and scroll-snap-type: y mandatory (on
+   body, see the .theme-personal rule) can never let the scroll container
+   rest anywhere that isn't a valid snap point. Confirmed directly: the
+   footer was fully present in the DOM and had real scrollable height
+   below Album, but any scroll attempt past Album's own snap point just
+   pulled straight back to it — the footer was unreachable, not just easy
+   to miss. */
 .theme-personal .site-footer {
   position: relative;
   z-index: 1;
+  scroll-snap-align: start;
   border-top: 1px solid var(--border);
   color: var(--muted);
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
