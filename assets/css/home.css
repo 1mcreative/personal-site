@@ -9,9 +9,11 @@
    swatch, not two independently-chosen ones. */
 .theme-home {
   --bg: #ffffff;
+  --surface: #f5f6f8;
   --text: #14171c;
   --muted: #5b6572;
   --accent: #1d4ed8;
+  --border: #e3e6ea;
 
   background: var(--bg);
   color: var(--text);
@@ -1278,13 +1280,41 @@
    now that .page-corner/.portal-orb (which used to own it) are both
    deprecated. Persistent, not timed like .joke-hint below, per the
    explicit "make sure users sees it" ask — margin-left:0 overrides the
-   footer version's inline spacing, irrelevant to a standalone button. */
+   footer version's inline spacing, irrelevant to a standalone button.
+   Recolored to .hero-status-chip's own quiet glass pill instead of
+   .bored-trigger's solid accent-gradient fill, per direct feedback that
+   it was "highlighting too much" — the loud version made sense in a
+   muted footer competing with plain text, but here it was the single
+   most saturated thing on the whole hero, outshouting the actual content.
+   .bored-trigger itself (the footer version on /resume/, /life/, /lab/)
+   is untouched; this only overrides the homepage's own instance. */
 .hero-bored-trigger {
   position: absolute;
   z-index: 2;
   top: var(--space-3);
   right: var(--space-3);
   margin-left: 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(29, 78, 216, 0.16);
+  color: var(--text) !important;
+  box-shadow: 0 2px 10px rgba(20, 23, 28, 0.07);
+}
+
+.hero-bored-trigger:hover,
+.hero-bored-trigger:focus-visible {
+  box-shadow: 0 10px 24px rgba(29, 78, 216, 0.2);
+}
+
+.hero-bored-trigger .bored-trigger-icon {
+  color: var(--accent);
+  /* No idle wiggle here — the hero already has the globe as its one
+     ambient motion; a second, permanently-animating element competes for
+     attention instead of just being noticed once. The footer version
+     keeps its wiggle (tokens.css), since a quiet footer has no such
+     competition. */
+  animation: none;
 }
 
 @media (max-width: 640px) {
