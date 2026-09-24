@@ -48,222 +48,190 @@ permalink: /life/
 <section class="life-section" id="youtube">
   <h2>YouTube</h2>
 
-  <div class="youtube-channels">
-    <a class="youtube-channel-card" href="https://www.youtube.com/@1mcreative372" rel="me noopener" target="_blank">
-      <span class="youtube-channel-head">
-        <span class="youtube-channel-icon" aria-hidden="true">{% include youtube-glyph.svg %}</span>
-        <span class="youtube-channel-body">
-          <span class="youtube-channel-label">YouTube</span>
-          <span class="youtube-channel-name">1mCreative</span>
+  <div class="video-row">
+    <a class="video-row-label" href="https://www.youtube.com/@redfilms3721" rel="me noopener" target="_blank">RED FILMS</a>
+    <div class="video-grid">
+      <a class="video-card" href="https://www.youtube.com/watch?v=pZdl8tFruTI" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/pZdl8tFruTI/hqdefault.jpg" alt="GOA TRIP AFTER-MOVIE (The Chainsmokers, Roses ft. Rozes) video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
         </span>
-      </span>
-      <span class="youtube-channel-cta">Visit channel</span>
-    </a>
-    <a class="youtube-channel-card" href="https://www.youtube.com/@redfilms3721" rel="me noopener" target="_blank">
-      <span class="youtube-channel-head">
-        <span class="youtube-channel-icon" aria-hidden="true">{% include youtube-glyph.svg %}</span>
-        <span class="youtube-channel-body">
-          <span class="youtube-channel-label">Second channel</span>
-          <span class="youtube-channel-name">RED FILMS</span>
+        <span class="video-title">GOA Trip After-Movie</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=vgZgmf9bxkY" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/vgZgmf9bxkY/hqdefault.jpg" alt="The SPARSH 2K16 After Movie video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
         </span>
-      </span>
-      <span class="youtube-channel-cta">Visit channel</span>
-    </a>
+        <span class="video-title">SPARSH 2K16 After Movie</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=m-RVcpSKOwU" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/m-RVcpSKOwU/hqdefault.jpg" alt="SPARSH 2K18 Official Pre-Movie video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">SPARSH 2K18 Pre-Movie</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=hicWv51l_5E" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/hicWv51l_5E/hqdefault.jpg" alt="SPARSH 2K18 Theme Official Teaser video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">SPARSH 2K18 Theme Teaser</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=PL-iZ5fIyJI" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/PL-iZ5fIyJI/hqdefault.jpg" alt="Motion Graphics Promotion video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">Motion Graphics Promotion</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=Te2yj3FiDUY" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/Te2yj3FiDUY/hqdefault.jpg" alt="Sparsh Aftermovie Teaser video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">Sparsh Aftermovie Teaser</span>
+      </a>
+    </div>
   </div>
 
-  <div class="video-grid">
-    <a class="video-card" href="https://www.youtube.com/watch?v=pZdl8tFruTI" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/pZdl8tFruTI/hqdefault.jpg" alt="GOA TRIP AFTER-MOVIE (The Chainsmokers, Roses ft. Rozes) video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">GOA Trip After-Movie</span>
-      <span class="video-meta">RED FILMS</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=vgZgmf9bxkY" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/vgZgmf9bxkY/hqdefault.jpg" alt="The SPARSH 2K16 After Movie video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">SPARSH 2K16 After Movie</span>
-      <span class="video-meta">RED FILMS</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=m-RVcpSKOwU" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/m-RVcpSKOwU/hqdefault.jpg" alt="SPARSH 2K18 Official Pre-Movie video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">SPARSH 2K18 Pre-Movie</span>
-      <span class="video-meta">RED FILMS</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=hicWv51l_5E" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/hicWv51l_5E/hqdefault.jpg" alt="SPARSH 2K18 Theme Official Teaser video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">SPARSH 2K18 Theme Teaser</span>
-      <span class="video-meta">RED FILMS</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=PL-iZ5fIyJI" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/PL-iZ5fIyJI/hqdefault.jpg" alt="Motion Graphics Promotion video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">Motion Graphics Promotion</span>
-      <span class="video-meta">RED FILMS</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=Te2yj3FiDUY" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/Te2yj3FiDUY/hqdefault.jpg" alt="Sparsh Aftermovie Teaser video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">Sparsh Aftermovie Teaser</span>
-      <span class="video-meta">RED FILMS</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=aZaKbsn5Hnw" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/aZaKbsn5Hnw/hqdefault.jpg" alt="GOA Vlog 001 Workation video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">GOA Vlog #001: Workation</span>
-      <span class="video-meta">1mCreative</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/shorts/KjJsl01lUPQ" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/KjJsl01lUPQ/hqdefault.jpg" alt="Pichola Lake Udaipur Sunset Travel Short thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">Pichola Lake, Udaipur</span>
-      <span class="video-meta">1mCreative</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/shorts/Ka9JtmPsskg" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/Ka9JtmPsskg/hqdefault.jpg" alt="Jaisalmer Cityview Travel Short thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">Jaisalmer Cityview</span>
-      <span class="video-meta">1mCreative</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/shorts/_adxj9yECC0" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/_adxj9yECC0/hqdefault.jpg" alt="The Weekend Ride Travel Short thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">The Weekend Ride</span>
-      <span class="video-meta">1mCreative</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/shorts/nO5FPT0qdKI" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/nO5FPT0qdKI/hqdefault.jpg" alt="North Goa Parra Road Short thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">North Goa, Parra Road</span>
-      <span class="video-meta">1mCreative</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/shorts/XJxepFQ7REc" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/XJxepFQ7REc/hqdefault.jpg" alt="Dwarka Mini Vlog Short thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">Dwarka Mini Vlog</span>
-      <span class="video-meta">1mCreative</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/shorts/MDK_QSR7y-c" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/MDK_QSR7y-c/hqdefault.jpg" alt="Munnar Travel and Fun Short thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">Munnar Travel and Fun</span>
-      <span class="video-meta">1mCreative</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/shorts/gJk09CL9cOg" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/gJk09CL9cOg/hqdefault.jpg" alt="Before and After Lightroom Photoediting Short thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">Before &amp; After: Lightroom</span>
-      <span class="video-meta">1mCreative</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=h2J2uv1jSXg" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/h2J2uv1jSXg/hqdefault.jpg" alt="HEYY MAMAA (Nicki Minaj &amp; Afrojack Remix) video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">HEYY MAMAA (Nicki Minaj &amp; Afrojack Remix)</span>
-      <span class="video-meta">Kartik Bansal</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=wtqYbetLbOs" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/wtqYbetLbOs/hqdefault.jpg" alt="My Way / Let Me Love You video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">My Way / Let Me Love You</span>
-      <span class="video-meta">Kartik Bansal</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=EMF4ibMb98I" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/EMF4ibMb98I/hqdefault.jpg" alt="Cake By The Ocean video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">Cake By The Ocean</span>
-      <span class="video-meta">Kartik Bansal</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=aXFeZ1J2B3g" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/aXFeZ1J2B3g/hqdefault.jpg" alt="Shape of You video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">Shape of You</span>
-      <span class="video-meta">Kartik Bansal</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=4n9hTMowmYk" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/4n9hTMowmYk/hqdefault.jpg" alt="What Do You Mean video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">What Do You Mean</span>
-      <span class="video-meta">Kartik Bansal</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=wJuUjnG72y4" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/wJuUjnG72y4/hqdefault.jpg" alt="Mega Compilation video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">Mega Compilation</span>
-      <span class="video-meta">Kartik Bansal</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=LPFDsxn_O8o" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/LPFDsxn_O8o/hqdefault.jpg" alt="BAIT video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">BAIT</span>
-      <span class="video-meta">Kartik Bansal</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=VisrPMqK9r0" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/VisrPMqK9r0/hqdefault.jpg" alt="Lights Out video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">Lights Out</span>
-      <span class="video-meta">Kartik Bansal</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=03jnDh7kMvk" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/03jnDh7kMvk/hqdefault.jpg" alt="Old Skool video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">Old Skool</span>
-      <span class="video-meta">Kartik Bansal</span>
-    </a>
-    <a class="video-card" href="https://www.youtube.com/watch?v=qvF-QaE9Cfo" rel="noopener" target="_blank">
-      <span class="video-thumb">
-        <img src="https://img.youtube.com/vi/qvF-QaE9Cfo/hqdefault.jpg" alt="Hymn for the Weekend video thumbnail" loading="lazy" width="320" height="180">
-        <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
-      </span>
-      <span class="video-title">Hymn for the Weekend</span>
-      <span class="video-meta">Kartik Bansal</span>
-    </a>
+  <div class="video-row">
+    <a class="video-row-label" href="https://www.youtube.com/@1mcreative372" rel="me noopener" target="_blank">1mCreative</a>
+    <div class="video-grid">
+      <a class="video-card" href="https://www.youtube.com/watch?v=aZaKbsn5Hnw" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/aZaKbsn5Hnw/hqdefault.jpg" alt="GOA Vlog 001 Workation video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">GOA Vlog #001: Workation</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/shorts/KjJsl01lUPQ" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/KjJsl01lUPQ/hqdefault.jpg" alt="Pichola Lake Udaipur Sunset Travel Short thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">Pichola Lake, Udaipur</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/shorts/Ka9JtmPsskg" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/Ka9JtmPsskg/hqdefault.jpg" alt="Jaisalmer Cityview Travel Short thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">Jaisalmer Cityview</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/shorts/_adxj9yECC0" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/_adxj9yECC0/hqdefault.jpg" alt="The Weekend Ride Travel Short thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">The Weekend Ride</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/shorts/nO5FPT0qdKI" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/nO5FPT0qdKI/hqdefault.jpg" alt="North Goa Parra Road Short thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">North Goa, Parra Road</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/shorts/XJxepFQ7REc" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/XJxepFQ7REc/hqdefault.jpg" alt="Dwarka Mini Vlog Short thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">Dwarka Mini Vlog</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/shorts/MDK_QSR7y-c" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/MDK_QSR7y-c/hqdefault.jpg" alt="Munnar Travel and Fun Short thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">Munnar Travel and Fun</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/shorts/gJk09CL9cOg" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/gJk09CL9cOg/hqdefault.jpg" alt="Before and After Lightroom Photoediting Short thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">Before &amp; After: Lightroom</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="video-row">
+    <a class="video-row-label" href="https://www.youtube.com/@kartikbansal9289" rel="noopener" target="_blank">Kartik Bansal</a>
+    <div class="video-grid">
+      <a class="video-card" href="https://www.youtube.com/watch?v=h2J2uv1jSXg" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/h2J2uv1jSXg/hqdefault.jpg" alt="HEYY MAMAA (Nicki Minaj &amp; Afrojack Remix) video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">HEYY MAMAA (Nicki Minaj &amp; Afrojack Remix)</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=wtqYbetLbOs" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/wtqYbetLbOs/hqdefault.jpg" alt="My Way / Let Me Love You video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">My Way / Let Me Love You</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=EMF4ibMb98I" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/EMF4ibMb98I/hqdefault.jpg" alt="Cake By The Ocean video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">Cake By The Ocean</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=aXFeZ1J2B3g" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/aXFeZ1J2B3g/hqdefault.jpg" alt="Shape of You video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">Shape of You</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=4n9hTMowmYk" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/4n9hTMowmYk/hqdefault.jpg" alt="What Do You Mean video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">What Do You Mean</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=wJuUjnG72y4" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/wJuUjnG72y4/hqdefault.jpg" alt="Mega Compilation video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">Mega Compilation</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=LPFDsxn_O8o" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/LPFDsxn_O8o/hqdefault.jpg" alt="BAIT video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">BAIT</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=VisrPMqK9r0" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/VisrPMqK9r0/hqdefault.jpg" alt="Lights Out video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">Lights Out</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=03jnDh7kMvk" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/03jnDh7kMvk/hqdefault.jpg" alt="Old Skool video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">Old Skool</span>
+      </a>
+      <a class="video-card" href="https://www.youtube.com/watch?v=qvF-QaE9Cfo" rel="noopener" target="_blank">
+        <span class="video-thumb">
+          <img src="https://img.youtube.com/vi/qvF-QaE9Cfo/hqdefault.jpg" alt="Hymn for the Weekend video thumbnail" loading="lazy" width="320" height="180">
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>
+        </span>
+        <span class="video-title">Hymn for the Weekend</span>
+      </a>
+    </div>
   </div>
 </section>
 

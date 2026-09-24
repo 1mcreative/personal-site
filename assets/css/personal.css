@@ -816,104 +816,39 @@ html:has(body.theme-personal) {
    external platform gets its own brand color" exception already
    established for Instagram's pink hover glow, which the site-wide
    blue-accent pass deliberately left alone for the same reason. */
-.theme-personal .youtube-channels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+/* Each channel/creator gets its own row: a small clickable name linking
+   straight to that channel, directly above its own horizontal strip of
+   cards — replaces the old .youtube-channels card pair that sat above all
+   24 cards as one undifferentiated pile. Kartik Bansal (whose videos these
+   are, per each card's own .video-title/href — he's not a channel the
+   site owner runs) gets a real clickable row label for the first time
+   here too, instead of only being named in a hover-only meta line. */
+.theme-personal .video-row {
   margin-top: var(--space-3);
 }
 
-.theme-personal .youtube-channel-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-1);
-  flex: 1 1 240px;
-  background: color-mix(in srgb, var(--surface) 45%, transparent);
-  backdrop-filter: blur(22px) saturate(150%);
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-2) var(--space-3);
-  text-decoration: none;
-  color: var(--text);
-  transition: border-color var(--speed) var(--ease), transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
-}
-
-/* Icon + label/name only, its own row — keeping .youtube-channel-cta out
-   of this flex row (instead of a --space-2-separated third sibling in it,
-   the original layout) is the actual fix, not a style tweak: a CTA with
-   flex-shrink:0 sharing a row with a shrinkable text column squeezed that
-   column down to ~20px on a real narrow card (confirmed via
-   getBoundingClientRect(), not assumed), wrapping "RED FILMS" onto lines
-   that sat directly under "Visit channel ↗". Same structural fix
-   .social-card already uses for the identical icon+text+CTA shape. */
-.theme-personal .youtube-channel-head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  width: 100%;
-}
-
-.theme-personal .youtube-channel-card:hover,
-.theme-personal .youtube-channel-card:focus-visible {
-  border-color: #ff0000;
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px -12px rgba(255, 0, 0, 0.35);
-}
-
-.theme-personal .youtube-channel-icon {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-}
-
-.theme-personal .youtube-channel-body {
-  min-width: 0;
-}
-
-.theme-personal .youtube-channel-label {
-  display: block;
-  color: var(--muted);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.theme-personal .youtube-channel-name {
-  display: block;
+.theme-personal .video-row-label {
+  display: inline-block;
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  margin-top: 2px;
-}
-
-.theme-personal .youtube-channel-cta {
-  margin-top: var(--space-1);
-  padding-top: var(--space-1);
-  border-top: 1px solid var(--border);
-  width: 100%;
-  font-size: 0.85rem;
-  font-weight: 600;
+  line-height: 1.3;
   color: var(--text);
-  opacity: 0.75;
-  transition: opacity var(--speed) var(--ease), transform var(--speed) var(--ease);
+  text-decoration: none;
+  opacity: 0.8;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+  transition: opacity var(--speed) var(--ease), color var(--speed) var(--ease);
 }
 
-.theme-personal .youtube-channel-cta::after {
+.theme-personal .video-row-label::after {
   content: " ↗";
   font-weight: 400;
 }
 
-.theme-personal .youtube-channel-card:hover .youtube-channel-cta,
-.theme-personal .youtube-channel-card:focus-visible .youtube-channel-cta {
+.theme-personal .video-row-label:hover,
+.theme-personal .video-row-label:focus-visible {
   opacity: 1;
-  transform: translateX(2px);
+  color: #ff0000;
 }
 
 .theme-personal .video-grid-intro {
@@ -932,20 +867,23 @@ html:has(body.theme-personal) {
    below — .social-card hit exactly this bug once already (a hover lift
    clipped clean off by the row's own overflow-y: hidden, since it had no
    slack above the resting card); this row gets that slack from the start.
-   One playlist-style row now holds all 24 videos across both of the user's
-   own channels plus the Kartik Bansal edits — previously three separate
-   rows (each its own thumbnail grid) pushed #youtube's real height to
-   1261px against a 768px viewport, confirmed directly via
-   getBoundingClientRect(): with no snap point inside that overflow, a
-   scroll gesture landing anywhere in the extra ~500px had nothing to catch
-   it, which is what actually read as "stuck." One compact row, uniform
-   card size, real metadata always visible instead of gated behind hover —
-   the same fix closes the overflow, the sizing-consistency request, and
-   the "channel name should travel with the card" request together. */
+   Three of these now sit inside #youtube (one per .video-row, see above) —
+   an earlier pass had collapsed them into one unified 24-card row because
+   three separate grids plus a per-card .video-meta line pushed #youtube's
+   real height to 1261px against a 768px viewport, confirmed directly via
+   getBoundingClientRect(), with no snap point inside that overflow. This
+   time the per-card .video-meta line is gone (the channel name now lives
+   once, in the row's own label, not repeated on every card under it),
+   which alone claws back enough height that three grids plus three labels
+   fits #youtube's real budget with room to spare — confirmed the same way,
+   via getBoundingClientRect() at both mobile and desktop after building,
+   not just estimated from the CSS. margin-top is small (var(--space-1))
+   since .video-row-label directly above already carries the bulk of the
+   spacing via its own row's var(--space-3) margin-top. */
 .theme-personal .video-grid {
   display: flex;
   gap: var(--space-2);
-  margin-top: var(--space-2);
+  margin-top: var(--space-1);
   width: 100vw;
   margin-left: calc(50% - 50vw);
   padding: var(--space-1) var(--space-3) var(--space-1) var(--nav-clearance);
@@ -1082,21 +1020,6 @@ html:has(body.theme-personal) {
   font-size: 0.85rem;
   font-weight: 600;
   line-height: 1.3;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
-}
-
-/* Real metadata only — YouTube's oEmbed endpoint (the same one this site's
-   titles were fetched from, see CLAUDE.md) has no description field, so
-   there's no genuine "caption" to show beyond title + who the video is
-   actually for. Always visible now, like a real YouTube playlist row's own
-   channel-name line — per direct feedback that channel identity needs to
-   travel with each card, not live only in a separate row label or the
-   channel-card links at the top of the section. */
-.theme-personal .video-meta {
-  display: block;
-  margin-top: 2px;
-  font-size: 0.75rem;
-  color: var(--muted);
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
 }
 
