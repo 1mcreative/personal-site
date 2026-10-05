@@ -51,6 +51,10 @@
     "uniform float uCamDist;",
     "uniform float uFillScale;",
     "varying float vDepth;",
+    // Carries aQuadOffset through unchanged so the fragment shader can mask
+    // the quad into a circle (see FRAG's uQuadMode branch) — (0,0) for every
+    // non-quad draw, same as aQuadOffset itself, so nothing else reads this.
+    "varying vec2 vQuadOffset;",
     "void main() {",
     "  float ct = cos(uTiltX), st = sin(uTiltX);",
     "  vec3 p = vec3(aPos.x, aPos.y * ct - aPos.z * st, aPos.y * st + aPos.z * ct);",
@@ -61,6 +65,7 @@
     "  float persp = focal / z;",
     "  vec2 center = vec2(r.x * persp, r.y * persp);",
     "  gl_Position = vec4(center + aQuadOffset * uFillScale, 0.0, 1.0);",
+    "  vQuadOffset = aQuadOffset;",
     "  vDepth = clamp((r.z + 1.0) / 2.0, 0.0, 1.0);",
     "  gl_PointSize = max(1.0, uPointScale * persp);",
     "}",
@@ -69,6 +74,7 @@
   var FRAG = [
     "precision mediump float;",
     "varying float vDepth;",
+    "varying vec2 vQuadOffset;",
     "uniform vec3 uColor;",
     // The soft-edge falloff (0.5 down to this) is a *fraction* of the
     // point's own radius, not a fixed pixel width — fine at the small
@@ -84,12 +90,27 @@
     // undefined per spec, and empirically (confirmed via direct
     // gl.readPixels right after the draw call, not a screenshot) read
     // back as a value whose distance from center exceeded 0.5 every time,
-    // discarding 100% of the quad's fragments. A flat, unmasked fill
-    // bypasses that dot-circle logic entirely instead of trying to make
-    // gl_PointCoord behave for a primitive it was never meant for.
+    // discarding 100% of the quad's fragments. vQuadOffset (plain clip-
+    // space geometry, not a point-sprite coordinate) sidesteps that gap
+    // instead of trying to make gl_PointCoord behave for a primitive it
+    // was never meant for.
     "uniform float uQuadMode;",
     "void main() {",
     "  if (uQuadMode > 0.5) {",
+    // vQuadOffset is the unit square's own corner offsets (±1,±1),
+    // untouched by uFillScale — so its inscribed unit circle grows in
+    // lockstep with the quad itself, reported "becomes a rectangle" fixed
+    // by discarding outside it: the visible shape is a true circle at
+    // every point during the zoom, not just once it's already so large
+    // its corners are off-screen. Reaches the same screen-space extent
+    // the old square did along each axis (see the VERT comment on
+    // uFillScale's ±4 ceiling), so full coverage still lands before the
+    // zoom sequence ends — a hard edge, not a smoothstep, since a
+    // falloff fraction that reads fine on a small quad becomes a huge,
+    // scale-dependent blur once this is blown up to cover the viewport
+    // (the exact trap uEdgeInner/markerEdgeInner above already exists to
+    // avoid for the point-sprite marker).
+    "    if (length(vQuadOffset) > 1.0) discard;",
     "    gl_FragColor = vec4(uColor, 1.0);",
     "    return;",
     "  }",

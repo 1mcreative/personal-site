@@ -236,6 +236,23 @@
      holds a consistent small-but-real gap at every one, never negative. */
   width: min(66vw, 820px, calc(100vh - 239px));
   aspect-ratio: 1;
+  /* The sphere/marker rendering only ever draws a circular silhouette
+     within this square box — nothing previously clipped the box's own
+     corners into that shape, so they stayed invisible at rest (empty
+     canvas there) but became real, visible rectangle corners once the
+     resume-exit zoom's "fill the frame" quad (globe.js) grew past the
+     sphere's own render radius: reported "yellow dot becomes a
+     rectangle." aspect-ratio:1 keeps this box a perfect square at every
+     width, and --globe-zoom scales it *uniformly* (one scalar, not
+     scaleX/scaleY), so a circular clip here stays a perfect circle at
+     any zoom level rather than drifting into an ellipse — border-radius
+     clips the box itself before the transform scales the already-round
+     result, the same reason a circle scaled up stays a circle. Verified
+     the sphere's own dots at rest already render comfortably inside this
+     radius (camDist leaves real margin), so this doesn't crop anything
+     that was visible before. */
+  border-radius: 50%;
+  overflow: hidden;
   transform: translate(-50%, 50%) scale(var(--globe-zoom, 1));
   cursor: grab;
   /* Without this, a browser can claim a click-drag as its own pan/scroll
