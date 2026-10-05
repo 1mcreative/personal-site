@@ -109,6 +109,21 @@
     // ever actually happen.
     var navigated = false;
 
+    // Reported "while playing the game, an accidental swipe up opens
+    // /resume/" — the wheel/touchmove listeners below are on window, so a
+    // drag gesture across Slice Blade's own canvas (dragging to slice a
+    // letter is itself just a swipe, from this listener's point of view)
+    // still bubbles all the way up and reads as "leave the page" even
+    // though the game modal is covering the whole hero. Checked inside
+    // goToResume/goToLife themselves, not each listener separately, so
+    // every path that can trigger either (wheel, touchmove, and — just as
+    // a defensive match, though the modal's own backdrop already blocks
+    // this one — .life-pull-btn's click) is covered by one guard.
+    var sliceBladeModal = document.querySelector("[data-slice-blade-modal]");
+    var sliceBladeOpen = function () {
+      return !!(sliceBladeModal && !sliceBladeModal.hidden);
+    };
+
     // Swipe left (or the .life-pull-btn click) opens /life/: grow
     // .life-wipe from a small circle centered on the button into one big
     // enough to cover the whole screen, then navigate. Same "no
@@ -137,7 +152,7 @@
     window.addEventListener("resize", syncLifeWipe, { passive: true });
 
     var goToLife = function () {
-      if (navigated || !lifeWipe || !pullBtn) return;
+      if (navigated || !lifeWipe || !pullBtn || sliceBladeOpen()) return;
       navigated = true;
       syncLifeWipe();
       lifeWipe.classList.add("life-wipe-active");
@@ -168,7 +183,7 @@
     }
 
     var goToResume = function () {
-      if (navigated) return;
+      if (navigated || sliceBladeOpen()) return;
       navigated = true;
       // "Zoom to happen to the yellow dot — if it's on the back side the
       // globe should spin and bring it to the front, then fill the screen
