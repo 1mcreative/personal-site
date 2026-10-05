@@ -47,6 +47,7 @@ exclude:
   - DESIGN.md
   - VERSIONING.md
   - SEO-PLAYBOOK.md
+  - INSTAGRAM_SETUP.md
   - Gemfile
   - Gemfile.lock
   - node_modules
