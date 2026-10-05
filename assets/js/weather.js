@@ -1,15 +1,14 @@
 // Weather chip (index.md/home.css: the second .hero-status chip,
 // stacking below the clock) — per explicit follow-up ("next step is
-// showing weather info based on users location"). Unlike the clock, this
-// can't stay silent about location the same way: real weather needs real
-// coordinates. Asked directly which tradeoff to take (a Geolocation
-// permission prompt vs. a silent, approximate IP lookup) and the answer
-// was the IP route — so this does send the visitor's IP to a free
-// geolocation lookup (ipwho.is) and the resulting approximate lat/lon to
-// a free weather API (Open-Meteo), both over plain HTTPS with no API key
-// (this is a static site with no backend to keep a secret in, so a
-// keyless API is the only kind that can safely live in client-side JS
-// here — nothing for the user to sign up for or hand over).
+// showing weather info based on users location"). Location comes from
+// assets/js/geo-locate.js's shared resolver (the browser's own precise
+// Geolocation, when granted, falling back to an approximate IP lookup)
+// rather than this file doing its own lookup — see that file's header
+// comment for why sharing one resolver matters once distance.js needed
+// the identical location too. The resulting lat/lon feeds Open-Meteo
+// (free, keyless — this is a static site with no backend to keep a
+// secret API key in, so a keyless API is the only kind that can safely
+// live in client-side JS here).
 //
 // Fails silent and inert, same progressive-enhancement shape as every
 // other effect on this page: the chip element doesn't exist at all until
@@ -68,7 +67,7 @@
 
     var meta = iconFor(code);
     var chip = document.createElement("span");
-    chip.className = "hero-status-chip hero-weather-chip";
+    chip.className = "hero-status-chip hero-status-chip-dynamic hero-weather-chip";
     if (city) chip.title = meta.label + " in " + city;
 
     // The icon markup is always one of this file's own hardcoded ICONS
@@ -86,6 +85,15 @@
     var label = document.createElement("span");
     label.textContent = Math.round(temp) + "°" + unit;
     chip.appendChild(label);
+
+    // Hover-reveal detail (see .hero-status-detail in home.css) — the
+    // same condition/city text the title tooltip already carried, now
+    // also visible without needing to wait out the browser's own native
+    // tooltip delay.
+    var detail = document.createElement("span");
+    detail.className = "hero-status-detail";
+    detail.textContent = " · " + meta.label + (city ? ", " + city : "");
+    chip.appendChild(detail);
 
     container.appendChild(chip);
     // Flush layout so the fade-in below animates from the CSS's opacity:0
@@ -115,23 +123,13 @@
       });
   }
 
-  // ipwho.is: free, keyless, CORS-enabled, HTTPS — unlike ip-api.com,
-  // whose free tier is HTTP-only and would be blocked as mixed content on
-  // this HTTPS site.
-  fetch("https://ipwho.is/")
-    .then(function (res) {
-      return res.ok ? res.json() : Promise.reject(res.status);
-    })
-    .then(function (geo) {
-      if (!geo || !geo.success || typeof geo.latitude !== "number" || typeof geo.longitude !== "number") return;
-      // Fahrenheit for a US visitor, Celsius otherwise — same "match what
-      // the visitor is already used to" reasoning the clock applies to
-      // 12h/24h, just driven off this lookup's own country code instead
-      // of Intl, since that's what's already being fetched here.
-      var unit = geo.country_code === "US" ? "F" : "C";
-      fetchWeather(geo.latitude, geo.longitude, unit, geo.city);
-    })
-    .catch(function () {
-      // IP lookup failed/blocked — no chip.
-    });
+  if (typeof window.resolveVisitorLocation !== "function") return;
+
+  window.resolveVisitorLocation(function (loc) {
+    if (!loc) return;
+    // Fahrenheit for a visitor geo-locate.js resolved as US-based,
+    // Celsius otherwise — same "match what the visitor is already used
+    // to" reasoning the clock applies to 12h/24h.
+    fetchWeather(loc.lat, loc.lon, loc.prefersImperial ? "F" : "C", loc.city);
+  });
 })();

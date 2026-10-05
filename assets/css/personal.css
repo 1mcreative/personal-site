@@ -1,3 +1,18 @@
+/* html normally has overflow:visible, and per the CSS Overflow spec, a root
+   element with overflow:visible propagates its BODY child's own overflow up
+   to the viewport instead of leaving it on body — meaning a plain
+   `body { overflow-y: auto }` doesn't make body a real scroll container at
+   all, it just relabels the viewport's own scroll with body's value, and
+   scroll-snap-type set on body then governs nothing a real scroll gesture
+   ever touches. Confirmed directly (not assumed): a real scroll left
+   document.body.scrollTop at 0 while window.scrollY moved. html:has() stops
+   the propagation so body becomes the actual scrolling box its own rules
+   below already assume it is. Scoped via :has() rather than a bare `html`
+   rule so this never touches any other page's normal document scroll. */
+html:has(body.theme-personal) {
+  overflow: hidden;
+}
+
 /* Personal theme — dark, relaxed, life-and-Instagram-first. */
 .theme-personal {
   --bg: #0f1419;
@@ -22,10 +37,10 @@
      into view completely rather than resting at some arbitrary partial
      scroll position — per direct feedback that sections were reading as
      one overlapping continuous wall of content instead of distinct areas.
-     scroll-snap-type has to live on the actual scrolling box; body is that
-     box here (html/body carry no other overflow rule on this page), so
-     body itself becomes the scroll container instead of the viewport at
-     large. position:fixed children (.life-hero, .site-header, .section-nav)
+     scroll-snap-type has to live on the actual scrolling box — body, made
+     real by the html:has() rule above; without it this height/overflow
+     pair looks correct in computed style but never receives real scroll
+     input. position:fixed children (.life-hero, .site-header, .section-nav)
      are unaffected — overflow alone doesn't change their containing block,
      confirmed directly after wiring this up, not just assumed. */
   height: 100vh;
@@ -61,21 +76,13 @@
   opacity: 0;
 }
 
-/* The "dot" — starts at a near-zero scale (true 0 would stop transform's
-   own transition from having anything to interpolate from in some engines)
-   centered on the viewport, then grows to full size. transform, not width/
-   height, so the canvas's own backing resolution/ResizeObserver never see
-   a size change mid-grow, only a visual one. */
-.theme-personal.js-intro .life-hero {
-  transform: scale(0.015);
-  transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.theme-personal.js-intro .life-hero.is-grown {
-  transform: scale(1);
-}
-
-.theme-personal.js-intro .site-header,
+/* No CSS transform on .life-hero anymore — the "grows from a dot" effect
+   used to be a scale() on this whole wrapper, which visually read as the
+   camera zooming toward a tiny, already-complete copy of the final image
+   rather than the black hole itself forming. window.blackHoleGrow() (see
+   life-intro.js and black-hole-lite.js) now animates the disk's own
+   visual radius inside the shader instead — this element just holds the
+   canvas at its real, constant size throughout. */
 .theme-personal.js-intro .life-hero-inner h1,
 .theme-personal.js-intro .life-hero-inner p {
   opacity: 0;
@@ -83,25 +90,62 @@
   transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
 }
 
-.theme-personal.js-intro .site-header.is-visible,
 .theme-personal.js-intro .life-hero-inner h1.is-visible,
 .theme-personal.js-intro .life-hero-inner p.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* "Everything else" (section-nav, plus every .life-section — Instagram/
-   YouTube/Album) arrives as one final group once the hero's own pieces have
-   landed, rather than staggering every individual card — reads as "the
-   page has arrived," not a slow reveal of dozens of elements one by one. */
-.theme-personal.js-intro .section-nav,
+/* .site-header needs its own fade-in-from-below, same as h1/p above, but it
+   already carries a load-bearing transform of its own (translateX(-50%) for
+   horizontal centering, set on the base .site-header rule below) — a plain
+   "transform: translateY(...)" here would win on specificity and silently
+   replace that centering transform outright, since a later/more-specific
+   rule's transform doesn't merge with an earlier one's, it replaces it. Both
+   halves are composed into one transform value at each stage instead. */
+.theme-personal.js-intro .site-header {
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+  transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
+}
+
+.theme-personal.js-intro .site-header.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* The .life-section chapters (Instagram/YouTube/Album) settle immediately
+   rather than joining the timed sequence — see life-intro.js's own
+   comment: they're all off-screen for the whole intro, so staging their
+   reveal has nothing to be visible against anyway. */
 .theme-personal.js-intro .life-section {
   opacity: 0;
   transition: opacity 0.6s var(--ease);
 }
 
-.theme-personal.js-intro .section-nav.is-visible,
 .theme-personal.js-intro .life-section.is-visible {
+  opacity: 1;
+}
+
+/* The side nav's own container (text arrives with it, one step) is
+   separate from each icon inside it — per direct request, the three
+   icons reveal in their own order (Instagram, then YouTube, then Album)
+   rather than all arriving as part of the container's own fade. */
+.theme-personal.js-intro .section-nav {
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+}
+
+.theme-personal.js-intro .section-nav.is-visible {
+  opacity: 1;
+}
+
+.theme-personal.js-intro .section-nav-link {
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+
+.theme-personal.js-intro .section-nav-link.is-visible {
   opacity: 1;
 }
 
@@ -110,17 +154,20 @@
     display: none;
   }
 
-  .theme-personal.js-intro .life-hero {
-    transform: none;
-  }
-
-  .theme-personal.js-intro .site-header,
   .theme-personal.js-intro .life-hero-inner h1,
   .theme-personal.js-intro .life-hero-inner p,
   .theme-personal.js-intro .section-nav,
+  .theme-personal.js-intro .section-nav-link,
   .theme-personal.js-intro .life-section {
     opacity: 1;
     transform: none;
+  }
+
+  /* Not transform: none — .site-header's own centering transform (below)
+     still applies under reduced motion, only the slide-in half is dropped. */
+  .theme-personal.js-intro .site-header {
+    opacity: 1;
+    transform: translateX(-50%);
   }
 }
 
@@ -145,6 +192,25 @@
   background: color-mix(in srgb, var(--surface) 32%, transparent);
   backdrop-filter: blur(24px) saturate(150%);
   -webkit-backdrop-filter: blur(24px) saturate(150%);
+}
+
+/* Auto-hides on scroll-down, returns on scroll-up (assets/js/nav-autohide.js)
+   — per direct request for the floating nav. Reuses the same transform
+   transition already declared on .theme-personal.js-intro .site-header
+   below (0.55s) rather than adding a second, lower-specificity one here —
+   js-intro is permanent (added synchronously, never removed), so that
+   higher-specificity rule always wins anyway; a duration set on this base
+   rule would just be dead code. This selector is .js-intro-qualified for
+   the same reason: it makes this rule's specificity (4 classes) match
+   .site-header.is-visible's own (also 4), so source order — this rule
+   comes later — breaks the tie in hidden's favor for a visitor who has
+   both classes at once (finished the intro, then scrolled); without that
+   match, .is-visible would silently win regardless of order and the
+   header would never actually hide. translateX(-50%) is composed into the
+   same transform value for the usual reason: a later rule's transform
+   replaces an earlier one's outright, it doesn't merge with it. */
+.theme-personal.js-intro .site-header.is-nav-hidden {
+  transform: translateX(-50%) translateY(-150%);
 }
 
 .theme-personal .site-header .header-inner {
@@ -217,9 +283,18 @@
   }
 }
 
+/* scroll-snap-align: start — without it, this was the one part of the page
+   with no snap point of its own, and scroll-snap-type: y mandatory (on
+   body, see the .theme-personal rule) can never let the scroll container
+   rest anywhere that isn't a valid snap point. Confirmed directly: the
+   footer was fully present in the DOM and had real scrollable height
+   below Album, but any scroll attempt past Album's own snap point just
+   pulled straight back to it — the footer was unreachable, not just easy
+   to miss. */
 .theme-personal .site-footer {
   position: relative;
   z-index: 1;
+  scroll-snap-align: start;
   border-top: 1px solid var(--border);
   color: var(--muted);
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
@@ -254,14 +329,33 @@
   height: 100svh;
   z-index: 0;
   overflow: hidden;
+  /* Same reasoning as .life-hero-canvas just below: this wrapper is purely
+     decorative (already aria-hidden) and nothing needs it as a pointer
+     target, but being a fixed, full-viewport element left as a hit-target
+     by default, it was next in line to reproduce the identical scroll-stuck
+     issue the canvas itself had. */
+  pointer-events: none;
 }
 
+/* pointer-events: none — the canvas doesn't actually need to receive
+   pointer input itself: black-hole-lite.js's hover-follow reads
+   window-level pointermove (not the canvas's own), and click-effects.js
+   listens on document, not the canvas. Left as a real hit-target (the
+   default), this position:fixed, full-viewport element was the reason a
+   scroll gesture over most of the empty hero/section background — anywhere
+   without text or a card directly under the cursor — genuinely failed to
+   scroll the page at all, confirmed directly: the wheel event fired (a
+   window-level listener saw it) but body.scrollTop never moved, while the
+   identical gesture over a text element a few pixels away worked every
+   time. Removing it as a hit-target removes that ambiguity outright rather
+   than working around a specific browser's resolution of it. */
 .theme-personal .life-hero-canvas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   display: block;
+  pointer-events: none;
 }
 
 .theme-personal main#main {
@@ -340,7 +434,13 @@
   gap: var(--space-2);
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  padding: 0 var(--space-3) var(--space-1) var(--nav-clearance);
+  /* Top padding beyond what the cards themselves need is deliberate
+     headroom for the hover lift below — this row's own overflow-y:hidden
+     was silently clipping the top ~3px of a hovered card (border, gradient
+     highlight line) off, since a card resting flush against the row's own
+     edge has nowhere to go when it lifts. Confirmed directly, not just
+     reasoned about: the reported "highlight line gets cut off" bug. */
+  padding: var(--space-2) var(--space-3) var(--space-1) var(--nav-clearance);
   /* Real box padding alone isn't enough here: with scroll-snap-type active,
      a leading padding whose size doesn't match scroll-padding isn't a valid
      snap position, so the browser silently jumps scrollLeft to the padding
@@ -350,7 +450,7 @@
      correct resting/snap position, so scrollLeft correctly stays at 0. */
   scroll-padding-left: var(--nav-clearance);
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: visible;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -492,6 +592,113 @@
   transform: translateX(2px);
 }
 
+/* Live Instagram feed (assets/js/instagram-feed.js, via Behold.so) — replaces
+   the two static handle cards above (.social-card, kept for /lab/'s own
+   demo, not deleted) with real photo content, per direct feedback that the
+   old cards "marketed the ID, not the content." Merges both accounts'
+   posts into one grid sorted by real timestamp rather than two separately
+   labeled rows, matching the same consistency preference the YouTube
+   section's own redesign already established. */
+.theme-personal .ig-feed-grid,
+.theme-personal .ig-feed-loading {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+/* This project has hit this exact bug once already on .lab-modal: a bare
+   [hidden] attribute selector loses to any class selector on specificity,
+   so instagram-feed.js's "loadingEl.hidden = true" was correctly setting
+   the attribute while this file's own "display: grid" above just kept
+   winning — confirmed directly, not assumed, via a real screenshot still
+   showing the skeleton after the JS reported it hidden. Class+attribute
+   forces this to actually win. */
+.theme-personal .ig-feed-grid[hidden],
+.theme-personal .ig-feed-loading[hidden] {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .theme-personal .ig-feed-grid,
+  .theme-personal .ig-feed-loading {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .theme-personal .ig-feed-grid,
+  .theme-personal .ig-feed-loading {
+    grid-template-columns: 1fr;
+  }
+}
+
+.theme-personal .ig-feed-loading span {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  background: var(--surface);
+  animation: ig-feed-pulse 1.4s ease-in-out infinite;
+}
+.theme-personal .ig-feed-loading span:nth-child(2) { animation-delay: 0.1s; }
+.theme-personal .ig-feed-loading span:nth-child(3) { animation-delay: 0.2s; }
+.theme-personal .ig-feed-loading span:nth-child(4) { animation-delay: 0.15s; }
+.theme-personal .ig-feed-loading span:nth-child(5) { animation-delay: 0.25s; }
+.theme-personal .ig-feed-loading span:nth-child(6) { animation-delay: 0.05s; }
+
+@keyframes ig-feed-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-personal .ig-feed-loading span {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+.theme-personal .ig-feed-item {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.theme-personal .ig-feed-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s var(--ease);
+}
+
+.theme-personal .ig-feed-item:hover img,
+.theme-personal .ig-feed-item:focus-visible img {
+  transform: scale(1.06);
+}
+
+.theme-personal .ig-feed-error {
+  text-align: center;
+  padding: var(--space-4) 0;
+  color: var(--muted);
+}
+
+/* Small, always-visible regardless of feed state — losing a direct path to
+   the real profiles (not just a specific post) would be a real regression
+   from what the handle cards used to guarantee. */
+.theme-personal .ig-feed-links {
+  margin-top: var(--space-2);
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.theme-personal .ig-feed-links a {
+  margin: 0 var(--space-1);
+}
+
 /* Click effects (sniper reticle) — see assets/js/click-effects.js. Fixed
    overlay so it works anywhere on the page, not just over the intro/cards. */
 .theme-personal .click-fx-layer {
@@ -609,104 +816,39 @@
    external platform gets its own brand color" exception already
    established for Instagram's pink hover glow, which the site-wide
    blue-accent pass deliberately left alone for the same reason. */
-.theme-personal .youtube-channels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+/* Each channel/creator gets its own row: a small clickable name linking
+   straight to that channel, directly above its own horizontal strip of
+   cards — replaces the old .youtube-channels card pair that sat above all
+   24 cards as one undifferentiated pile. Kartik Bansal (whose videos these
+   are, per each card's own .video-title/href — he's not a channel the
+   site owner runs) gets a real clickable row label for the first time
+   here too, instead of only being named in a hover-only meta line. */
+.theme-personal .video-row {
   margin-top: var(--space-3);
 }
 
-.theme-personal .youtube-channel-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-1);
-  flex: 1 1 240px;
-  background: color-mix(in srgb, var(--surface) 45%, transparent);
-  backdrop-filter: blur(22px) saturate(150%);
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-2) var(--space-3);
-  text-decoration: none;
-  color: var(--text);
-  transition: border-color var(--speed) var(--ease), transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
-}
-
-/* Icon + label/name only, its own row — keeping .youtube-channel-cta out
-   of this flex row (instead of a --space-2-separated third sibling in it,
-   the original layout) is the actual fix, not a style tweak: a CTA with
-   flex-shrink:0 sharing a row with a shrinkable text column squeezed that
-   column down to ~20px on a real narrow card (confirmed via
-   getBoundingClientRect(), not assumed), wrapping "RED FILMS" onto lines
-   that sat directly under "Visit channel ↗". Same structural fix
-   .social-card already uses for the identical icon+text+CTA shape. */
-.theme-personal .youtube-channel-head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  width: 100%;
-}
-
-.theme-personal .youtube-channel-card:hover,
-.theme-personal .youtube-channel-card:focus-visible {
-  border-color: #ff0000;
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px -12px rgba(255, 0, 0, 0.35);
-}
-
-.theme-personal .youtube-channel-icon {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-}
-
-.theme-personal .youtube-channel-body {
-  min-width: 0;
-}
-
-.theme-personal .youtube-channel-label {
-  display: block;
-  color: var(--muted);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.theme-personal .youtube-channel-name {
-  display: block;
+.theme-personal .video-row-label {
+  display: inline-block;
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  margin-top: 2px;
-}
-
-.theme-personal .youtube-channel-cta {
-  margin-top: var(--space-1);
-  padding-top: var(--space-1);
-  border-top: 1px solid var(--border);
-  width: 100%;
-  font-size: 0.85rem;
-  font-weight: 600;
+  line-height: 1.3;
   color: var(--text);
-  opacity: 0.75;
-  transition: opacity var(--speed) var(--ease), transform var(--speed) var(--ease);
+  text-decoration: none;
+  opacity: 0.8;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+  transition: opacity var(--speed) var(--ease), color var(--speed) var(--ease);
 }
 
-.theme-personal .youtube-channel-cta::after {
+.theme-personal .video-row-label::after {
   content: " ↗";
   font-weight: 400;
 }
 
-.theme-personal .youtube-channel-card:hover .youtube-channel-cta,
-.theme-personal .youtube-channel-card:focus-visible .youtube-channel-cta {
+.theme-personal .video-row-label:hover,
+.theme-personal .video-row-label:focus-visible {
   opacity: 1;
-  transform: translateX(2px);
+  color: #ff0000;
 }
 
 .theme-personal .video-grid-intro {
@@ -720,17 +862,34 @@
    comment for why the padding is paired with a matching scroll-padding —
    a scroll-snap container silently jumps scrollLeft to an unmirrored
    leading padding otherwise), kept separate so this row and the Instagram
-   one can change independently. */
+   one can change independently. Extra top/bottom padding (beyond what the
+   content itself needs) is deliberate headroom for the hover scale-up
+   below — .social-card hit exactly this bug once already (a hover lift
+   clipped clean off by the row's own overflow-y: hidden, since it had no
+   slack above the resting card); this row gets that slack from the start.
+   Three of these now sit inside #youtube (one per .video-row, see above) —
+   an earlier pass had collapsed them into one unified 24-card row because
+   three separate grids plus a per-card .video-meta line pushed #youtube's
+   real height to 1261px against a 768px viewport, confirmed directly via
+   getBoundingClientRect(), with no snap point inside that overflow. This
+   time the per-card .video-meta line is gone (the channel name now lives
+   once, in the row's own label, not repeated on every card under it),
+   which alone claws back enough height that three grids plus three labels
+   fits #youtube's real budget with room to spare — confirmed the same way,
+   via getBoundingClientRect() at both mobile and desktop after building,
+   not just estimated from the CSS. margin-top is small (var(--space-1))
+   since .video-row-label directly above already carries the bulk of the
+   spacing via its own row's var(--space-3) margin-top. */
 .theme-personal .video-grid {
   display: flex;
   gap: var(--space-2);
-  margin-top: var(--space-2);
+  margin-top: var(--space-1);
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  padding: 0 var(--space-3) var(--space-1) var(--nav-clearance);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--nav-clearance);
   scroll-padding-left: var(--nav-clearance);
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: visible;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -740,12 +899,29 @@
   display: none;
 }
 
+/* Every card — regardless of source (RED FILMS' 16:9 event films, 1mCreative's
+   vertical Shorts, Kartik Bansal's dance edits) — gets the identical box.
+   YouTube's own hqdefault.jpg is the same flat 480x360 raster for a Short
+   as for a long-form video (confirmed directly, not assumed), so cropping
+   every thumbnail into one shared 16:9 frame via object-fit:cover isn't
+   losing anything format-specific — there was never a "true vertical"
+   source image to begin with. */
 .theme-personal .video-card {
   flex: 0 0 auto;
-  width: 220px;
+  width: 160px;
   scroll-snap-align: start;
   text-decoration: none;
   color: var(--text);
+  transition: transform var(--speed) var(--ease), z-index 0s var(--speed);
+}
+
+/* Netflix-style hover pop, toned down from an earlier, larger-card version
+   of this same idea — a compact playlist row doesn't need (or have vertical
+   room for) a dramatic scale-up, and a smaller one reduces how much
+   headroom .video-grid has to reserve against clipping. */
+.theme-personal .video-card.is-hover-active {
+  transform: scale(1.08);
+  z-index: 5;
 }
 
 .theme-personal .video-thumb {
@@ -756,6 +932,7 @@
   overflow: hidden;
   border: 1px solid var(--border);
   background: var(--bg);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   transition: border-color var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
 }
 
@@ -764,31 +941,81 @@
   height: 100%;
   object-fit: cover;
   display: block;
-}
-
-.theme-personal .video-play {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: rgba(0, 0, 0, 0.25);
-  opacity: 0;
   transition: opacity var(--speed) var(--ease);
 }
 
+/* The live preview iframe (added/removed by video-hover.js on hover intent,
+   never present in the static markup) sits over the poster image rather
+   than replacing it, so there's always an instant frame to show before the
+   embed has actually loaded — removing the iframe on hover-out just lets
+   the still image show through again, real playback stops immediately
+   since the iframe itself is gone, not just visually hidden. */
+.theme-personal .video-thumb iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: none;
+}
+
+/* A small centered badge, not a full-thumbnail scrim — visible by default,
+   not gated behind :hover/:focus-visible. That gate meant touch visitors
+   never saw any "this is a video" cue at all (neither state a tap can
+   trigger), confirmed directly: computed opacity read 0 at rest with
+   nothing to reveal it on a touch device. Real platforms (YouTube, Vimeo)
+   all show a persistent play affordance on thumbnails for the same reason. */
+.theme-personal .video-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.55);
+  transition: transform var(--speed) var(--ease), background var(--speed) var(--ease), opacity var(--speed) var(--ease);
+}
+
+.theme-personal .video-play svg {
+  width: 14px;
+  height: 14px;
+}
+
 .theme-personal .video-card:hover .video-thumb,
-.theme-personal .video-card:focus-visible .video-thumb {
+.theme-personal .video-card:focus-visible .video-thumb,
+.theme-personal .video-card.is-hover-active .video-thumb {
   border-color: #ff0000;
-  box-shadow: 0 10px 30px -12px rgba(255, 0, 0, 0.35);
+  box-shadow: 0 16px 36px -14px rgba(255, 0, 0, 0.45);
 }
 
 .theme-personal .video-card:hover .video-play,
 .theme-personal .video-card:focus-visible .video-play {
-  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.15);
+  background: rgba(0, 0, 0, 0.75);
 }
 
+/* Once a real preview starts playing, the static play badge would just sit
+   on top of it doing nothing useful — hide it for that state only, not
+   the plain hover state above it. */
+.theme-personal .video-card.is-hover-active .video-play {
+  opacity: 0;
+}
+
+/* Playlist-style: clamped to a fixed line count (not unbounded wrapping),
+   so every card is still the same height regardless of how long its real
+   title is — the full text is still the link's accessible name either way.
+   Two lines, not one: several real titles here only differ in their last
+   few words ("SPARSH 2K18 Pre-Movie" vs "SPARSH 2K18 Theme Teaser"), and a
+   single-line clamp truncated both down to the identical "SPARSH 2K18...",
+   reading as duplicate cards at a glance. */
 .theme-personal .video-title {
-  display: block;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
   margin-top: var(--space-1);
   font-size: 0.85rem;
   font-weight: 600;

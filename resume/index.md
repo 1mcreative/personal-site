@@ -2,6 +2,7 @@
 layout: professional
 title: "Resume - Senior Software Engineer"
 description: "Bhavesh Nakum's resume: Senior Software Engineer at eBay, backend architecture, distributed systems, and big data platforms."
+image: "/assets/img/og-image.svg"
 permalink: /resume/
 ---
 
@@ -37,6 +38,12 @@ permalink: /resume/
         <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </a>
+    <a class="offset-btn" href="/questions/">
+      Interview Questions
+      <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
   </div>
 </header>
 
@@ -45,7 +52,7 @@ permalink: /resume/
 
 <section class="resume-section">
   <h2>Summary</h2>
-  <p>Senior Software Engineer with 8+ years of experience designing, developing, and operating high-performance backend systems, distributed microservices, and large-scale data platforms in Java and Python. Deep expertise across event-driven architecture (Apache Kafka, Apache Flink), big data processing (Apache Spark, Apache Airflow, Hive, HDFS), and multi-tenant, multi-region SaaS platform design with a strong focus on high availability, fault tolerance, and secure API development (OAuth, OWASP). Hands-on experience designing AI agent-driven workflows (including an agentic system that generates data schemas from natural-language chat input and a self-service, automated data consumption layer), alongside daily use of AI-augmented development tools (Cursor, Claude Code, GitHub Copilot, Qodo Merge) across coding, design, PR review, and testing. Skilled in cloud-native engineering across Microsoft Azure, Google Cloud Platform, and AWS, with hands-on experience in Kubernetes, Docker, and CI/CD pipeline automation. Proven technical leader with a track record of architecting production systems end-to-end, mentoring engineering teams, participating in technical hiring, and collaborating cross-functionally with product, data science, and business stakeholders across e-commerce, healthcare, and enterprise IT environments.</p>
+  <p>Senior Software Engineer with 8+ years of experience designing, developing, and operating high-performance backend systems, distributed microservices, and large-scale data platforms in Java and Python. Deep expertise across event-driven architecture (Apache Kafka, Apache Flink), big data processing (Apache Spark, Apache Airflow, Hive, HDFS), and multi-tenant, multi-region SaaS platform design with a strong focus on high availability, fault tolerance, and secure API development (OAuth, OWASP). Hands-on experience designing AI agent-driven workflows (including an agentic system that generates data schemas from natural-language chat input and a self-service, automated data consumption layer), alongside daily use of AI-augmented development tools (Cursor, Claude Code, GitHub Copilot, Qodo Merge) across coding, design, PR review, and testing. Skilled in cloud-native engineering across Microsoft Azure, Google Cloud Platform, and AWS, with hands-on experience in Kubernetes, Docker, and CI/CD pipeline automation. Proven technical leader and lead developer with a track record of architecting production systems end-to-end, mentoring engineering teams, participating in technical hiring, and collaborating cross-functionally with product, data science, and business stakeholders across e-commerce, healthcare, and enterprise IT environments.</p>
 </section>
 
 <section class="resume-section">
@@ -58,6 +65,7 @@ permalink: /resume/
       <span>Senior Software Engineer, eBay</span>
       <span class="entry-meta">Bengaluru &middot; Jun 2026 &ndash; Present</span>
     </p>
+    <p class="entry-summary">Owns eBay's real-time data pipelines, plus the team's AI schema generator and self-service data layer.</p>
     <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-ebay">
       <span class="entry-toggle-label">Show details</span>
       <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -79,6 +87,7 @@ permalink: /resume/
       <span>Senior Software Engineer (Lead), Walmart</span>
       <span class="entry-meta">Bengaluru &middot; Apr 2025 &ndash; May 2026</span>
     </p>
+    <p class="entry-summary">Led 6 engineers building Kafka-based pricing microservices across multiple countries.</p>
     <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-walmart-lead">
       <span class="entry-toggle-label">Show details</span>
       <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -105,6 +114,7 @@ permalink: /resume/
       <span>Software Developer, Walmart</span>
       <span class="entry-meta">Bengaluru &middot; Apr 2022 &ndash; Mar 2025</span>
     </p>
+    <p class="entry-summary">Built repricing and anomaly-detection pipelines that pulled over 1M mispriced items off the Walmart catalog.</p>
     <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-walmart-dev">
       <span class="entry-toggle-label">Show details</span>
       <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -125,6 +135,7 @@ permalink: /resume/
       <span>Data Engineer, UnitedHealth Group</span>
       <span class="entry-meta">Hyderabad &middot; Apr 2021 &ndash; Apr 2022</span>
     </p>
+    <p class="entry-summary">Built HIPAA-compliant ETL pipelines on Azure Data Factory and Databricks for healthcare data.</p>
     <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-uhg">
       <span class="entry-toggle-label">Show details</span>
       <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -144,6 +155,7 @@ permalink: /resume/
       <span>Systems Engineer, Tata Consultancy Services</span>
       <span class="entry-meta">Hyderabad &middot; Sep 2018 &ndash; Apr 2021</span>
     </p>
+    <p class="entry-summary">Migrated legacy data warehouses to Azure and cut query costs 25%.</p>
     <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-tcs">
       <span class="entry-toggle-label">Show details</span>
       <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -160,6 +172,67 @@ permalink: /resume/
   </div>
 
   </div>
+</section>
+
+<section class="resume-section">
+  <h2>Projects</h2>
+
+  <div class="experience-timeline">
+
+  <div class="resume-entry">
+    <p class="entry-heading">
+      <span>Real-Time Emotion-to-Emoji Detector</span>
+      <span class="entry-meta">SVNIT, Surat &middot; Final Year Project, 2018</span>
+    </p>
+    <p class="entry-summary">Built a browser tool that reads your facial expression through the webcam and shows a matching emoji.</p>
+    <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-emoji-project">
+      <span class="entry-toggle-label">Show details</span>
+      <svg class="entry-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="entry-details-wrap">
+      <ul class="entry-details" id="entry-detail-emoji-project" hidden>
+        <li><strong>Live capture:</strong> Captures your face live through the webcam, right in the browser, no app or upload required.</li>
+        <li><strong>Expression detection:</strong> Reads the expression and picks a matching emoji: happy, sad, angry, surprised, fearful, disgusted, or neutral.</li>
+        <li class="entry-demo-item">
+          <div class="emoji-demo" data-state="idle">
+            <div class="emoji-demo-stage">
+              <video class="emoji-demo-video" playsinline muted aria-hidden="true"></video>
+              <span class="emoji-demo-placeholder" aria-hidden="true">&#x1F642;</span>
+              <span class="emoji-demo-emoji" aria-hidden="true"></span>
+            </div>
+            <p class="emoji-demo-status">Turn your camera on and it'll guess how you're feeling.</p>
+            <div class="emoji-demo-actions">
+              <button type="button" class="offset-btn emoji-demo-start">
+                <span class="emoji-demo-start-label">Try it now</span>
+                <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <button type="button" class="offset-btn emoji-demo-stop" hidden>Stop camera</button>
+            </div>
+            <p class="emoji-demo-note">Runs entirely in your browser. Nothing leaves your device.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  </div>
+</section>
+
+<section class="resume-section">
+  <h2>Additional highlights</h2>
+  <ul>
+    <li><strong>Agentic AI System Design:</strong> Hands-on experience designing and shipping an AI agent-driven workflow for automated data schema generation and a self-service, automated data consumption layer, moving a previously manual, team-dependent process to a fully automated, consumer-driven path.</li>
+    <li><strong>Mentorship &amp; Hiring:</strong> Mentored new hires and junior engineers; participated in hiring and interview panels for vendor and FTE roles.</li>
+    <li><strong>AI-Augmented Development:</strong> Practical, day-to-day use of AI coding tools (Cursor, Claude Code, GitHub Copilot, Qodo Merge) and general-purpose LLM tools (Claude, ChatGPT) to accelerate development, elevate code review quality, and support research and technical communication.</li>
+    <li><strong>Legacy &amp; Proprietary System Modernization:</strong> Consistent track record diving into proprietary and legacy systems (internal release pipelines, Teradata data warehouses, Hadoop platforms) to understand their inner workings and strategically modernize them.</li>
+    <li><strong>Regulated &amp; Enterprise Environments:</strong> Experience delivering technology solutions in compliance-driven settings (HIPAA-regulated healthcare data) and for large enterprise clients (Proximus/Belgium, Bank of America).</li>
+    <li><strong>CI/CD:</strong> Automated CI/CD pipelines by integrating functional, integration, end-to-end, and performance testing into the deployment process.</li>
+    <li><strong>Engineering Standards:</strong> Passionate about performance optimization, code quality, testability, and technical documentation for high-concurrency, high-throughput production systems.</li>
+  </ul>
 </section>
 
 </div>
@@ -213,19 +286,6 @@ permalink: /resume/
 </section>
 
 <section class="resume-section">
-  <h2>Additional highlights</h2>
-  <ul>
-    <li><strong>Agentic AI System Design:</strong> Hands-on experience designing and shipping an AI agent-driven workflow for automated data schema generation and a self-service, automated data consumption layer, moving a previously manual, team-dependent process to a fully automated, consumer-driven path.</li>
-    <li><strong>Mentorship &amp; Hiring:</strong> Mentored new hires and junior engineers; participated in hiring and interview panels for vendor and FTE roles.</li>
-    <li><strong>AI-Augmented Development:</strong> Practical, day-to-day use of AI coding tools (Cursor, Claude Code, GitHub Copilot, Qodo Merge) and general-purpose LLM tools (Claude, ChatGPT) to accelerate development, elevate code review quality, and support research and technical communication.</li>
-    <li><strong>Legacy &amp; Proprietary System Modernization:</strong> Consistent track record diving into proprietary and legacy systems (internal release pipelines, Teradata data warehouses, Hadoop platforms) to understand their inner workings and strategically modernize them.</li>
-    <li><strong>Regulated &amp; Enterprise Environments:</strong> Experience delivering technology solutions in compliance-driven settings (HIPAA-regulated healthcare data) and for large enterprise clients (Proximus/Belgium, Bank of America).</li>
-    <li><strong>CI/CD:</strong> Automated CI/CD pipelines by integrating functional, integration, end-to-end, and performance testing into the deployment process.</li>
-    <li><strong>Engineering Standards:</strong> Passionate about performance optimization, code quality, testability, and technical documentation for high-concurrency, high-throughput production systems.</li>
-  </ul>
-</section>
-
-<section class="resume-section">
   <h2>Education &amp; certifications</h2>
   <ul>
     <li>B.Tech, Computer Engineering, SVNIT, Surat (2018) &middot; CGPA 7.18/10</li>
@@ -236,3 +296,84 @@ permalink: /resume/
 
 </div>
 </div>
+
+<section class="resume-section" id="faq">
+  <h2>Frequently asked questions</h2>
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>Who is Bhavesh Nakum?</summary>
+      <p>Bhavesh Nakum is a Senior Software Engineer based in Bengaluru, India, currently working on eBay's core Data team.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What does Bhavesh Nakum do?</summary>
+      <p>He designs and builds backend systems and distributed data pipelines, with hands-on work in event-driven architecture (Apache Kafka, Apache Flink), big data processing, and AI agent-driven workflows.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Where has Bhavesh Nakum worked?</summary>
+      <p>eBay, Walmart (as Senior Software Engineer, Lead), UnitedHealth Group, and Tata Consultancy Services, spanning backend engineering, data engineering, and cloud migration work since 2018.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Is Bhavesh Nakum a lead developer?</summary>
+      <p>Yes. At Walmart he led and mentored a cross-functional team of 6 engineers as Senior Software Engineer (Lead), and continues to take on technical leadership and mentoring responsibilities.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What technologies does Bhavesh Nakum work with?</summary>
+      <p>Java, Python, Spring Boot, Apache Kafka, Apache Flink, Apache Spark, Kubernetes, Docker, and cloud platforms including Microsoft Azure, Google Cloud Platform, and AWS.</p>
+    </details>
+  </div>
+</section>
+
+<!-- FAQPage schema, matching the visible Q&A above word-for-word (required
+     for Google's FAQ rich-result guidelines, not just present anywhere on
+     the page). AEO gap flagged in the site audit: the facts already existed
+     on this page, just never formatted as direct answers to explicit
+     questions — this section and schema are that formatting change, not
+     new claims. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Who is Bhavesh Nakum?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Bhavesh Nakum is a Senior Software Engineer based in Bengaluru, India, currently working on eBay's core Data team."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does Bhavesh Nakum do?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "He designs and builds backend systems and distributed data pipelines, with hands-on work in event-driven architecture (Apache Kafka, Apache Flink), big data processing, and AI agent-driven workflows."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where has Bhavesh Nakum worked?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "eBay, Walmart (as Senior Software Engineer, Lead), UnitedHealth Group, and Tata Consultancy Services, spanning backend engineering, data engineering, and cloud migration work since 2018."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is Bhavesh Nakum a lead developer?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. At Walmart he led and mentored a cross-functional team of 6 engineers as Senior Software Engineer (Lead), and continues to take on technical leadership and mentoring responsibilities."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What technologies does Bhavesh Nakum work with?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Java, Python, Spring Boot, Apache Kafka, Apache Flink, Apache Spark, Kubernetes, Docker, and cloud platforms including Microsoft Azure, Google Cloud Platform, and AWS."
+      }
+    }
+  ]
+}
+</script>

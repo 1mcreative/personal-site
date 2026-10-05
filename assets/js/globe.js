@@ -22,8 +22,19 @@
   var canvas = document.querySelector(".hero-globe-canvas");
   if (!host || !canvas) return;
 
+  // antialias was true. This canvas redraws every frame for as long as the
+  // page stays open (auto-rotate never stops), and a Lighthouse run flagged
+  // 11.6s of Total Blocking Time attributed entirely to this file's draw
+  // calls. MSAA is one of the more expensive things to keep paying for on
+  // every single frame of a background element, especially under
+  // software-rendered WebGL (common in headless/CI Chrome, which lacks real
+  // GPU acceleration) — dropping it is a clear, visible-downside-free cut to
+  // that recurring per-frame cost. Left unaddressed here, since it trades
+  // off visible smoothness/density rather than being a free win: the
+  // auto-rotate frame rate and the point count both also contribute to the
+  // same per-frame cost.
   var gl =
-    canvas.getContext("webgl", { antialias: true, alpha: true }) ||
+    canvas.getContext("webgl", { antialias: false, alpha: true }) ||
     canvas.getContext("experimental-webgl");
   if (!gl) return;
 

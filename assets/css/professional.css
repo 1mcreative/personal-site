@@ -411,6 +411,35 @@
   margin-bottom: var(--space-2);
 }
 
+/* FAQ (AEO): native details/summary, no JS needed to expand/collapse and
+   nothing to break if it fails to load. */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--space-2);
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: var(--space-1) 0;
+}
+
+.faq-item summary::marker {
+  color: var(--accent);
+}
+
+.faq-item p {
+  margin-top: var(--space-1);
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
 /* Experience timeline — one continuous spine (::before on the wrapper)
    with a dot per entry (::before on each .resume-entry) instead of each
    entry carrying its own disconnected border-left segment. GUTTER below
@@ -474,10 +503,27 @@
   font-size: 0.9rem;
 }
 
-/* Collapsed by default (see assets/js/entry-toggle.js) — only the heading
-   above (title, company, dates) is the "high-level summary" until this is
-   deliberately opened; nothing here auto-expands on hover or scroll. */
-.entry-toggle {
+/* One always-visible line of real substance per entry, so a collapsed
+   entry reads as more than a title and a button — the two-column balance
+   fix (moving Additional Highlights into .resume-main) closed the height
+   gap, but a visitor scanning the timeline before opening anything still
+   needs something to read. Full sentence, body-text color (not --muted
+   like entry-meta) so it carries real weight rather than reading as a
+   second metadata line. */
+.resume-entry .entry-summary {
+  margin: 0.35rem 0 0;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Collapsed by default (see assets/js/entry-toggle.js) — the heading and
+   summary above are the "high-level summary" until this is deliberately
+   opened; nothing here auto-expands on hover or scroll.
+   .question-toggle (/questions/, assets/js/interview-questions.js) shares
+   every rule below it: same disclosure component, different page. */
+.entry-toggle,
+.question-toggle {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -494,11 +540,14 @@
 }
 
 .entry-toggle:hover,
-.entry-toggle:focus-visible {
+.entry-toggle:focus-visible,
+.question-toggle:hover,
+.question-toggle:focus-visible {
   text-decoration: underline;
 }
 
-.entry-toggle:focus-visible {
+.entry-toggle:focus-visible,
+.question-toggle:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 4px;
@@ -508,7 +557,8 @@
   transition: transform 0.25s ease;
 }
 
-.entry-toggle[aria-expanded="true"] .entry-chevron {
+.entry-toggle[aria-expanded="true"] .entry-chevron,
+.question-toggle[aria-expanded="true"] .entry-chevron {
   transform: rotate(180deg);
 }
 
@@ -516,13 +566,21 @@
    entries with very different bullet counts (4 vs. 9) each expand at a
    speed proportional to their own content instead of sharing one fixed
    cap and visibly pausing at the end when short. */
-.entry-details-wrap {
+.entry-details-wrap,
+.question-answer-wrap {
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.35s ease;
 }
 
 .resume-entry.is-expanded .entry-details-wrap {
+  grid-template-rows: 1fr;
+}
+
+/* .question-answer-wrap has no wrapping .resume-entry-style parent to key
+   off, so assets/js/interview-questions.js toggles this class directly on
+   the wrap instead of on an ancestor. */
+.question-answer-wrap.is-expanded {
   grid-template-rows: 1fr;
 }
 
@@ -537,10 +595,150 @@
   margin-bottom: 0.3rem;
 }
 
+.question-answer-wrap > .question-answer {
+  overflow: hidden;
+  min-height: 0;
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .entry-details-wrap,
+  .question-answer-wrap,
   .entry-chevron {
     transition-duration: 0.01ms;
+  }
+}
+
+/* Emotion-to-Emoji demo, inside the Projects entry's expanded details. A real
+   camera + face-api.js expression model, not a video or a screenshot — see
+   assets/js/emoji-detector.js. Lives as the last <li> in .entry-details so it
+   inherits the exact same hidden/collapse mechanics as the text bullets above
+   it (one accessibility surface, not a second one to keep in sync); the
+   bullet marker is stripped since a whole interactive widget reading as one
+   list item is a layout choice, not literal list content. */
+.entry-demo-item {
+  list-style: none;
+  margin-top: 0.5rem;
+}
+
+.emoji-demo {
+  max-width: 320px;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.emoji-demo-stage {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.emoji-demo-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Mirrored so it reads like a mirror, not a security feed. */
+  transform: scaleX(-1);
+  display: none;
+}
+
+.emoji-demo-placeholder {
+  font-size: 2.25rem;
+  opacity: 0.5;
+}
+
+.emoji-demo-emoji {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  font-size: 2rem;
+  line-height: 1;
+  display: none;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+
+.emoji-demo[data-state="running"] .emoji-demo-video,
+.emoji-demo[data-state="running"] .emoji-demo-emoji {
+  display: block;
+}
+
+.emoji-demo[data-state="running"] .emoji-demo-placeholder {
+  display: none;
+}
+
+.emoji-demo-status {
+  position: relative;
+  margin: 0.75rem 0 0;
+  padding-left: 0;
+  min-height: 1.2em;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.emoji-demo[data-state="loading"] .emoji-demo-status {
+  padding-left: 1rem;
+}
+
+.emoji-demo[data-state="loading"] .emoji-demo-status::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.4em;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: emoji-demo-pulse 1s ease-in-out infinite;
+}
+
+/* Reuses the contact form's own established error color (tokens.css
+   .contact-status[data-state="error"]) rather than inventing a new hue. */
+.emoji-demo[data-state="error"] .emoji-demo-status {
+  color: #e0575b;
+}
+
+@keyframes emoji-demo-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.emoji-demo-actions {
+  margin-top: 0.75rem;
+}
+
+.emoji-demo .offset-btn {
+  padding: 0.5rem 1.1rem;
+  min-height: 44px;
+  font-size: 0.85rem;
+}
+
+.emoji-demo-note {
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emoji-demo-status::before {
+    animation-duration: 0.01ms;
   }
 }
 
@@ -640,4 +838,245 @@
   .emerge-pending {
     transition: none;
   }
+}
+
+/* ---------------------------------------------------------------------
+   /questions/ — interview question log with faceted filters (company /
+   round / tech stack), driven by assets/js/interview-questions.js.
+   Reuses this page's own tokens (--bg/--surface/--text/--muted/--accent/
+   --border) and .skill-pill for the per-card tech tags, same as
+   everything else on this theme.
+   --------------------------------------------------------------------- */
+
+.questions-header {
+  margin-bottom: var(--space-3);
+}
+
+.questions-intro {
+  color: var(--muted);
+}
+
+.questions-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.filter-group-label {
+  flex-shrink: 0;
+  width: 90px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Same pill shape as .skill-pill, but interactive: a real toggle button
+   (aria-pressed), so it needs this project's own ≥44px touch-target floor
+   — met via min-height/padding rather than font-size, so the label stays
+   readable. */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.4rem 0.85rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color var(--speed) var(--ease), border-color var(--speed) var(--ease), color var(--speed) var(--ease);
+}
+
+.filter-chip:hover {
+  border-color: var(--accent);
+}
+
+.filter-chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.filter-chip[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.filter-reset {
+  align-self: flex-start;
+  padding: 0.3rem 0.2rem;
+  min-height: 44px;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filter-reset:hover,
+.filter-reset:focus-visible {
+  text-decoration: underline;
+}
+
+.questions-count {
+  margin: 0 0 var(--space-2);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.questions-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.question-card {
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.question-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.question-tag {
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.question-tag-company {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+}
+
+.question-tag-round {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.question-text {
+  margin: 0 0 0.6rem;
+  font-weight: 600;
+  max-width: none;
+}
+
+/* Rendered via `{{ q.problem | markdownify }}` (_data/interview_questions.yml)
+   — plain paragraph/list/inline-code content, so this just resets the
+   default <p>/<ul> margins to sit tightly under .question-text instead of
+   the wider spacing kramdown's own output would otherwise carry. */
+.question-problem {
+  margin-bottom: 0.6rem;
+  color: var(--text);
+}
+
+.question-problem p,
+.question-problem ul,
+.question-answer-text p,
+.question-answer-text ul,
+.question-example p,
+.question-example ul {
+  margin: 0 0 0.5rem;
+  max-width: none;
+}
+
+.question-problem :last-child,
+.question-answer-text :last-child,
+.question-example :last-child,
+.question-note :last-child {
+  margin-bottom: 0;
+}
+
+.question-problem code,
+.question-example code,
+.question-answer-text code,
+.question-note code {
+  padding: 0.1em 0.35em;
+  background: var(--surface);
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
+.question-card-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.4rem;
+}
+
+/* Fenced ``` blocks in `example`/`answer` (the ASCII tree/elevation
+   diagrams, the cost matrix, the JSON input) — monospace and `pre` so
+   the hand-aligned spacing survives, dark like assets/css/lab.css's own
+   .lab-code so a code block reads as one consistent "this is source
+   data" treatment sitewide rather than inventing a second style. */
+.question-example pre {
+  margin: 0 0 0.6rem;
+  padding: 0.9rem;
+  overflow-x: auto;
+  background: #12161c;
+  color: #d6dde5;
+  border-radius: var(--radius);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.question-example pre code {
+  padding: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+.question-note {
+  padding-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.question-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.88rem;
+}
+
+.questions-empty {
+  padding: var(--space-3) 0;
+  color: var(--muted);
+  text-align: center;
 }

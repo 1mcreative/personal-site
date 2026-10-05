@@ -2,6 +2,7 @@
 layout: home
 title: "Senior Software Engineer & Backend Architect"
 description: "Bhavesh Nakum: Senior Software Engineer in Bengaluru, building backend systems and data platforms at eBay by day, Instagram by night. Poke around."
+image: "/assets/img/og-image.svg"
 permalink: /
 ---
 
@@ -35,8 +36,19 @@ permalink: /
         <path d="M12 7.5v4.5l3 1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <span class="hero-clock-time"></span>
+      <span class="hero-status-detail hero-clock-detail"></span>
     </span>
   </div>
+
+  <button type="button" class="bored-trigger hero-bored-trigger" data-slice-blade-open aria-label="Getting bored? Play a quick slicing game">
+    <span class="bored-trigger-icon" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M5 19L19 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M13 5h6v6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    Getting bored?
+  </button>
 
   <canvas class="pixel-name-canvas" aria-hidden="true"></canvas>
 

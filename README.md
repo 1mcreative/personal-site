@@ -23,7 +23,8 @@ The site is split into two themed halves off a neutral homepage:
 | `/` | Homepage — links to both sides | neutral |
 | `/resume/` | Resume, work history, contact | bright/professional |
 | `/life/` | Instagram and hobbies | dark/personal |
-| `/interviews/`, `/questions/` | Interview experience & question sets (placeholder, not yet in nav) | legacy plain HTML |
+| `/questions/` | Interview questions, filterable by company/round/tech stack — data in `_data/interview_questions.yml`, still sample entries (placeholder, not yet in nav) | bright/professional |
+| `/interviews/` | Interview experience/stories (placeholder, not yet in nav) | legacy plain HTML |
 | `/coming-soon/` | Old holding page (currently unused by the homepage) | — |
 
 Shared layout pieces live in `_layouts/` and `_includes/`; theme colors and shared tokens live in `assets/css/`.
