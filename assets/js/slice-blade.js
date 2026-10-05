@@ -23,6 +23,18 @@
 // Reuses this site's own established modal shell (open/close, focus
 // trap, Escape, backdrop click — the exact pattern contact-modal.js
 // already uses) rather than building new modal plumbing from scratch.
+//
+// Sharing (added later): on a real human's loss (not the self-playing
+// attract-mode demo's own game-overs), a panel offers the Web Share API
+// as the primary option — on mobile this puts WhatsApp/Instagram/
+// LinkedIn/etc. in the OS's own native sheet for free, screenshot
+// included — plus explicit WhatsApp/LinkedIn web-intent links, a copy-
+// link button, and a save-image button for desktop and for Instagram,
+// which has no web share intent at all. The "shareable link" itself is
+// just the current page URL plus a `?score=` query string: this is a
+// static site with no backend to verify or store a score against, so a
+// shared link is honestly just "come try to beat this," read back as a
+// challenge banner that auto-opens the game, not a real leaderboard.
 (function () {
   var GLYPHS = {
     "0": ["01110", "10001", "10011", "10101", "11001", "10001", "01110"],
@@ -203,7 +215,7 @@
 
   var engine = null; // built once, first time the modal opens
 
-  function buildEngine(host, canvas, scoreEl, livesEl) {
+  function buildEngine(host, canvas, scoreEl, livesEl, shareDom) {
     var ctx = canvas.getContext("2d");
     var w = 0;
     var h = 0;
@@ -216,6 +228,7 @@
     var hudScore = null;
     var hudLives = 0;
     var hudLivesSet = 0;
+    var hudShareShown = false;
 
     // Real HTML text, not canvas-drawn — see the comment above paint()'s
     // old HUD code for why. Only touches the DOM when a value actually
@@ -231,6 +244,20 @@
         var out = "";
         for (var li = 0; li < hudLivesSet; li++) out += li < hudLives ? "●" : "○";
         livesEl.textContent = out;
+      }
+      // Only offer sharing on a real human's loss, not the self-playing
+      // attract-mode demo's own game-overs (which auto-restart within
+      // OVER_AUTOPLAY seconds and would yank the panel away mid-click).
+      if (shareDom && shareDom.wrap) {
+        var showShare = world.over && world.played;
+        if (showShare !== hudShareShown) {
+          hudShareShown = showShare;
+          shareDom.wrap.hidden = !showShare;
+          if (showShare) {
+            if (shareDom.score) shareDom.score.textContent = world.score;
+            if (shareDom.note) shareDom.note.textContent = "";
+          }
+        }
       }
     }
     var running = false;
@@ -631,6 +658,9 @@
     }
 
     return {
+      getScore: function () {
+        return world.score;
+      },
       start: function () {
         if (running) return;
         running = true;
@@ -672,10 +702,150 @@
   var canvas = modal.querySelector("[data-slice-blade-canvas]");
   var scoreEl = modal.querySelector("[data-slice-blade-score]");
   var livesEl = modal.querySelector("[data-slice-blade-lives]");
+  var challengeEl = modal.querySelector("[data-slice-blade-challenge]");
   var openers = document.querySelectorAll("[data-slice-blade-open]");
   var closers = modal.querySelectorAll("[data-slice-blade-close]");
   var lastFocused = null;
   var closeTimer = 0;
+
+  // A shared link carries the score in a query string — the honest
+  // version of "shareable link" a static site with no backend can
+  // actually offer: there's nowhere to store or verify a score, so the
+  // link just means "come try to beat this," read back below as a
+  // challenge banner, not a server-confirmed leaderboard entry.
+  var challengeScore = null;
+  (function readChallengeFromUrl() {
+    var params = new URLSearchParams(location.search);
+    var n = parseInt(params.get("score"), 10);
+    if (!n || n <= 0) return;
+    challengeScore = n;
+    params.delete("score");
+    var rest = params.toString();
+    history.replaceState(null, "", location.pathname + (rest ? "?" + rest : "") + location.hash);
+  })();
+
+  function shareUrl(score) {
+    var params = new URLSearchParams(location.search);
+    params.set("score", score);
+    return location.origin + location.pathname + "?" + params.toString();
+  }
+
+  function shareText(score) {
+    return "I scored " + score + " slicing letters in Slice Blade! Can you beat me?";
+  }
+
+  var shareDom = {
+    wrap: modal.querySelector("[data-slice-blade-share]"),
+    score: modal.querySelector("[data-slice-blade-share-score]"),
+    note: modal.querySelector("[data-slice-blade-share-note]"),
+  };
+  var shareNativeBtn = modal.querySelector("[data-slice-blade-share-native]");
+  var shareWhatsappBtn = modal.querySelector("[data-slice-blade-share-whatsapp]");
+  var shareInstagramBtn = modal.querySelector("[data-slice-blade-share-instagram]");
+  var shareLinkedinBtn = modal.querySelector("[data-slice-blade-share-linkedin]");
+  var shareCopyBtn = modal.querySelector("[data-slice-blade-share-copy]");
+  var shareSaveBtn = modal.querySelector("[data-slice-blade-share-save]");
+
+  if (navigator.share && shareNativeBtn) shareNativeBtn.hidden = false;
+
+  function setShareNote(msg) {
+    if (shareDom.note) shareDom.note.textContent = msg;
+  }
+
+  // Screenshotting the canvas at click time is enough — the GAME OVER
+  // overlay (with the real score) is redrawn into it every frame the
+  // whole time the share panel is visible, see paint() above.
+  function withScreenshot(cb) {
+    canvas.toBlob(function (blob) {
+      cb(blob);
+    }, "image/png");
+  }
+
+  function saveScreenshot(onSaved) {
+    withScreenshot(function (blob) {
+      if (!blob) return;
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "slice-blade-score.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+      if (onSaved) onSaved();
+    });
+  }
+
+  function doNativeShare() {
+    if (!engine) return;
+    var score = engine.getScore();
+    var payload = { title: "Slice Blade", text: shareText(score), url: shareUrl(score) };
+    withScreenshot(function (blob) {
+      var file = blob ? new File([blob], "slice-blade-score.png", { type: "image/png" }) : null;
+      if (file && navigator.canShare && navigator.canShare({ files: [file] })) payload.files = [file];
+      navigator.share(payload).catch(function () {});
+    });
+  }
+
+  function openShareLink(buildHref) {
+    if (!engine) return;
+    var score = engine.getScore();
+    window.open(buildHref(shareText(score), shareUrl(score)), "_blank", "noopener");
+  }
+
+  if (shareNativeBtn) shareNativeBtn.addEventListener("click", doNativeShare);
+  if (shareWhatsappBtn) {
+    shareWhatsappBtn.addEventListener("click", function () {
+      openShareLink(function (text, url) {
+        return "https://wa.me/?text=" + encodeURIComponent(text + " " + url);
+      });
+    });
+  }
+  if (shareLinkedinBtn) {
+    shareLinkedinBtn.addEventListener("click", function () {
+      openShareLink(function (text, url) {
+        return "https://www.linkedin.com/sharing/share-offsite/?url=" + encodeURIComponent(url);
+      });
+    });
+  }
+  if (shareCopyBtn) {
+    shareCopyBtn.addEventListener("click", function () {
+      if (!engine) return;
+      var url = shareUrl(engine.getScore());
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(
+          function () {
+            setShareNote("Link copied!");
+          },
+          function () {
+            setShareNote(url);
+          }
+        );
+      } else {
+        setShareNote(url);
+      }
+    });
+  }
+  if (shareSaveBtn) {
+    shareSaveBtn.addEventListener("click", function () {
+      saveScreenshot(function () {
+        setShareNote("Image saved.");
+      });
+    });
+  }
+  // Instagram has no web share intent at all — the native share sheet
+  // (where supported) already lists the Instagram app directly; without
+  // it, the honest fallback is "save the image, go post it yourself."
+  if (shareInstagramBtn) {
+    shareInstagramBtn.addEventListener("click", function () {
+      if (navigator.share) {
+        doNativeShare();
+      } else {
+        saveScreenshot(function () {
+          setShareNote("Image saved — open Instagram and share it from your gallery.");
+        });
+      }
+    });
+  }
 
   function focusable() {
     return Array.prototype.slice
@@ -714,7 +884,7 @@
     document.body.style.overflow = "hidden";
     document.addEventListener("keydown", onKeydown);
 
-    if (!engine) engine = buildEngine(host, canvas, scoreEl, livesEl);
+    if (!engine) engine = buildEngine(host, canvas, scoreEl, livesEl, shareDom);
     // Canvas can't measure a real size while [hidden] — start once the
     // panel is actually visible, same reflow-then-act pattern used
     // throughout this codebase for exactly this class of bug.
@@ -743,4 +913,16 @@
   Array.prototype.forEach.call(closers, function (el) {
     el.addEventListener("click", close);
   });
+
+  // A visitor who followed a shared link gets a challenge banner and
+  // the game opens itself, so the link is worth sending in the first
+  // place — on every page the trigger exists on, since the shared URL
+  // is whichever page the sharer happened to be on.
+  if (challengeScore) {
+    if (challengeEl) {
+      challengeEl.hidden = false;
+      challengeEl.textContent = "Beat my score: " + challengeScore + "!";
+    }
+    setTimeout(open, 400);
+  }
 })();

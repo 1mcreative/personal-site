@@ -22,12 +22,25 @@
       </h2>
     </div>
     <p class="slice-blade-sub">Drag through the falling letters. Skip the amber bombs. Leave it alone and it'll play itself.</p>
+    <p class="slice-blade-challenge" data-slice-blade-challenge hidden></p>
     <div class="slice-blade-host" data-slice-blade-host>
       <canvas data-slice-blade-canvas></canvas>
       <div class="slice-blade-hud">
         <span class="slice-blade-hud-chip" data-slice-blade-score>Score 0</span>
         <span class="slice-blade-hud-chip slice-blade-hud-lives" data-slice-blade-lives aria-label="Lives remaining"></span>
       </div>
+    </div>
+    <div class="slice-blade-share" data-slice-blade-share hidden>
+      <p class="slice-blade-share-score">Score <strong data-slice-blade-share-score>0</strong> — share it?</p>
+      <div class="slice-blade-share-actions">
+        <button type="button" class="slice-blade-share-btn slice-blade-share-btn-primary" data-slice-blade-share-native hidden>Share</button>
+        <button type="button" class="slice-blade-share-btn" data-slice-blade-share-whatsapp>WhatsApp</button>
+        <button type="button" class="slice-blade-share-btn" data-slice-blade-share-instagram>Instagram</button>
+        <button type="button" class="slice-blade-share-btn" data-slice-blade-share-linkedin>LinkedIn</button>
+        <button type="button" class="slice-blade-share-btn" data-slice-blade-share-copy>Copy link</button>
+        <button type="button" class="slice-blade-share-btn" data-slice-blade-share-save>Save image</button>
+      </div>
+      <p class="slice-blade-share-note" data-slice-blade-share-note aria-live="polite"></p>
     </div>
   </div>
 </div>
