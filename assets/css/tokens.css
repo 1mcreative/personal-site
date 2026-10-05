@@ -682,3 +682,73 @@ p {
   color: var(--accent);
   letter-spacing: 0.15em;
 }
+
+.slice-blade-challenge {
+  margin: 0 0 var(--space-2);
+  padding: 0.5em 0.9em;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Game-over share panel — reuses .contact-submit's gradient pill for the
+   one "best" option (native share sheet) and a plain bordered pill,
+   sized to this project's own established >=44px touch-target floor,
+   for everything the Web Share API doesn't cover on its own. */
+.slice-blade-share {
+  margin-top: var(--space-2);
+}
+
+.slice-blade-share-score {
+  margin: 0 0 var(--space-1);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.slice-blade-share-score strong {
+  color: var(--text);
+}
+
+.slice-blade-share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.slice-blade-share-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.5em 1.1em;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--speed) var(--ease), transform var(--speed) var(--ease);
+}
+
+.slice-blade-share-btn:hover,
+.slice-blade-share-btn:focus-visible {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.slice-blade-share-btn-primary {
+  border: none;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, white));
+  color: #fff;
+  box-shadow: 0 4px 16px -4px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.slice-blade-share-note {
+  margin: var(--space-1) 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  min-height: 1.1em;
+}
