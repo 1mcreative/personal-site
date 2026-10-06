@@ -646,17 +646,75 @@ body.lab-modal-open {
    names — only what's genuinely new to this page gets a rule here.
    --------------------------------------------------------------------- */
 
+/* <details> instead of a static section — someone who already knows how
+   skills work shouldn't have to scroll past three install-method cards to
+   reach the actual catalog. Closed by default; the summary line alone
+   carries the "(skip this if you already know)" hint. */
 .install-guide {
   margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
 
-.install-guide h2 {
-  margin-bottom: 0.3rem;
+.install-guide summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.5rem;
+  padding: 0.3rem 0;
+  font-weight: 700;
+  font-size: 1.05rem;
+  list-style: none;
+}
+
+.install-guide summary::-webkit-details-marker {
+  display: none;
+}
+
+.install-guide summary::before {
+  content: "";
+  flex-shrink: 0;
+  margin-top: 0.45em;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  transform: rotate(-45deg);
+  transition: transform var(--speed) var(--ease);
+}
+
+.install-guide[open] summary::before {
+  transform: rotate(45deg);
+}
+
+.install-guide summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.install-guide-hint {
+  flex-basis: 100%;
+  margin-left: 1.3rem;
+  font-weight: 400;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.install-guide-body {
+  padding-top: var(--space-2);
+}
+
+.install-guide-body > p:first-child {
+  margin-top: 0;
 }
 
 .install-guide code {
   padding: 0.1em 0.35em;
-  background: var(--surface);
+  background: var(--bg);
   border-radius: 4px;
   font-size: 0.88em;
 }
@@ -670,7 +728,7 @@ body.lab-modal-open {
 
 .install-method {
   padding: var(--space-2) var(--space-3);
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
 }
@@ -716,8 +774,94 @@ body.lab-modal-open {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
+/* .question-card already gives this its panel/border/radius; .skill-card
+   layers the catalog-specific presentation on top — a hover lift (same
+   numbers as .lab-card:hover, for one consistent "this is a card you can
+   act on" feel sitewide) plus an accent-colored top edge so the row of
+   cards reads as a product catalog, not a plain Q&A list. */
+.skill-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.skill-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 40%, transparent));
+}
+
+.skill-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 16px 32px -18px rgba(0, 0, 0, 0.28);
+}
+
+.skill-card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.skill-card-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, black));
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
 .skill-card-name {
-  margin: 0 0 0.2rem;
+  margin: 0 0 0.15rem;
+}
+
+.skill-card-tagline {
+  margin: 0;
+  font-weight: 600;
+}
+
+.skill-card-desc {
+  color: var(--muted);
+}
+
+/* Short "what this actually does" bullets, scannable without reading the
+   full description — a check icon in the accent color rather than a plain
+   bullet, so the row reads as a feature list, not another paragraph. */
+.skill-card-highlights {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.88rem;
+}
+
+.skill-card-highlights li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.skill-card-highlights li::before {
+  content: "";
+  flex-shrink: 0;
+  margin-top: 0.3em;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--accent);
 }
 
 .skill-card-actions {
@@ -732,6 +876,23 @@ body.lab-modal-open {
   padding: 0.5rem 1.1rem;
   font-size: 0.9rem;
   gap: 0.4rem;
+}
+
+.skill-card-share-btn {
+  gap: 0.35rem;
+}
+
+.skill-card-share-btn[aria-expanded="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.skill-card-share-panel {
+  margin: 0 0 0.6rem;
+  padding: 0.7rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
 }
 
 .skill-card-preview summary {
