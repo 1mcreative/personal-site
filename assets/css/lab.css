@@ -777,22 +777,12 @@ body.lab-modal-open {
 /* .question-card already gives this its panel/border/radius; .skill-card
    layers the catalog-specific presentation on top — a hover lift (same
    numbers as .lab-card:hover, for one consistent "this is a card you can
-   act on" feel sitewide) plus an accent-colored top edge so the row of
-   cards reads as a product catalog, not a plain Q&A list. */
+   act on" feel sitewide). The accent color already carries through the
+   monogram icon, highlight bullets, and hover border below, so this
+   doesn't also need a top accent bar — that's a tell on its own. */
 .skill-card {
   position: relative;
-  overflow: hidden;
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-}
-
-.skill-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 40%, transparent));
 }
 
 .skill-card:hover {
