@@ -19,10 +19,11 @@
   <header class="lab-header">
     <div class="lab-header-inner">
       <a class="brand" href="/">Bhavesh Nakum</a>
-      <nav aria-label="Lab">
+      <nav aria-label="Developer resources">
         <a href="/resume/">The Grind</a>
         <a href="/life/">The Chaos</a>
-        <span class="lab-header-current">Component Lab</span>
+        {% if page.url == '/lab/' %}<span class="lab-header-current">Component Lab</span>{% else %}<a href="/lab/">Component Lab</a>{% endif %}
+        {% if page.url == '/skills/' %}<span class="lab-header-current">Claude Skills</span>{% else %}<a href="/skills/">Claude Skills</a>{% endif %}
       </nav>
     </div>
   </header>
@@ -51,5 +52,6 @@
   </div>
 
   <script src="{{ '/assets/js/lab.js' | relative_url }}" defer></script>
+  <script src="{{ '/assets/js/skills-search.js' | relative_url }}" defer></script>
 </body>
 </html>

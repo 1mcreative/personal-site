@@ -636,3 +636,133 @@ body.lab-modal-open {
     transform: none;
   }
 }
+
+/* ---------------------------------------------------------------------
+   /skills/ — Claude Skills catalog. Reuses /questions/'s own classes
+   wholesale (.questions-header/.questions-intro/.questions-count/
+   .questions-list/.question-card/.question-example/.skill-pill/
+   .filter-chip/.questions-empty, all defined in professional.css,
+   already loaded by this layout) rather than cloning them under new
+   names — only what's genuinely new to this page gets a rule here.
+   --------------------------------------------------------------------- */
+
+.install-guide {
+  margin-bottom: var(--space-3);
+}
+
+.install-guide h2 {
+  margin-bottom: 0.3rem;
+}
+
+.install-guide code {
+  padding: 0.1em 0.35em;
+  background: var(--surface);
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
+.install-methods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.install-method {
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.install-method h3 {
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+.install-method ol {
+  margin: 0 0 0.6rem;
+  padding-left: 1.2rem;
+  font-size: 0.92rem;
+}
+
+.install-method li + li {
+  margin-top: 0.3rem;
+}
+
+.install-method .question-example pre {
+  font-size: 0.74rem;
+}
+
+.skills-search {
+  margin-bottom: var(--space-2);
+}
+
+.skills-search-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6em 0.9em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.skills-search-input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.skill-card-name {
+  margin: 0 0 0.2rem;
+}
+
+.skill-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0.8rem 0 0.4rem;
+}
+
+.skill-card-actions .offset-btn {
+  min-height: 44px;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.9rem;
+  gap: 0.4rem;
+}
+
+.skill-card-preview summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--accent);
+}
+
+.skill-card-preview summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.skill-card-preview .question-example {
+  margin-top: 0.5rem;
+}
+
+/* Unlike /questions/'s short ``` ASCII-diagram snippets (the thing
+   .question-example pre was built for, with overflow-x: auto), this is a
+   whole raw SKILL.md dumped verbatim — ordinary markdown paragraphs that
+   were never hard-wrapped, so left as overflow-x:auto they'd blow the
+   page out horizontally instead of just scrolling the code block. Wrap
+   instead. */
+.skill-card-preview .question-example pre {
+  max-height: 420px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

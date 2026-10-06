@@ -1,0 +1,91 @@
+---
+layout: lab
+title: "Claude Skills"
+description: "Real Claude Skills used to build and run bhaveshnakum.com — download one and install it in Claude Code, the Claude apps, or your own agent."
+image: "/assets/img/og-image.svg"
+permalink: /skills/
+---
+
+<header class="questions-header">
+  <h1>Claude Skills</h1>
+  <p class="questions-intro">A Claude Skill is one file, <code>SKILL.md</code>, that teaches Claude how to do a specific job well — a workflow, a set of rules, a review checklist. This whole site is built and run with Claude Code, and these are the actual skills behind it, not generic advice. Building something of your own? Take one.</p>
+</header>
+
+<section class="install-guide">
+  <h2>How to install a skill</h2>
+  <p>Every skill below is a zipped <code>SKILL.md</code> folder. Download it, unzip it, then hand it to Claude one of these ways.</p>
+
+  <div class="install-methods">
+    <article class="install-method">
+      <h3>Claude Code (CLI)</h3>
+      <ol>
+        <li>Unzip the download — you get a folder named after the skill, with <code>SKILL.md</code> inside.</li>
+        <li>Drop that folder into your skills directory:</li>
+      </ol>
+      <div class="question-example"><pre><code># this project only
+mkdir -p .claude/skills
+mv resume-tailor .claude/skills/
+
+# every project you work on
+mkdir -p ~/.claude/skills
+mv resume-tailor ~/.claude/skills/</code></pre></div>
+      <p class="question-note">Restart Claude Code (or start a new session). It picks the skill up automatically when what you ask for matches it, or you can invoke it directly by name.</p>
+    </article>
+
+    <article class="install-method">
+      <h3>Claude.ai, desktop &amp; mobile apps</h3>
+      <ol>
+        <li>Unzip the download — you only need the <code>SKILL.md</code> file inside.</li>
+        <li>Open <strong>Settings &rarr; Capabilities &rarr; Skills</strong> (Pro, Max, Team, and Enterprise plans).</li>
+        <li>Upload <code>SKILL.md</code> and turn the skill on.</li>
+      </ol>
+      <p class="question-note">Exact menu names shift between app versions — if "Skills" isn't under Capabilities, check Settings for it directly.</p>
+    </article>
+
+    <article class="install-method">
+      <h3>Your own agent (Developer Platform / Agent SDK)</h3>
+      <ol>
+        <li>Point your agent's skills directory at the unzipped folder, the same way you'd load any other skill in your setup.</li>
+        <li>Claude picks it up the next time that agent starts.</li>
+      </ol>
+    </article>
+  </div>
+</section>
+
+<div class="skills-search">
+  <label for="skills-search-input" class="sr-only">Search skills</label>
+  <input type="search" id="skills-search-input" class="skills-search-input" placeholder="Search skills by name, tag, or what they do…" data-skills-search-input>
+</div>
+
+<p class="questions-count" data-skills-count aria-live="polite"></p>
+
+<div class="questions-list" data-skills-list>
+  {% for skill in site.data.skills %}
+  {% assign search_blob = skill.name | append: " " | append: skill.tagline | append: " " | append: skill.description | append: " " %}
+  {% assign search_blob = search_blob | append: skill.tags | join: " " %}
+  <article class="question-card" data-search="{{ search_blob | downcase | escape }}">
+    <div class="question-card-meta question-card-stack">
+      {% for tag in skill.tags %}<span class="skill-pill">{{ tag }}</span>{% endfor %}
+    </div>
+    <h2 class="skill-card-name">{{ skill.name }}</h2>
+    <p class="question-text">{{ skill.tagline }}</p>
+    <p>{{ skill.description }}</p>
+    <div class="skill-card-actions">
+      <a class="offset-btn" href="{{ skill.zip | relative_url }}" download="{{ skill.zip_filename }}">
+        Download {{ skill.zip_filename }}
+        <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <button type="button" class="filter-chip" data-copy-target="skill-src-{{ skill.id }}">Copy SKILL.md</button>
+    </div>
+    <details class="skill-card-preview">
+      <summary>Preview SKILL.md</summary>
+      {% capture skill_raw %}{% include {{ skill.include }} %}{% endcapture %}
+      <div class="question-example"><pre><code id="skill-src-{{ skill.id }}">{{ skill_raw | strip | escape }}</code></pre></div>
+    </details>
+  </article>
+  {% endfor %}
+</div>
+
+<p class="questions-empty" data-skills-empty hidden>No skills match that search.</p>

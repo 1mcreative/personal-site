@@ -1,0 +1,15 @@
+# One entry per Claude Skill shown on /skills/. To add a new skill:
+# 1. Write its SKILL.md (with real `name`/`description` front matter) into
+#    _includes/skills/<id>/SKILL.md.
+# 2. Zip that folder into assets/skills/<id>/<id>.zip (see the resume-tailor
+#    entry below for the exact shape).
+# 3. Add an entry here. The /skills/ page is entirely data-driven off this
+#    file, so nothing else needs to change.
+- id: resume-tailor
+  name: "Resume Tailor"
+  tagline: "Tailors a real resume to a job description without inventing a single fact."
+  description: "Fans out into parallel agents that extract the JD's must-have keywords, audit the resume into a verified facts inventory, ask only for the gaps that can't be confirmed, write and ATS-score the bullets, then render a real PDF and Word file. Every line traces back to something the candidate actually confirmed."
+  tags: ["career", "resume", "job-search", "ats"]
+  include: "skills/resume-tailor/SKILL.md"
+  zip: "/assets/skills/resume-tailor/resume-tailor.zip"
+  zip_filename: "resume-tailor.zip"
