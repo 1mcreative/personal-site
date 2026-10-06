@@ -57,7 +57,13 @@
 
   function renderChip(km, useMiles, city) {
     var value = Math.round(useMiles ? km * KM_TO_MILES : km);
-    var unit = useMiles ? "mi" : "km";
+    // "14 km" alone says nothing about what it's measuring — reported
+    // directly as having "no meaning to convey it's distance between me
+    // and viewer." unit flows into every place the label gets built
+    // (the count-up, the reduced-motion branch, and the initial "0 ..."
+    // text below), so appending the context here fixes the resting
+    // state everywhere at once rather than patching three call sites.
+    var unit = (useMiles ? "mi" : "km") + " from me";
     var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     var chip = document.createElement("span");
