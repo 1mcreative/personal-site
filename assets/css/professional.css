@@ -20,8 +20,12 @@
   color: var(--accent);
 }
 
-.theme-professional .site-header {
-  border-bottom: 1px solid var(--border);
+/* The pill nav itself (position/shape/glass) is shared sitewide — see
+   tokens.css. It's fixed now, so it no longer pushes page content down the
+   way the old in-flow bordered header did; main#main needs its own top
+   clearance instead (verified in-browser against the nav's real height). */
+.theme-professional main#main {
+  padding-top: 6.5rem;
 }
 
 .theme-professional .site-header nav a {

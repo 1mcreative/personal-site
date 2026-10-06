@@ -15,6 +15,11 @@
   --accent: #1d4ed8;
   --surface: #f5f6f8;
   --border: #e3e6ea;
+  /* Matches .theme-professional's own override — a wide catalog page reads
+     better at this width than the shared 780px default, and the fixed pill
+     nav (tokens.css) reads var(--max-width) too, so it stays the same
+     width as main#main below instead of needing its own hardcoded number. */
+  --max-width: 1100px;
 
   background: var(--bg);
   color: var(--text);
@@ -24,27 +29,9 @@
   color: var(--accent);
 }
 
-.lab-header {
-  border-bottom: 1px solid var(--border);
-}
-
-.lab-header-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: var(--space-3);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-2);
-}
-
-.lab-header nav {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
+/* Shape/position/glass/padding for .lab-header and .lab-header-inner now
+   live in tokens.css, shared with .site-header — only the link colors
+   below are lab-specific. */
 
 .lab-header nav a {
   text-decoration: none;
@@ -62,10 +49,34 @@
   font-weight: 600;
 }
 
+/* max-width/padding-left/right already come from tokens.css's shared
+   main#main rule (now reading var(--max-width), which this theme sets to
+   the same 1100px above). padding-top clears the fixed pill nav, which no
+   longer pushes content down the way the old in-flow header did. Taller
+   under 640px, where the 4-item nav wraps onto more rows (see below). */
 .theme-lab main#main {
-  max-width: 1100px;
-  padding-left: var(--space-3);
-  padding-right: var(--space-3);
+  padding-top: 6.5rem;
+}
+
+/* This nav has 4 items (brand's siblings), not /life/'s 2 — nowrap would
+   just overflow instead of fitting, so it keeps tokens.css's wrap but a
+   full border-radius: 999px pill (right for a single row) turns into a
+   deformed blob once that wrap happens, confirmed live at 375px. Below
+   the row-wrapping threshold, trade the pill for a plain rounded panel —
+   still glass, still floating, just a shape that works wrapped onto
+   multiple lines — and size main#main's clearance for the taller result. */
+@media (max-width: 640px) {
+  .lab-header {
+    border-radius: var(--radius-lg);
+  }
+
+  .lab-header-inner {
+    gap: var(--space-1) var(--space-2);
+  }
+
+  .theme-lab main#main {
+    padding-top: 13.5rem;
+  }
 }
 
 .lab-intro {
