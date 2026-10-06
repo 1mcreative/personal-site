@@ -124,12 +124,16 @@ main#main,
    this treatment first. Position/shape/blur are generic; the actual color
    comes from each theme's own --surface/--border custom properties
    (already defined per theme for other components), so no per-theme
-   override is needed here. Blue/navy-tinted glass (color-mix on --surface)
-   rather than a flat neutral rgba, at 32% so it reads as clearly
-   see-through — past this project's own established 45% baseline (the
-   contact modal/cards) since /life/'s own nav was deliberately pushed more
-   transparent than that. Blur compensates (24px + saturate) so text over a
-   busy background underneath stays readable. */
+   override is needed here.
+   Pushed more transparent still (32%→16%) plus a stronger blur/saturate,
+   per direct "more transparent, more like glass" feedback. The actual
+   "liquid glass" read — real iOS glass controls, not just a blurred tint —
+   comes from the box-shadow stack, not the background: an inset bright
+   line along the top edge (light catching the rim, the signature iOS
+   highlight) and a faint all-around inset edge, both in white regardless
+   of theme (this is how iOS does it on dark glass too, not just light),
+   plus a soft outer shadow so the pill reads as a lifted, lensed surface
+   rather than a flat tinted rectangle. */
 .site-header,
 .lab-header {
   position: fixed;
@@ -139,11 +143,15 @@ main#main,
   z-index: 90;
   width: calc(100% - var(--space-3) * 2);
   max-width: var(--max-width);
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 32%, transparent);
-  backdrop-filter: blur(24px) saturate(150%);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  background: color-mix(in srgb, var(--surface) 16%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 45%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 10%, transparent),
+    0 8px 32px color-mix(in srgb, black 14%, transparent);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
   transition: transform 0.3s var(--ease);
 }
 
