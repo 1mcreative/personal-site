@@ -61,7 +61,7 @@ mv resume-tailor ~/.claude/skills/</code></pre></div>
 
 <p class="questions-count" data-skills-count aria-live="polite"></p>
 
-<div class="questions-list" data-skills-list>
+<div class="questions-list skills-grid-cards" data-skills-list>
   {% for skill in site.data.skills %}
   {% assign search_blob = skill.name | append: " " | append: skill.tagline | append: " " | append: skill.description | append: " " %}
   {% assign search_blob = search_blob | append: skill.tags | join: " " %}
@@ -109,7 +109,8 @@ mv resume-tailor ~/.claude/skills/</code></pre></div>
         aria-controls="share-panel-{{ skill.id }}"
       >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 .08 2.6l-6.25 3.63a3 3 0 1 0 0 3.54l6.25 3.63A3 3 0 1 0 15.17 20a3 3 0 0 0 2.83-4 2.98 2.98 0 0 0-2.17-.92c-.62 0-1.19.2-1.65.55l-6.25-3.63a3.02 3.02 0 0 0 0-1l6.25-3.63c.46.35 1.03.55 1.65.55A3 3 0 0 0 18 8z" fill="currentColor"/>
+          <path d="M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 6l-4-4-4 4M12 2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         Share
       </button>

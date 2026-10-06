@@ -774,6 +774,17 @@ body.lab-modal-open {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
+/* The whole point of a card grid here is showing "there are several of
+   these, browse what fits" — a single column makes that illegible (and
+   makes the cards themselves pointless) the moment there's more than one
+   skill. auto-fit so it's 1 column on a narrow screen and however many
+   340px+ columns actually fit above that, no breakpoint to maintain by
+   hand as more skills get added. */
+.skills-grid-cards {
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  align-items: start;
+}
+
 /* .question-card already gives this its panel/border/radius; .skill-card
    layers the catalog-specific presentation on top — a hover lift (same
    numbers as .lab-card:hover, for one consistent "this is a card you can
