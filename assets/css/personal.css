@@ -171,27 +171,14 @@ html:has(body.theme-personal) {
   }
 }
 
+/* Shape/position/glass now live in tokens.css, shared with every other
+   themed header. z-index stays overridden here, lower than the shared
+   default (90): this page's own .life-intro-veil sits at z-index 4 and
+   needs to cover the header during the load sequence — moot once the
+   header fades in (opacity-driven, not z-index), but keeps the original,
+   already-verified stacking order intact rather than re-deriving it. */
 .theme-personal .site-header {
-  position: fixed;
-  top: var(--space-2);
-  left: 50%;
-  transform: translateX(-50%);
   z-index: 3;
-  width: calc(100% - var(--space-3) * 2);
-  max-width: var(--max-width);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  /* Blue-tinted glass (color-mix on --surface, the theme's own navy) rather
-     than a flat neutral rgba — same "based on our website colors" treatment
-     now applied everywhere translucent on this page, not a one-off. Dropped
-     further (50%→32%) per direct "more transparent" feedback — past this
-     project's own established 45% baseline (the modal/cards both converged
-     there) since this was asked to read as clearly more see-through than
-     that, not just match it. Blur bumped to compensate (18px→24px), the
-     same pairing already used when the cards needed the identical fix. */
-  background: color-mix(in srgb, var(--surface) 32%, transparent);
-  backdrop-filter: blur(24px) saturate(150%);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
 }
 
 /* Auto-hides on scroll-down, returns on scroll-up (assets/js/nav-autohide.js)

@@ -90,6 +90,7 @@ svg {
 }
 
 .site-header .header-inner,
+.lab-header-inner,
 main#main,
 .site-footer {
   max-width: var(--max-width);
@@ -98,21 +99,61 @@ main#main,
   padding-right: var(--space-3);
 }
 
-.site-header .header-inner {
+.site-header .header-inner,
+.lab-header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: var(--space-1) var(--space-2);
-  padding-top: var(--space-3);
-  padding-bottom: var(--space-3);
+  padding-top: var(--space-1);
+  padding-bottom: var(--space-1);
 }
 
-.site-header nav {
+.site-header nav,
+.lab-header nav {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   flex-wrap: wrap;
+}
+
+/* One floating liquid-glass pill nav, shared by every themed header
+   (.site-header on /resume//life/, .lab-header on /lab//skills/) instead of
+   each theme reimplementing it — ported from /life/'s own nav, which had
+   this treatment first. Position/shape/blur are generic; the actual color
+   comes from each theme's own --surface/--border custom properties
+   (already defined per theme for other components), so no per-theme
+   override is needed here. Blue/navy-tinted glass (color-mix on --surface)
+   rather than a flat neutral rgba, at 32% so it reads as clearly
+   see-through — past this project's own established 45% baseline (the
+   contact modal/cards) since /life/'s own nav was deliberately pushed more
+   transparent than that. Blur compensates (24px + saturate) so text over a
+   busy background underneath stays readable. */
+.site-header,
+.lab-header {
+  position: fixed;
+  top: var(--space-2);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 90;
+  width: calc(100% - var(--space-3) * 2);
+  max-width: var(--max-width);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 32%, transparent);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  transition: transform 0.3s var(--ease);
+}
+
+/* Hides on scroll-down, returns on scroll-up (assets/js/nav-autohide.js) —
+   so the nav is always a short scroll-up away, never a trip back to the
+   very top. The glass background means it never fully hides content
+   either way, this is just extra screen real estate while scrolling. */
+.site-header.is-nav-hidden,
+.lab-header.is-nav-hidden {
+  transform: translateX(-50%) translateY(-150%);
 }
 
 .brand {
@@ -143,7 +184,8 @@ a.switch-side {
    collapsing the button to ~44px wide with the label crammed against its
    dashed border. Confirmed via computed style before and after this fix,
    not just reasoned about: paddingLeft/Right read 0px beforehand. */
-.site-header nav a:not(.galaxy-button):not(.offset-btn) {
+.site-header nav a:not(.galaxy-button):not(.offset-btn),
+.lab-header nav a {
   padding: 0.65rem 0;
 }
 
