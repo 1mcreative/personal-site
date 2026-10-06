@@ -12,6 +12,18 @@
 // Bangalore East — and hardcoded here as a constant, the same "look it
 // up once, bake in the result" approach globe.js already uses for its
 // own continent data. No live geocoding call happens for real visitors.
+//
+// Redesigned per direct feedback on the first version's "14 km from me"
+// label: unclear ("what does that mean?" — "from me" reads backwards
+// just as easily, like a store-locator's "near me" means near the
+// *visitor*, not the site owner) and it named the home city outright,
+// which the city/country string this chip used to show (in both the
+// label and the hover tooltip) made easy to reverse-geocode — an
+// explicit "do not tell directly I am in Bangalore" ask. The animated
+// number stays (still the one explicit "animate" requirement from the
+// original request), but it's now paired with a plain-English proximity
+// phrase instead of a bare unit, and HOME_LAT/HOME_LON's resolved city
+// is never rendered anywhere in this file, label or tooltip.
 (function () {
   var container = document.querySelector(".hero-status");
   if (!container) return;
@@ -33,6 +45,22 @@
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
     return EARTH_RADIUS_KM * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  // The actual "creative, playful, something new" part: a felt sense of
+  // distance reads more honestly than a raw number most people have no
+  // intuition for anyway (is 640km close? far? depends who you ask) —
+  // and, unlike "X km from me", none of these phrases need a city name
+  // or a preposition to make sense standing alone next to a pin icon.
+  // Thresholds are rough, not measured against anything in particular;
+  // this is a vibe, not a travel-time estimate.
+  function proximityPhrase(km) {
+    if (km < 20) return "next door";
+    if (km < 150) return "a short drive away";
+    if (km < 800) return "a road trip away";
+    if (km < 3000) return "a flight away";
+    if (km < 7000) return "a long flight away";
+    return "a world away";
   }
 
   // Counts up from 0 to the real distance rather than just printing it,
@@ -57,18 +85,21 @@
 
   function renderChip(km, useMiles, city) {
     var value = Math.round(useMiles ? km * KM_TO_MILES : km);
-    // "14 km" alone says nothing about what it's measuring — reported
-    // directly as having "no meaning to convey it's distance between me
-    // and viewer." unit flows into every place the label gets built
-    // (the count-up, the reduced-motion branch, and the initial "0 ..."
-    // text below), so appending the context here fixes the resting
-    // state everywhere at once rather than patching three call sites.
-    var unit = (useMiles ? "mi" : "km") + " from me";
+    // unit flows into every place the label gets built (the count-up,
+    // the reduced-motion branch, and the initial "0 ..." text below), so
+    // baking the proximity phrase in here fixes the resting state
+    // everywhere at once rather than patching three call sites. Computed
+    // off the real km, not `value`, since the thresholds above are
+    // always in km regardless of which unit is actually displayed.
+    var unit = (useMiles ? "mi" : "km") + " · " + proximityPhrase(km);
     var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Never the destination city — only ever the visitor's own, which is
+    // their own public info, not Bhavesh's.
+    var crowFlies = "as the crow flies" + (city ? " from " + city : "");
 
     var chip = document.createElement("span");
     chip.className = "hero-status-chip hero-status-chip-dynamic hero-distance-chip";
-    chip.title = (city ? city + " to " : "") + "Bengaluru, India";
+    chip.title = crowFlies;
 
     // Trusted, hardcoded icon markup only — see weather.js's own comment
     // on why this is safe with innerHTML while the label text below still
@@ -89,7 +120,7 @@
     // text as the title tooltip above, now visible on hover too.
     var detail = document.createElement("span");
     detail.className = "hero-status-detail";
-    detail.textContent = " · " + (city ? city + " to " : "") + "Bengaluru, India";
+    detail.textContent = " · " + crowFlies;
     chip.appendChild(detail);
 
     container.appendChild(chip);
