@@ -9,6 +9,11 @@
   name: "Resume Tailor"
   tagline: "Tailors a real resume to a job description without inventing a single fact."
   description: "Fans out into parallel agents that extract the JD's must-have keywords, audit the resume into a verified facts inventory, ask only for the gaps that can't be confirmed, write and ATS-score the bullets, then render a real PDF and Word file. Every line traces back to something the candidate actually confirmed."
+  highlights:
+    - "Parallel agents for JD analysis, resume audit, and gap mapping"
+    - "Fact-checks every bullet — zero invented metrics or placeholders"
+    - "Scores against a real ATS rubric and fixes anything under 75"
+    - "Delivers an actual PDF and Word file, not just text in chat"
   tags: ["career", "resume", "job-search", "ats"]
   include: "skills/resume-tailor/SKILL.md"
   zip: "/assets/skills/resume-tailor/resume-tailor.zip"
