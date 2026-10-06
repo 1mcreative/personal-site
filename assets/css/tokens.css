@@ -817,3 +817,16 @@ p {
   white-space: nowrap;
   border: 0;
 }
+
+/* Cursor trail (assets/js/cursor-trail.js) — a full-viewport overlay, so it
+   has to sit above literally everything (every modal on this site tops
+   out at z-index:300) to read as attached to the real cursor rather than
+   tucked behind some page's own stacking context. pointer-events:none
+   means the stacking order can never actually block a click regardless;
+   this is a belt-and-suspenders value, not a load-bearing one. */
+.cursor-trail-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
