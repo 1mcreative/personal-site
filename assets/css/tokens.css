@@ -752,3 +752,18 @@ p {
   color: var(--muted);
   min-height: 1.1em;
 }
+
+/* Visually-hidden but still readable by screen readers — a real <label>
+   that doesn't need to take up layout space (e.g. a search input whose
+   placeholder already carries the visible hint). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
