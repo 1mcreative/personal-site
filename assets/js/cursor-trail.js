@@ -28,6 +28,15 @@
 // introduced a color outside each theme's own single accent, and a
 // site-wide effect is exactly the place that rule matters most.
 //
+// Two-toned, not flat single-accent, per direct follow-up: "make it...
+// color full as our website is purly white" — asking for more color
+// specifically because the site itself is so monochrome. The second
+// tone is #f59e0b, not a new hue either: the same amber globe.js's
+// Bangalore marker and the Black Hole's redshift tint already use as a
+// secondary accent alongside blue, reused here rather than invented —
+// this site's own established formula for "livelier without a new
+// color," not a one-off exception.
+//
 // Gated on prefers-reduced-motion (skipped entirely, same as every other
 // ambient/decorative effect on this site) and on a real hover-capable
 // pointer (hover:hover + pointer:fine) — a "trail" has no coherent
@@ -62,10 +71,11 @@
   if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
   var MAX_PARTICLES = 90;
-  var CELL = 2; // px per glyph "pixel"
-  var GLOW_PX = 4;
+  var CELL = 1.5; // px per glyph "pixel"
+  var GLOW_PX = 3;
   var GLOW_ALPHA = 0.35;
   var DRAG = 7; // higher = particles reach their target offset faster
+  var ACCENT_SHARE = 0.6; // fraction of particles in the page's own --accent, rest in amber
 
   var TRAIL_SPACING = 32; // px of real pointer movement between trail spawns
   var TRAIL_DRIFT = 10; // px of random extra drift added per trail particle
@@ -120,9 +130,16 @@
   }
   // --accent is scoped to the body's own theme class (see DESIGN.md), so
   // this always reads the current page's real accent, never a guess.
-  var rgb = hexToRgb(getComputedStyle(document.body).getPropertyValue("--accent").trim()) || [29, 78, 216];
+  // PALETTE[0] is that accent; PALETTE[1] is the site's own established
+  // amber secondary (see the file header comment) — always this exact
+  // hex everywhere it's used on this site, so hardcoded rather than
+  // read from a custom property that doesn't exist for it.
+  var PALETTE = [
+    hexToRgb(getComputedStyle(document.body).getPropertyValue("--accent").trim()) || [29, 78, 216],
+    [0xf5, 0x9e, 0x0b],
+  ];
 
-  function makeSprite(bits) {
+  function makeSprite(bits, rgb) {
     var pad = Math.ceil(GLOW_PX * 1.5) + 2;
     var size = 7 * CELL + pad * 2;
     var c = document.createElement("canvas");
@@ -147,12 +164,17 @@
     return c;
   }
   var SPRITE_PAD = Math.ceil(GLOW_PX * 1.5) + 2;
-  var sprites = GLYPHS.map(makeSprite);
+  // sprites[paletteIndex][glyphIndex] — one full glyph set baked per color.
+  var sprites = PALETTE.map(function (rgb) {
+    return GLYPHS.map(function (bits) {
+      return makeSprite(bits, rgb);
+    });
+  });
   var half = Math.floor((7 * CELL) / 2);
 
   var parts = [];
   for (var i = 0; i < MAX_PARTICLES; i++) {
-    parts.push({ alive: false, x: 0, y: 0, dx: 0, dy: 0, life: 0, age: 0, glyph: 0 });
+    parts.push({ alive: false, x: 0, y: 0, dx: 0, dy: 0, life: 0, age: 0, glyph: 0, pal: 0 });
   }
   var head = 0;
   function rand(a, b) {
@@ -168,7 +190,8 @@
     q.dy = dy;
     q.life = life;
     q.age = 0;
-    q.glyph = (Math.random() * sprites.length) | 0;
+    q.glyph = (Math.random() * GLYPHS.length) | 0;
+    q.pal = Math.random() < ACCENT_SHARE ? 0 : 1;
   }
 
   var mouseX = NaN,
@@ -264,7 +287,7 @@
       ctx.globalAlpha = Math.max(0, Math.min(fadeIn, fadeOut)) * 0.85;
       var cx = Math.round(q.x + q.dx * eased);
       var cy = Math.round(q.y + q.dy * eased);
-      var spr = sprites[q.glyph];
+      var spr = sprites[q.pal][q.glyph];
       ctx.drawImage(spr, cx - half - SPRITE_PAD, cy - half - SPRITE_PAD, spr.width / dpr, spr.height / dpr);
     }
     ctx.restore();
