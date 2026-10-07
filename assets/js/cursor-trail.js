@@ -34,17 +34,40 @@
 // meaning on touch, where there's no persistent pointer position to
 // trail from, so touch visitors never pay for a canvas/rAF loop that
 // couldn't express the effect anyway.
+//
+// Reported directly as "very big... lagging... big offset between
+// pointer and trail" — one real root cause behind all three: the canvas
+// never had an explicit CSS size (see .cursor-trail-canvas in
+// tokens.css), so as a replaced element it rendered at its own
+// width/height ATTRIBUTE value (the DPR-scaled backing-buffer size set
+// below) instead of being stretched to the viewport by inset:0 alone —
+// everything drawn in "CSS pixel" coordinates ended up displayed at
+// roughly double its real size and position. Fixed in tokens.css.
+// Separately, and only found while re-verifying that fix: resize() ran
+// exactly once and only re-ran on a real `resize` event — the same
+// "0x0 viewport at first measurement" race this project has already hit
+// and fixed (via ResizeObserver) in text-fall.js/pixel-name.js, except
+// this script had no self-correction at all if that race landed. loop()
+// below now re-checks the real viewport size every frame instead
+// (cheaper than a ResizeObserver for a plain full-viewport overlay with
+// no single host element to observe, and correct regardless of whether
+// any particular resize event ever fires in a given browser).
+// CELL/GLOW_PX also shrunk per direct "make it small" feedback, and
+// MAX_PARTICLES/TRAIL_SPACING pulled back per "it is lagging" — on top
+// of the sizing fix, which already accounted for most of both reports
+// (a canvas drawing at ~2x its intended area was both the visibly
+// oversized trail and roughly 4x the real pixel fill-rate cost).
 (function () {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
-  var MAX_PARTICLES = 140;
-  var CELL = 3; // px per glyph "pixel"
-  var GLOW_PX = 6;
+  var MAX_PARTICLES = 90;
+  var CELL = 2; // px per glyph "pixel"
+  var GLOW_PX = 4;
   var GLOW_ALPHA = 0.35;
   var DRAG = 7; // higher = particles reach their target offset faster
 
-  var TRAIL_SPACING = 26; // px of real pointer movement between trail spawns
+  var TRAIL_SPACING = 32; // px of real pointer movement between trail spawns
   var TRAIL_DRIFT = 10; // px of random extra drift added per trail particle
   var TRAIL_LIFE_MIN = 0.35;
   var TRAIL_LIFE_MAX = 0.6;
@@ -84,7 +107,10 @@
     canvas.height = Math.max(1, Math.round(H * dpr));
   }
   resize();
-  window.addEventListener("resize", resize, { passive: true });
+  // No `resize` listener: loop() below re-checks the real viewport size
+  // every frame instead, which is both faster to react and correct
+  // regardless of whether this browser/navigation ever actually fires
+  // one — see the file header comment.
 
   function hexToRgb(hex) {
     var m = /^#?([0-9a-f]{6})$/i.exec(hex || "");
@@ -182,6 +208,12 @@
       lastT = 0;
       return;
     }
+    // Self-healing instead of relying on a `resize` event ever firing —
+    // see the file header comment on why a one-shot measurement isn't
+    // safe here. Two cheap reads, correct every frame regardless of
+    // whether this particular browser/navigation fires resize for a
+    // given size change.
+    if (window.innerWidth !== W || window.innerHeight !== H) resize();
     var dt = lastT ? Math.min((t - lastT) / 1000, 1 / 20) : 0;
     lastT = t;
 
