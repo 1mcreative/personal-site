@@ -236,12 +236,46 @@ permalink: /life/
 </section>
 
 <section class="life-section" id="album">
-  <div class="album-placeholder">
+  {% assign photos = site.data.album %}
+  <div class="album-intro">
     <span class="album-placeholder-icon" aria-hidden="true">{% include album-glyph.svg %}</span>
     <h2>Photo album</h2>
-    <p class="coming-later">A real gallery's coming, eventually.</p>
-    <div class="album-placeholder-grid" aria-hidden="true">
-      <span></span><span></span><span></span><span></span><span></span><span></span>
-    </div>
+    <p class="coming-later">{% if photos.size > 0 %}Drag, or scroll sideways, to look through. Tap one for the story.{% else %}Empty for now, drag to preview how it'll feel once real photos land.{% endif %}</p>
+  </div>
+
+  <div class="photo-slider" id="photo-slider">
+    {% if photos.size > 0 %}
+      {% for photo in photos %}
+      <button type="button" class="photo-slide" data-photo-open data-full="{{ photo.src }}" data-caption="{{ photo.caption | default: '' | escape }}" data-location="{{ photo.location | default: '' | escape }}" data-date="{{ photo.date | default: '' | escape }}">
+        <img src="{{ photo.src }}" alt="{{ photo.alt | default: '' }}" loading="lazy" decoding="async" width="170" height="170" draggable="false"{% if photo.offsetY %} style="--offset-y: {{ photo.offsetY }}px"{% endif %}>
+      </button>
+      {% endfor %}
+    {% else %}
+      {% for n in (0..7) %}
+      <div class="photo-slide photo-slide-placeholder" aria-hidden="true" style="--hue: {{ n | times: 47 | plus: 210 | modulo: 360 }}"></div>
+      {% endfor %}
+    {% endif %}
   </div>
 </section>
+
+<!-- Photo info modal — reuses .contact-modal's own shell/transitions
+     (tokens.css), same convention slice-blade-modal.html already
+     established for a second modal on this site. Scoped to /life/ only
+     (not a shared footer include) since the Album section is the only
+     place that needs it. Content is populated per-click from whichever
+     .photo-slide button was pressed (assets/js/photo-modal.js) rather
+     than one modal per photo. -->
+<div class="contact-modal" data-photo-modal hidden>
+  <div class="contact-modal-backdrop" data-photo-close></div>
+  <div class="contact-modal-panel photo-modal-panel" role="dialog" aria-modal="true" aria-labelledby="photo-modal-caption">
+    <button type="button" class="contact-modal-close" data-photo-close aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <img class="photo-modal-image" data-photo-modal-image alt="">
+    <p class="photo-modal-caption" id="photo-modal-caption" data-photo-modal-caption></p>
+    <dl class="photo-modal-meta" data-photo-modal-meta></dl>
+    <p class="photo-modal-request">Want this one in full resolution? <a href="mailto:{{ site.email }}" data-photo-modal-request>Email me</a> and I'll send it over.</p>
+  </div>
+</div>

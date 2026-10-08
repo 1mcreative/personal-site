@@ -750,14 +750,8 @@ html:has(body.theme-personal) {
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
 }
 
-/* Album's real placeholder — replaces what used to be a single muted line,
-   which all but disappeared against the Black Hole background once this
-   section became a full screen on its own (confirmed directly: scrolled to
-   it and could barely find the text). A dashed 3x2 grid of empty tiles
-   gives the section the same visual weight/rhythm as Instagram's cards and
-   YouTube's thumbnails without pretending there's real content — honest
-   about being empty, not just quieter about it. */
-.theme-personal .album-placeholder {
+/* Album intro: icon/heading/caption above the slider below. */
+.theme-personal .album-intro {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -778,20 +772,155 @@ html:has(body.theme-personal) {
   height: 100%;
 }
 
-.theme-personal .album-placeholder-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+/* Smooth Scroll Slider — ported from a pasted Originkit React component
+   into plain JS/CSS (photo-slider.js). This is the real, no-JS/
+   reduced-motion markup: a plain horizontally-scrollable row, same
+   full-bleed + scroll-snap recipe as .social-grid/.video-grid above. When
+   motion is allowed, photo-slider.js adds .is-enhanced and takes over
+   layout with its own absolute-positioned, auto-looping, drag/wheel-driven
+   transform loop — this rule set is what that state falls back from, not
+   just a loading skeleton. Placeholder tiles (no real photos yet) use the
+   exact gradient-hue formula the original React component falls back to
+   when it has no images either. */
+.theme-personal .photo-slider {
+  display: flex;
   gap: var(--space-2);
-  max-width: 360px;
-  width: 100%;
-  margin-top: var(--space-3);
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: var(--space-1) var(--space-3) var(--space-2) var(--nav-clearance);
+  scroll-padding-left: var(--nav-clearance);
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
-.theme-personal .album-placeholder-grid span {
-  aspect-ratio: 1;
+.theme-personal .photo-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.theme-personal .photo-slide {
+  flex: 0 0 auto;
+  width: 170px;
+  height: 170px;
   border-radius: var(--radius);
-  border: 1px dashed var(--border);
-  background: color-mix(in srgb, var(--surface) 25%, transparent);
+  overflow: hidden;
+  scroll-snap-align: start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Real photos render as a <button> (clicking one opens the info modal);
+   placeholder tiles stay plain <div>s with nothing to show. Button-only
+   reset, kept separate from the shared sizing/background rule above so
+   the placeholder divs are untouched. */
+.theme-personal button.photo-slide {
+  display: block;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.theme-personal button.photo-slide:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.theme-personal .photo-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% calc(50% + var(--offset-y, 0px));
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  /* Soft deterrent only (see photo-modal.js's own contextmenu guard) —
+     removes iOS's long-press "Save/Copy Image" callout menu. */
+  -webkit-touch-callout: none;
+}
+
+.theme-personal .photo-slide-placeholder {
+  background: linear-gradient(150deg, hsl(var(--hue) 42% 34%), hsl(calc(var(--hue) + 45) 55% 10%));
+}
+
+.theme-personal .photo-slider.is-enhanced {
+  position: relative;
+  overflow: hidden;
+  scroll-snap-type: none;
+  padding: 0;
+  cursor: grab;
+}
+
+.theme-personal .photo-slider.is-enhanced .photo-slide {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  margin: 0;
+  will-change: transform, filter;
+  scroll-snap-align: none;
+}
+
+.theme-personal .photo-slider.is-enhanced.is-dragging {
+  cursor: grabbing;
+}
+
+/* Photo info modal — reuses .contact-modal's own shell (tokens.css), only
+   the content area is specific to this one. */
+.photo-modal-panel {
+  width: min(460px, 100%);
+}
+
+.photo-modal-image {
+  display: block;
+  width: 100%;
+  max-height: 50vh;
+  object-fit: contain;
+  border-radius: var(--radius);
+  margin-bottom: var(--space-2);
+  background: color-mix(in srgb, var(--bg) 40%, transparent);
+  -webkit-touch-callout: none;
+}
+
+.photo-modal-caption {
+  margin: 0 0 var(--space-2);
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.photo-modal-caption[hidden],
+.photo-modal-meta[hidden] {
+  display: none;
+}
+
+.photo-modal-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3em 0.8em;
+  margin: 0 0 var(--space-2);
+  font-size: 0.85rem;
+}
+
+.photo-modal-meta dt {
+  color: var(--muted);
+}
+
+.photo-modal-meta dd {
+  margin: 0;
+  color: var(--text);
+}
+
+.photo-modal-request {
+  margin: 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 
 /* YouTube: two channel cards plus a horizontally scrolling row of specific
