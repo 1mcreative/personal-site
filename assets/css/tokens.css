@@ -594,6 +594,12 @@ p {
 .slice-blade-panel {
   width: min(900px, 100%);
   max-height: min(80vh, 720px);
+  /* Flex column so a short/landscape viewport shrinks the canvas host
+     to make room for the title/sub text instead of letting the host's
+     own fixed vh height push everything (including the game-over share
+     overlay inside it) past the panel's bottom edge, forcing a scroll. */
+  display: flex;
+  flex-direction: column;
 }
 
 .slice-blade-header {
@@ -601,6 +607,7 @@ p {
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-2);
+  flex-shrink: 0;
 }
 
 .slice-blade-title {
@@ -621,12 +628,38 @@ p {
   margin: 0 0 var(--space-2);
   color: var(--muted);
   font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+/* A short viewport (a phone in landscape) has so little height that the
+   panel's own fixed padding and header/sub margins — fine on a normal
+   screen — are what push the share overlay past the fold, not the game
+   host itself. Tighten just the chrome around it rather than the host's
+   own touch-target-compliant floor, which can't shrink any further. */
+@media (max-height: 480px) {
+  .slice-blade-panel {
+    padding: var(--space-2);
+  }
+
+  .slice-blade-header {
+    margin-bottom: var(--space-1);
+  }
+
+  .slice-blade-sub {
+    margin-bottom: var(--space-1);
+  }
 }
 
 .slice-blade-host {
   position: relative;
   width: 100%;
-  height: min(60vh, 560px);
+  flex: 1 1 auto;
+  /* Floor tall enough that the game-over share overlay's own worst
+     case (6 pills at the 44px touch-target floor, wrapped 2-per-row)
+     always fits inside the host box instead of getting silently
+     clipped by overflow: hidden below. */
+  min-height: 220px;
+  max-height: min(60vh, 560px);
   overflow: hidden;
   border-radius: var(--radius);
   background: var(--bg);
@@ -691,19 +724,38 @@ p {
   color: var(--text);
   font-size: 0.85rem;
   font-weight: 600;
+  flex-shrink: 0;
 }
 
-/* Game-over share panel — reuses .contact-submit's gradient pill for the
-   one "best" option (native share sheet) and a plain bordered pill,
-   sized to this project's own established >=44px touch-target floor,
-   for everything the Web Share API doesn't cover on its own. */
+/* Game-over share panel — overlaid on the bottom of .slice-blade-host
+   (same absolute-inside-the-relative-host technique .slice-blade-hud
+   already uses), not a block below it, so it adds zero height to the
+   modal panel: whatever already fit on screen without scrolling still
+   fits, on a phone, a tablet, or a desktop window. Reuses
+   .contact-submit's gradient pill for the one "best" option (native
+   share sheet) and a plain bordered pill, sized to this project's own
+   established >=44px touch-target floor, for everything the Web Share
+   API doesn't cover on its own. */
 .slice-blade-share {
-  margin-top: var(--space-2);
+  position: absolute;
+  left: var(--space-1);
+  right: var(--space-1);
+  bottom: var(--space-1);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface) 75%, transparent);
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  border: 1px solid var(--border);
 }
 
 .slice-blade-share-score {
-  margin: 0 0 var(--space-1);
-  font-size: 0.9rem;
+  margin: 0;
+  font-size: 0.85rem;
   color: var(--muted);
 }
 
@@ -714,20 +766,20 @@ p {
 .slice-blade-share-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1);
+  gap: 0.4rem;
 }
 
 .slice-blade-share-btn {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: 0.5em 1.1em;
+  padding: 0.4em 0.9em;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
   color: var(--text);
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: border-color var(--speed) var(--ease), transform var(--speed) var(--ease);
@@ -747,8 +799,8 @@ p {
 }
 
 .slice-blade-share-note {
-  margin: var(--space-1) 0 0;
-  font-size: 0.8rem;
+  margin: 0;
+  font-size: 0.75rem;
   color: var(--muted);
   min-height: 1.1em;
 }
