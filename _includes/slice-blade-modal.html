@@ -29,18 +29,25 @@
         <span class="slice-blade-hud-chip" data-slice-blade-score>Score 0</span>
         <span class="slice-blade-hud-chip slice-blade-hud-lives" data-slice-blade-lives aria-label="Lives remaining"></span>
       </div>
-    </div>
-    <div class="slice-blade-share" data-slice-blade-share hidden>
-      <p class="slice-blade-share-score">Score <strong data-slice-blade-share-score>0</strong> — share it?</p>
-      <div class="slice-blade-share-actions">
-        <button type="button" class="slice-blade-share-btn slice-blade-share-btn-primary" data-slice-blade-share-native hidden>Share</button>
-        <button type="button" class="slice-blade-share-btn" data-slice-blade-share-whatsapp>WhatsApp</button>
-        <button type="button" class="slice-blade-share-btn" data-slice-blade-share-instagram>Instagram</button>
-        <button type="button" class="slice-blade-share-btn" data-slice-blade-share-linkedin>LinkedIn</button>
-        <button type="button" class="slice-blade-share-btn" data-slice-blade-share-copy>Copy link</button>
-        <button type="button" class="slice-blade-share-btn" data-slice-blade-share-save>Save image</button>
+      <!-- Overlaid on the canvas, not a block below it — a block below
+           added real height to the modal panel and pushed the share
+           buttons past the viewport on short screens, forcing a scroll
+           right when they should be the one thing in view. Overlaying
+           inside .slice-blade-host (same technique .slice-blade-hud
+           already uses) means game-over adds zero new height: whatever
+           already fit without scrolling still fits. -->
+      <div class="slice-blade-share" data-slice-blade-share hidden>
+        <p class="slice-blade-share-score">Score <strong data-slice-blade-share-score>0</strong> — share it?</p>
+        <div class="slice-blade-share-actions">
+          <button type="button" class="slice-blade-share-btn slice-blade-share-btn-primary" data-slice-blade-share-native hidden>Share</button>
+          <button type="button" class="slice-blade-share-btn" data-slice-blade-share-whatsapp>WhatsApp</button>
+          <button type="button" class="slice-blade-share-btn" data-slice-blade-share-instagram>Instagram</button>
+          <button type="button" class="slice-blade-share-btn" data-slice-blade-share-linkedin>LinkedIn</button>
+          <button type="button" class="slice-blade-share-btn" data-slice-blade-share-copy>Copy link</button>
+          <button type="button" class="slice-blade-share-btn" data-slice-blade-share-save>Save image</button>
+        </div>
+        <p class="slice-blade-share-note" data-slice-blade-share-note aria-live="polite"></p>
       </div>
-      <p class="slice-blade-share-note" data-slice-blade-share-note aria-live="polite"></p>
     </div>
   </div>
 </div>
