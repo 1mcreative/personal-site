@@ -62,8 +62,9 @@
 // (cheaper than a ResizeObserver for a plain full-viewport overlay with
 // no single host element to observe, and correct regardless of whether
 // any particular resize event ever fires in a given browser).
-// CELL/GLOW_PX also shrunk per direct "make it small" feedback (and a
-// third time, 1.5/3 to 1.2/2.5, on "bit smaller"), and MAX_PARTICLES/
+// CELL/GLOW_PX also shrunk per direct "make it small" feedback, and twice
+// more on "bit smaller" then plain "smaller" (1.5/3 to 1.2/2.5 to 0.8/1.8,
+// so a 7-cell glyph is now 5.6px across), and MAX_PARTICLES/
 // TRAIL_SPACING pulled back per "it is lagging" — on top of the sizing
 // fix, which already accounted for most of both reports (a canvas
 // drawing at ~2x its intended area was both the visibly oversized trail
@@ -73,8 +74,8 @@
   if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
   var MAX_PARTICLES = 90;
-  var CELL = 1.2; // px per glyph "pixel"
-  var GLOW_PX = 2.5;
+  var CELL = 0.8; // px per glyph "pixel"
+  var GLOW_PX = 1.8;
   var GLOW_ALPHA = 0.35;
   var DRAG = 7; // higher = particles reach their target offset faster
   var ACCENT_SHARE = 0.25; // fraction of particles in the page's own --accent, rest split evenly across the other colors
@@ -175,7 +176,9 @@
       return makeSprite(bits, rgb);
     });
   });
-  var half = Math.floor((7 * CELL) / 2);
+  // Exact, not floored: at 0.8px cells a floor() would sit the glyph ~0.8px
+  // off its spawn point, a visible share of a 5.6px glyph.
+  var half = (7 * CELL) / 2;
 
   var parts = [];
   for (var i = 0; i < MAX_PARTICLES; i++) {
