@@ -22,20 +22,21 @@
 // pointer") — this canvas never sets `cursor` on anything and the arrow
 // sprite/rows are gone entirely, not just unused.
 //
-// Recolored to this page's own --accent (read live per page, since this
-// script runs identically on every theme) instead of the reference's
-// five-color pink/cyan/white/violet/lime palette — this site has never
-// introduced a color outside each theme's own single accent, and a
-// site-wide effect is exactly the place that rule matters most.
-//
-// Two-toned, not flat single-accent, per direct follow-up: "make it...
-// color full as our website is purly white" — asking for more color
-// specifically because the site itself is so monochrome. The second
-// tone is #f59e0b, not a new hue either: the same amber globe.js's
-// Bangalore marker and the Black Hole's redshift tint already use as a
-// secondary accent alongside blue, reused here rather than invented —
-// this site's own established formula for "livelier without a new
-// color," not a one-off exception.
+// Color history, so the next reader doesn't have to reconstruct it. The
+// reference ships a five-color pink/cyan/white/violet/lime palette; the
+// first port replaced it with each page's own --accent alone (this site
+// had never used a color outside each theme's accent, and a site-wide
+// effect is where that rule matters most). Direct follow-ups pushed back
+// twice: "color full as our website is purly white", then "bit smaller and
+// add more colors". It is now six colors: the page's own --accent (read
+// live per page, about a quarter of the particles, so each page still
+// leads with its own blue), amber (#f59e0b, already the secondary accent
+// on globe.js's marker and the Black Hole's redshift tint), and four that
+// are NOT established site colors: pink, emerald, violet and cyan. That is
+// a deliberate, requested exception to the palette rule, the same kind of
+// carve-out the Instagram and YouTube cards already are, confined to a
+// decorative overlay that carries no text or meaning. All 500-weight hues,
+// so each one reads on the white pages and on /life/'s dark one.
 //
 // Gated on prefers-reduced-motion (skipped entirely, same as every other
 // ambient/decorative effect on this site) and on a real hover-capable
@@ -61,21 +62,22 @@
 // (cheaper than a ResizeObserver for a plain full-viewport overlay with
 // no single host element to observe, and correct regardless of whether
 // any particular resize event ever fires in a given browser).
-// CELL/GLOW_PX also shrunk per direct "make it small" feedback, and
-// MAX_PARTICLES/TRAIL_SPACING pulled back per "it is lagging" — on top
-// of the sizing fix, which already accounted for most of both reports
-// (a canvas drawing at ~2x its intended area was both the visibly
-// oversized trail and roughly 4x the real pixel fill-rate cost).
+// CELL/GLOW_PX also shrunk per direct "make it small" feedback (and a
+// third time, 1.5/3 to 1.2/2.5, on "bit smaller"), and MAX_PARTICLES/
+// TRAIL_SPACING pulled back per "it is lagging" — on top of the sizing
+// fix, which already accounted for most of both reports (a canvas
+// drawing at ~2x its intended area was both the visibly oversized trail
+// and roughly 4x the real pixel fill-rate cost).
 (function () {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
   var MAX_PARTICLES = 90;
-  var CELL = 1.5; // px per glyph "pixel"
-  var GLOW_PX = 3;
+  var CELL = 1.2; // px per glyph "pixel"
+  var GLOW_PX = 2.5;
   var GLOW_ALPHA = 0.35;
   var DRAG = 7; // higher = particles reach their target offset faster
-  var ACCENT_SHARE = 0.6; // fraction of particles in the page's own --accent, rest in amber
+  var ACCENT_SHARE = 0.25; // fraction of particles in the page's own --accent, rest split evenly across the other colors
 
   var TRAIL_SPACING = 32; // px of real pointer movement between trail spawns
   var TRAIL_DRIFT = 10; // px of random extra drift added per trail particle
@@ -130,13 +132,16 @@
   }
   // --accent is scoped to the body's own theme class (see DESIGN.md), so
   // this always reads the current page's real accent, never a guess.
-  // PALETTE[0] is that accent; PALETTE[1] is the site's own established
-  // amber secondary (see the file header comment) — always this exact
-  // hex everywhere it's used on this site, so hardcoded rather than
-  // read from a custom property that doesn't exist for it.
+  // PALETTE[0] is that accent; the rest are fixed hexes with no custom
+  // property behind them (see the file header comment on which of them
+  // are established site colors and which are the requested exception).
   var PALETTE = [
     hexToRgb(getComputedStyle(document.body).getPropertyValue("--accent").trim()) || [29, 78, 216],
-    [0xf5, 0x9e, 0x0b],
+    hexToRgb("#f59e0b"), // amber
+    hexToRgb("#ec4899"), // pink
+    hexToRgb("#10b981"), // emerald
+    hexToRgb("#8b5cf6"), // violet
+    hexToRgb("#06b6d4"), // cyan
   ];
 
   function makeSprite(bits, rgb) {
@@ -191,7 +196,7 @@
     q.life = life;
     q.age = 0;
     q.glyph = (Math.random() * GLYPHS.length) | 0;
-    q.pal = Math.random() < ACCENT_SHARE ? 0 : 1;
+    q.pal = Math.random() < ACCENT_SHARE ? 0 : 1 + ((Math.random() * (PALETTE.length - 1)) | 0);
   }
 
   var mouseX = NaN,
