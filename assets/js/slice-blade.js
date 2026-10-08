@@ -393,8 +393,14 @@
     function step(dt) {
       var mul = 1;
 
-      if (hovering) {
-        world.played = true;
+      // Only real pointer movement (onMove, below) flips played true —
+      // merely resting the cursor over the canvas (hovering, e.g. right
+      // after the trigger button was clicked at that same screen spot)
+      // used to count as "a human is playing" on its own, misattributing
+      // the self-playing attract-mode's own score as a real game and
+      // wrongly offering it to share. Hovering still keeps a real,
+      // already-in-progress game from going idle.
+      if (hovering && world.played) {
         world.idle = 0;
       }
       world.idle += dt;
@@ -638,8 +644,6 @@
     }
     function onEnter() {
       hovering = true;
-      world.played = true;
-      world.idle = 0;
     }
     function onLeave() {
       hovering = false;
