@@ -1282,10 +1282,17 @@
   gap: var(--space-1);
 }
 
+/* flex-wrap + max-width: the weather widget is wider than a pill, and at
+   768px (iPad portrait) a long distance label ("6,999 km · a long flight
+   away") would run the row into .hero-bored-trigger. The cap reserves
+   that button's corner; past it the last chip drops to a second line
+   instead of overlapping. Wider screens never reach the cap. */
 @media (min-width: 768px) {
   .hero-status {
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
+    max-width: calc(100% - 210px);
   }
 }
 
@@ -1405,8 +1412,10 @@
 
 /* .hero-weather-icon (assets/js/weather.js): the animated weather icon.
    Drawn bigger than the 16px line icons next to it because motion needs
-   room to read; the negative block margins hand that room back so the
-   chip stays exactly as tall as the clock and distance chips beside it.
+   room to read; on the compact (mobile) chip the negative block margins
+   hand that room back so it stays exactly as tall as the clock and
+   distance chips beside it. From tablet width up the chip becomes a
+   widget instead (block at the end of this section).
    Everything a keyframe moves carries .wx, which pivots on its own
    bounding box (fill-box) instead of the SVG's top-left origin, so the
    sun's rays spin in place and the cloud drifts from where it sits.
@@ -1415,9 +1424,9 @@
    pair the globe marker and cursor trail already use. Transform and
    opacity only, no layout. */
 .hero-weather-icon {
-  width: 26px;
-  height: 26px;
-  margin: -5px -2px -5px -4px;
+  width: 32px;
+  height: 32px;
+  margin: -8px -3px -8px -5px;
 }
 
 .hero-weather-icon .wx {
@@ -1464,8 +1473,110 @@
   50% { transform: scale(.55); opacity: .5; }
 }
 
+/* Weather widget (tablet and up), per "put lil big like widgets... widgets
+   like animation in desktop and tab view": the chip becomes a rounded
+   card with the icon drawn large on the left, a big temperature, and the
+   condition always visible underneath (the compact chip only reveals it
+   on hover, which touch tablets can't do anyway). A tint and a softly
+   pulsing glow behind the icon, both keyed off data-wx, carry the
+   "weather scene" feel; amber for sun, sky blue for everything else,
+   indigo wash for the moon. Light tints only, so the dark text never
+   needs a night-mode flip. Compact chip keeps a plain " · " separator
+   before the detail (the widget has its own line instead). */
+.hero-weather-chip {
+  --wx-tint: rgba(110, 193, 255, 0.18);
+  --wx-glow: rgba(110, 193, 255, 0.5);
+}
+
+/* :hover listed too — .hero-status-chip:hover's `background` shorthand
+   resets the image otherwise, so the tint would blink out on hover. */
+.hero-weather-chip,
+.hero-weather-chip:hover {
+  background-image: linear-gradient(100deg, var(--wx-tint), transparent 75%);
+}
+
+.hero-weather-chip[data-wx="sun"],
+.hero-weather-chip[data-wx="cloud-sun"] {
+  --wx-tint: rgba(245, 158, 11, 0.16);
+  --wx-glow: rgba(245, 158, 11, 0.45);
+}
+
+.hero-weather-chip[data-wx="moon"],
+.hero-weather-chip[data-wx="cloud-moon"] {
+  --wx-tint: rgba(29, 78, 216, 0.12);
+}
+
+.hero-weather-chip .hero-status-detail::before {
+  content: " · ";
+  white-space: pre;
+}
+
+@keyframes wx-halo {
+  0%, 100% { transform: scale(0.9); opacity: 0.9; }
+  50% { transform: scale(1.3); opacity: 0.45; }
+}
+
+@media (min-width: 768px) {
+  .hero-weather-chip {
+    position: relative;
+    display: inline-grid;
+    grid-template-columns: 52px auto;
+    column-gap: 0.75rem;
+    row-gap: 0.2rem;
+    align-items: center;
+    padding: 0.4rem 1.2rem 0.4rem 0.5rem;
+    border-radius: 22px;
+  }
+
+  /* Absolutely positioned, so it sits outside the grid; the icon's own
+     z-index keeps it painted above this. */
+  .hero-weather-chip::before {
+    content: "";
+    position: absolute;
+    left: 0.5rem;
+    top: 50%;
+    width: 52px;
+    height: 52px;
+    margin-top: -26px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--wx-glow) 0%, transparent 70%);
+    animation: wx-halo 3.6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .hero-weather-icon {
+    position: relative;
+    z-index: 1;
+    grid-row: 1 / span 2;
+    width: 52px;
+    height: 52px;
+    margin: 0;
+  }
+
+  .hero-weather-temp {
+    align-self: end;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .hero-weather-chip .hero-status-detail {
+    align-self: start;
+    max-width: 150px;
+    opacity: 1;
+    text-overflow: ellipsis;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .hero-weather-chip .hero-status-detail::before {
+    content: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .hero-weather-icon .wx {
+  .hero-weather-icon .wx,
+  .hero-weather-chip::before {
     animation: none;
   }
 }
@@ -1551,10 +1662,18 @@
    class now that a second chip needs the identical treatment, rather
    than repeating it per chip class. Skips the fade under reduced motion
    (added already-visible instead, in JS terms indistinguishable from a
-   plain opacity:1 element the moment this class lands). */
+   plain opacity:1 element the moment this class lands).
+   The transition list repeats .hero-status-chip's own (transform/box-
+   shadow/background) next to opacity: a bare `transition: opacity` here
+   replaced that list outright, so these chips' hover lift snapped
+   instead of springing like the clock chip's. */
 .hero-status-chip-dynamic {
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition:
+    opacity 0.4s ease,
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.25s ease,
+    background 0.25s ease;
 }
 
 .hero-status-chip-dynamic.hero-status-chip-in {

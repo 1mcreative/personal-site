@@ -144,17 +144,21 @@
       "</svg>";
     chip.appendChild(wrap.firstChild);
 
+    // Tint/glow in home.css key off the icon name (sun, moon, cloud-rain...).
+    chip.setAttribute("data-wx", meta.icon);
+
     var label = document.createElement("span");
+    label.className = "hero-weather-temp";
     label.textContent = Math.round(temp) + "°" + unit;
     chip.appendChild(label);
 
-    // Hover-reveal detail (see .hero-status-detail in home.css) — the
-    // same condition/city text the title tooltip already carried, now
-    // also visible without needing to wait out the browser's own native
-    // tooltip delay.
+    // Condition/city line (see .hero-status-detail in home.css): hover-
+    // revealed on the compact mobile chip, always visible as the widget's
+    // second line from tablet width up. The " · " separator the compact
+    // version needs is CSS (::before), so the widget line starts clean.
     var detail = document.createElement("span");
     detail.className = "hero-status-detail";
-    detail.textContent = " · " + meta.label + (city ? ", " + city : "");
+    detail.textContent = meta.label + (city ? ", " + city : "");
     chip.appendChild(detail);
 
     container.appendChild(chip);
