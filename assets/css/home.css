@@ -1429,7 +1429,8 @@
   margin: -8px -3px -8px -5px;
 }
 
-.hero-weather-icon .wx {
+.hero-weather-icon .wx,
+.hero-weather-scene .wx {
   transform-box: fill-box;
   transform-origin: center;
 }
@@ -1474,18 +1475,19 @@
 }
 
 /* Weather widget (tablet and up), per "put lil big like widgets... widgets
-   like animation in desktop and tab view": the chip becomes a rounded
-   card with the icon drawn large on the left, a big temperature, and the
-   condition always visible underneath (the compact chip only reveals it
-   on hover, which touch tablets can't do anyway). A tint and a softly
-   pulsing glow behind the icon, both keyed off data-wx, carry the
-   "weather scene" feel; amber for sun, sky blue for everything else,
-   indigo wash for the moon. Light tints only, so the dark text never
-   needs a night-mode flip. Compact chip keeps a plain " · " separator
-   before the detail (the widget has its own line instead). */
+   like animation in desktop and tab view" and then "add some character":
+   the chip becomes a rounded card holding a character scene (a 76x64 SVG
+   drawn at 92x77; built in weather.js, see SCENES) with a big temperature
+   and the condition always visible beside it (the compact chip only
+   reveals it on hover, which touch tablets can't do anyway). A light tint
+   keyed off data-wx (amber for sun, indigo for moon, sky blue for
+   everything else) carries the weather mood behind the scene; light on
+   purpose, so the dark text never needs a night-mode flip. Below 768px
+   the chip stays compact and shows the small icon instead; whichever SVG
+   is display:none doesn't run its animations. The compact chip keeps a
+   plain " · " before the detail (the widget has its own line instead). */
 .hero-weather-chip {
   --wx-tint: rgba(110, 193, 255, 0.18);
-  --wx-glow: rgba(110, 193, 255, 0.5);
 }
 
 /* :hover listed too — .hero-status-chip:hover's `background` shorthand
@@ -1498,7 +1500,6 @@
 .hero-weather-chip[data-wx="sun"],
 .hero-weather-chip[data-wx="cloud-sun"] {
   --wx-tint: rgba(245, 158, 11, 0.16);
-  --wx-glow: rgba(245, 158, 11, 0.45);
 }
 
 .hero-weather-chip[data-wx="moon"],
@@ -1511,46 +1512,112 @@
   white-space: pre;
 }
 
-@keyframes wx-halo {
-  0%, 100% { transform: scale(0.9); opacity: 0.9; }
-  50% { transform: scale(1.3); opacity: 0.45; }
+/* Character rig (weather.js: pivot/leg/arm/who). .wxc rotates about its
+   own origin, which weather.js places on the joint (shoulder, hip, hand,
+   feet), so --r is a resting pose and --a a swing around it; walking,
+   waving, flapping and leaning are all this one keyframe with different
+   numbers set inline. */
+.wxc {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  transform: rotate(var(--r, 0deg));
+}
+
+.wxc-osc { animation: wxc-osc 1s ease-in-out infinite; }
+.wxc-bob { animation: wxc-bob 0.45s ease-in-out infinite; }
+.wxc-shiver { animation: wxc-shiver 0.12s linear infinite alternate; }
+
+@keyframes wxc-osc {
+  0%, 100% { transform: rotate(calc(var(--r, 0deg) - var(--a, 0deg))); }
+  50% { transform: rotate(calc(var(--r, 0deg) + var(--a, 0deg))); }
+}
+@keyframes wxc-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-0.9px); }
+}
+@keyframes wxc-shiver {
+  from { transform: translateX(-0.6px); }
+  to { transform: translateX(0.6px); }
+}
+
+/* Scene weather (weather.js: drops, flakes, WIND, fog bands, zzz, glow) */
+.wxs-rain { animation: wxs-rain 0.85s linear infinite; }
+.wxs-snow { animation: wxs-snow 2.6s linear infinite; }
+.wxs-wind { animation: wxs-wind 0.8s linear infinite; }
+.wxs-fog { animation: wxs-fog 5s ease-in-out infinite; }
+.wxs-zzz { animation: wxs-zzz 2.6s ease-out infinite; }
+.wxs-flutter { animation: wxs-flutter 0.32s ease-in-out infinite; }
+.wxs-ground { animation: wxs-ground 0.9s linear infinite; }
+.wxs-glow { opacity: 0; animation: wxs-glow 3s linear infinite; }
+
+@keyframes wxs-rain {
+  0% { transform: translate(0, -6px); opacity: 0; }
+  12%, 85% { opacity: 0.9; }
+  100% { transform: translate(var(--dx, -6px), 38px); opacity: 0; }
+}
+@keyframes wxs-snow {
+  0% { transform: translate(0, -4px); opacity: 0; }
+  15%, 85% { opacity: 1; }
+  100% { transform: translate(4px, 40px); opacity: 0; }
+}
+@keyframes wxs-wind {
+  0% { transform: translateX(12px); opacity: 0; }
+  20%, 80% { opacity: 0.9; }
+  100% { transform: translateX(-34px); opacity: 0; }
+}
+@keyframes wxs-fog {
+  0%, 100% { transform: translateX(-7px); }
+  50% { transform: translateX(7px); }
+}
+@keyframes wxs-zzz {
+  0% { transform: translate(0, 2px) scale(0.5); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translate(5px, -10px) scale(1.1); opacity: 0; }
+}
+@keyframes wxs-flutter {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(0.88, 1.1); }
+}
+@keyframes wxs-ground {
+  to { stroke-dashoffset: 11; }
+}
+/* Same double stutter as wx-flash, as a warm bloom behind the bolt. */
+@keyframes wxs-glow {
+  0%, 50%, 100% { opacity: 0; }
+  54% { opacity: 0.55; }
+  58% { opacity: 0; }
+  62% { opacity: 0.35; }
+  66% { opacity: 0; }
+}
+
+/* color: the cloud outlines are currentColor; the small icon gets the
+   accent from .hero-status-icon, so the scene needs it set here or they
+   fall back to the chip's near-black text color. */
+.hero-weather-scene {
+  display: none;
+  color: var(--accent);
 }
 
 @media (min-width: 768px) {
   .hero-weather-chip {
-    position: relative;
     display: inline-grid;
-    grid-template-columns: 52px auto;
-    column-gap: 0.75rem;
+    grid-template-columns: 92px auto;
+    column-gap: 0.7rem;
     row-gap: 0.2rem;
     align-items: center;
-    padding: 0.4rem 1.2rem 0.4rem 0.5rem;
+    padding: 0.3rem 1.2rem 0.3rem 0.4rem;
     border-radius: 22px;
   }
 
-  /* Absolutely positioned, so it sits outside the grid; the icon's own
-     z-index keeps it painted above this. */
-  .hero-weather-chip::before {
-    content: "";
-    position: absolute;
-    left: 0.5rem;
-    top: 50%;
-    width: 52px;
-    height: 52px;
-    margin-top: -26px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--wx-glow) 0%, transparent 70%);
-    animation: wx-halo 3.6s ease-in-out infinite;
-    pointer-events: none;
+  .hero-weather-icon {
+    display: none;
   }
 
-  .hero-weather-icon {
-    position: relative;
-    z-index: 1;
+  .hero-weather-scene {
+    display: block;
     grid-row: 1 / span 2;
-    width: 52px;
-    height: 52px;
-    margin: 0;
+    width: 92px;
+    height: 77px;
   }
 
   .hero-weather-temp {
@@ -1574,9 +1641,12 @@
   }
 }
 
+/* Reduced motion: every icon and scene animation off. Limbs hold their
+   resting --r pose, drops and flakes sit where they were drawn. */
 @media (prefers-reduced-motion: reduce) {
   .hero-weather-icon .wx,
-  .hero-weather-chip::before {
+  .hero-weather-scene,
+  .hero-weather-scene * {
     animation: none;
   }
 }
