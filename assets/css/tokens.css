@@ -806,6 +806,17 @@ p {
   border: 1px solid var(--border);
 }
 
+/* [hidden]: a bare class selector's `display: flex` above is author-
+   origin CSS, which beats the UA stylesheet's `[hidden] { display: none }`
+   outright regardless of specificity — the exact bug this project has
+   already hit twice (.lab-modal, .ig-feed-loading). Without this, the
+   JS below was correctly toggling the hidden attribute the whole time,
+   it just never had any visual effect: the panel stayed on screen
+   during live play, not just at game-over. */
+.slice-blade-share[hidden] {
+  display: none;
+}
+
 .slice-blade-share-score {
   margin: 0;
   font-size: 0.85rem;
