@@ -1403,6 +1403,73 @@
   color: var(--accent);
 }
 
+/* .hero-weather-icon (assets/js/weather.js): the animated weather icon.
+   Drawn bigger than the 16px line icons next to it because motion needs
+   room to read; the negative block margins hand that room back so the
+   chip stays exactly as tall as the clock and distance chips beside it.
+   Everything a keyframe moves carries .wx, which pivots on its own
+   bounding box (fill-box) instead of the SVG's top-left origin, so the
+   sun's rays spin in place and the cloud drifts from where it sits.
+   Colors are set in the SVG markup (amber sun/bolt, sky-blue
+   rain/snow/fog, the accent for cloud outlines) — the same blue + amber
+   pair the globe marker and cursor trail already use. Transform and
+   opacity only, no layout. */
+.hero-weather-icon {
+  width: 26px;
+  height: 26px;
+  margin: -5px -2px -5px -4px;
+}
+
+.hero-weather-icon .wx {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.wx-spin { animation: wx-spin 18s linear infinite; }
+.wx-breathe { animation: wx-breathe 3.2s ease-in-out infinite; }
+.wx-sway { animation: wx-sway 5s ease-in-out infinite; }
+.wx-drift { animation: wx-drift 5s ease-in-out infinite; }
+.wx-fog { animation: wx-drift 3.4s ease-in-out infinite; }
+.wx-fall { animation: wx-fall 1.1s linear infinite; }
+.wx-snow { animation: wx-snow 2.6s linear infinite; }
+.wx-flash { animation: wx-flash 3s linear infinite; }
+.wx-twinkle { animation: wx-twinkle 2.2s ease-in-out infinite; }
+/* Opposite phase for the second cloud / middle fog line, so the pair
+   drifts apart and back instead of moving in lockstep. */
+.wx-rev { animation-direction: reverse; }
+
+@keyframes wx-spin { to { transform: rotate(360deg); } }
+@keyframes wx-breathe { 50% { transform: scale(1.08); } }
+@keyframes wx-sway { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+@keyframes wx-drift { 0%, 100% { transform: translateX(-1.3px); } 50% { transform: translateX(1.3px); } }
+@keyframes wx-fall {
+  0% { transform: translateY(-2.5px); opacity: 0; }
+  25%, 70% { opacity: 1; }
+  100% { transform: translateY(3.5px); opacity: 0; }
+}
+@keyframes wx-snow {
+  0% { transform: translate(-.8px, -2.5px); opacity: 0; }
+  25%, 70% { opacity: 1; }
+  100% { transform: translate(.8px, 3.5px); opacity: 0; }
+}
+/* Steady bolt that stutters twice, then rests. */
+@keyframes wx-flash {
+  0%, 50%, 100% { opacity: 1; }
+  54% { opacity: .15; }
+  58% { opacity: 1; }
+  62% { opacity: .3; }
+}
+@keyframes wx-twinkle {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(.55); opacity: .5; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-weather-icon .wx {
+    animation: none;
+  }
+}
+
 /* .hero-status-detail: the hover-reveal line each chip appends (see
    hero.js/weather.js/distance.js) — collapsed to nothing at rest,
    revealed on hover/focus. A real interaction, not just a hover color

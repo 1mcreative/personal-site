@@ -20,40 +20,102 @@
   var container = document.querySelector(".hero-status");
   if (!container) return;
 
-  // Small hand-drawn icon set, same stroke language as the rest of this
-  // page's SVGs (currentColor, ~1.6px stroke, round caps) — authored for
-  // this file, not pulled from an icon library, matching how every other
-  // icon here was made.
+  // Animated icon set, per "add weather animations like these"
+  // (Iconscout's Seasons & Weather Lottie pack). That pack is licensed,
+  // JS-rendered, and would make lottie-web this site's first runtime
+  // dependency, so these are hand-built inline SVG moved by the CSS
+  // keyframes in home.css (.wx-*: transform/opacity only, off under
+  // reduced motion) — same zero-dependency approach as every other effect
+  // here. Filled shapes in the site's own blue + amber instead of the old
+  // single-color outlines, since a 16px stroke icon can't carry motion.
+  // Geometry is all on a 24 grid; .wx marks anything a keyframe moves.
+  var AMBER = "#f59e0b";
+  var SKY = "#6ec1ff";
+  var CLOUD_PATH = "M7 19h10a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7 9.5 3.5 3.5 0 0 0 7 19Z";
+  // Cloud body in its own <g> so the placement transform and the drift
+  // keyframe's transform don't overwrite each other (CSS transform
+  // replaces the SVG attribute rather than composing with it).
+  function cloud(place, cls, stroke) {
+    return (
+      '<g transform="' + place + '"><path class="wx ' + cls + '" d="' + CLOUD_PATH +
+      '" fill="#e6f0ff" stroke="' + stroke + '" stroke-width="2" stroke-linejoin="round"/></g>'
+    );
+  }
+  var RAIN_CLOUD = "translate(1.4 -3.4) scale(.9)";
+  var MOON_PATH = "M20.3 14.7A8.5 8.5 0 1 1 11.9 3.5A7 7 0 0 0 20.3 14.7Z";
+  // Four-point sparkle, concave sides, centered on (x, y).
+  function spark(x, y, r, delay) {
+    return (
+      '<path class="wx wx-twinkle" style="animation-delay:' + delay + 's" fill="' + SKY + '" d="M' + x + " " + (y - r) +
+      "Q" + x + " " + y + " " + (x + r) + " " + y + "Q" + x + " " + y + " " + x + " " + (y + r) +
+      "Q" + x + " " + y + " " + (x - r) + " " + y + "Q" + x + " " + y + " " + x + " " + (y - r) + 'Z"/>'
+    );
+  }
+  // All eight rays (even ones a cloud will hide) so the group's bounding
+  // box stays centered on the sun and the spin pivots on it.
+  function rays(cx, cy, from, to) {
+    var d = "";
+    for (var i = 0; i < 8; i++) {
+      var a = (i * Math.PI) / 4;
+      var c = Math.cos(a);
+      var s = Math.sin(a);
+      d += "M" + (cx + c * from).toFixed(2) + " " + (cy + s * from).toFixed(2) +
+        "L" + (cx + c * to).toFixed(2) + " " + (cy + s * to).toFixed(2);
+    }
+    return '<g class="wx wx-spin"><path d="' + d + '" stroke="' + AMBER + '" stroke-width="1.8" stroke-linecap="round"/></g>';
+  }
   var ICONS = {
     sun:
-      '<circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.6"/>' +
-      '<path d="M12 2.5v2.5M12 19v2.5M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2.5 12H5M19 12h2.5M4.2 19.8L6 18M18 6l1.8-1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+      rays(12, 12, 7.2, 9.6) +
+      '<circle class="wx wx-breathe" cx="12" cy="12" r="4.6" fill="' + AMBER + '"/>',
+    moon:
+      '<g class="wx wx-sway"><path d="' + MOON_PATH + '" fill="' + AMBER + '"/></g>' +
+      spark(18, 7.5, 2.6, 0) + spark(21, 3.8, 1.5, -1.1),
     "cloud-sun":
-      '<circle cx="7" cy="7" r="2.8" stroke="currentColor" stroke-width="1.6"/>' +
-      '<path d="M7 2v1.4M7 10.6V12M2 7H0.6M13.4 7H12M3.5 3.5l1 1M3.5 3.5l1 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>' +
-      '<path d="M9 20.5h6.5a3.5 3.5 0 0 0 .5-6.96A5 5 0 0 0 6.8 15.2 3.3 3.3 0 0 0 9 20.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+      rays(8.5, 8.5, 5.1, 7) +
+      '<circle class="wx wx-breathe" cx="8.5" cy="8.5" r="3.4" fill="' + AMBER + '"/>' +
+      cloud("translate(4.3 4.4) scale(.8)", "wx-drift", "currentColor"),
+    "cloud-moon":
+      '<g transform="translate(-.3 -.1) scale(.72)"><g class="wx wx-sway"><path d="' + MOON_PATH + '" fill="' + AMBER + '"/></g></g>' +
+      spark(18.5, 5.5, 2, 0) +
+      cloud("translate(4.3 4.4) scale(.8)", "wx-drift", "currentColor"),
     cloud:
-      '<path d="M7 19h10a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7 9.5 3.5 3.5 0 0 0 7 19Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+      cloud("translate(7.5 .2) scale(.62)", "wx-drift wx-rev", SKY) +
+      cloud("translate(-.4 3.6) scale(.86)", "wx-drift", "currentColor"),
     "cloud-fog":
-      '<path d="M6.5 13.5h9a3.5 3.5 0 0 0 .5-6.96A5 5 0 0 0 6.5 8.5a3 3 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>' +
-      '<path d="M4 17.5h16M6 20.5h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+      cloud("translate(1.9 -3.1) scale(.85)", "wx-drift", "currentColor") +
+      '<g stroke="' + SKY + '" stroke-width="1.8" stroke-linecap="round">' +
+      '<path class="wx wx-fog" d="M4 16.2h13"/>' +
+      '<path class="wx wx-fog wx-rev" d="M8 19.2h12"/>' +
+      '<path class="wx wx-fog" style="animation-delay:-1.2s" d="M5 22.2h9"/></g>',
+    // Precipitation is drawn before the cloud so each drop emerges from
+    // behind its lower edge instead of popping in on top of it.
     "cloud-rain":
-      '<path d="M7 14h10a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7 4.5 3.5 3.5 0 0 0 7 14Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>' +
-      '<path d="M9 17.5l-1.3 3M13 17.5l-1.3 3M17 17.5l-1.3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+      '<g stroke="' + SKY + '" stroke-width="2" stroke-linecap="round">' +
+      '<path class="wx wx-fall" d="M8.2 16.4l-.9 2.6"/>' +
+      '<path class="wx wx-fall" style="animation-delay:-.4s" d="M12.7 16.4l-.9 2.6"/>' +
+      '<path class="wx wx-fall" style="animation-delay:-.75s" d="M17.2 16.4l-.9 2.6"/></g>' +
+      cloud(RAIN_CLOUD, "wx-drift", "currentColor"),
     "cloud-snow":
-      '<path d="M7 14h10a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7 4.5 3.5 3.5 0 0 0 7 14Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>' +
-      '<path d="M8.5 18v3M12 17.5v4M15.5 18v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+      '<g fill="' + SKY + '">' +
+      '<circle class="wx wx-snow" cx="8" cy="17" r="1.3"/>' +
+      '<circle class="wx wx-snow" style="animation-delay:-.9s" cx="12" cy="18.5" r="1.3"/>' +
+      '<circle class="wx wx-snow" style="animation-delay:-1.7s" cx="16" cy="17" r="1.3"/></g>' +
+      cloud(RAIN_CLOUD, "wx-drift", "currentColor"),
     "cloud-lightning":
-      '<path d="M7 13h10a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7 3.5 3.5 3.5 0 0 0 7 13Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>' +
-      '<path d="M13 15.5l-3 4h3l-2 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+      '<g transform="translate(7 12.2) scale(.5)"><path class="wx wx-flash" d="M13 2L4 14h7l-1 8 10-13h-7Z" fill="' + AMBER +
+      '" stroke="' + AMBER + '" stroke-width="2" stroke-linejoin="round"/></g>' +
+      cloud(RAIN_CLOUD, "wx-drift", "currentColor"),
   };
 
   // WMO weather codes (Open-Meteo's `weathercode`) collapsed into the
   // icon set above, grouped the same way Open-Meteo's own docs group
-  // them: https://open-meteo.com/en/docs's weather code table.
-  function iconFor(code) {
-    if (code === 0) return { icon: "sun", label: "Clear" };
-    if (code === 1 || code === 2) return { icon: "cloud-sun", label: "Partly cloudy" };
+  // them: https://open-meteo.com/en/docs's weather code table. `isDay`
+  // comes from the same current_weather block, so a clear 2am doesn't
+  // get a spinning sun.
+  function iconFor(code, isDay) {
+    if (code === 0) return { icon: isDay ? "sun" : "moon", label: "Clear" };
+    if (code === 1 || code === 2) return { icon: isDay ? "cloud-sun" : "cloud-moon", label: "Partly cloudy" };
     if (code === 3) return { icon: "cloud", label: "Overcast" };
     if (code === 45 || code === 48) return { icon: "cloud-fog", label: "Foggy" };
     if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return { icon: "cloud-rain", label: "Rainy" };
@@ -62,10 +124,10 @@
     return { icon: "cloud", label: "Cloudy" };
   }
 
-  function renderChip(temp, code, unit, city) {
+  function renderChip(temp, code, isDay, unit, city) {
     if (typeof temp !== "number" || isNaN(temp)) return;
 
-    var meta = iconFor(code);
+    var meta = iconFor(code, isDay);
     var chip = document.createElement("span");
     chip.className = "hero-status-chip hero-status-chip-dynamic hero-weather-chip";
     if (city) chip.title = meta.label + " in " + city;
@@ -77,7 +139,7 @@
     // instead, since that IS untrusted data from the geolocation API.
     var wrap = document.createElement("span");
     wrap.innerHTML =
-      '<svg class="hero-status-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+      '<svg class="hero-status-icon hero-weather-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
       (ICONS[meta.icon] || ICONS.cloud) +
       "</svg>";
     chip.appendChild(wrap.firstChild);
@@ -116,7 +178,7 @@
       .then(function (json) {
         var cw = json && json.current_weather;
         if (!cw) return;
-        renderChip(cw.temperature, cw.weathercode, unit, city);
+        renderChip(cw.temperature, cw.weathercode, cw.is_day !== 0, unit, city);
       })
       .catch(function () {
         // Weather fetch failed — no chip, no error shown (see top comment).
