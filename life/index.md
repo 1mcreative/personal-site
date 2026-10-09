@@ -244,10 +244,19 @@ permalink: /life/
   </div>
 
   <div class="photo-slider" id="photo-slider">
+    <!-- No loading="lazy" here deliberately: this page makes `body`, not
+         the document, the real scroll container (see personal.css's own
+         html:has() comment), and native lazy-loading has real, documented
+         cross-browser bugs recognizing "near the viewport" inside a
+         non-default scroll root — confirmed as the cause of a real report
+         (photo never loading on a real desktop browser, reproduced with
+         cache and timing both ruled out). With a handful of photos, eager
+         loading is cheap; revisit with a real IntersectionObserver if the
+         album grows large enough that this starts to matter. -->
     {% if photos.size > 0 %}
       {% for photo in photos %}
       <button type="button" class="photo-slide" data-photo-open data-full="{{ photo.src }}" data-caption="{{ photo.caption | default: '' | escape }}" data-location="{{ photo.location | default: '' | escape }}" data-date="{{ photo.date | default: '' | escape }}">
-        <img src="{{ photo.src }}" alt="{{ photo.alt | default: '' }}" loading="lazy" decoding="async" width="170" height="170" draggable="false"{% if photo.offsetY %} style="--offset-y: {{ photo.offsetY }}px"{% endif %}>
+        <img src="{{ photo.src }}" alt="{{ photo.alt | default: '' }}" decoding="async" width="170" height="170" draggable="false"{% if photo.offsetY %} style="--offset-y: {{ photo.offsetY }}px"{% endif %}>
       </button>
       {% endfor %}
     {% else %}
