@@ -125,17 +125,21 @@ main#main,
    comes from each theme's own --surface/--border custom properties
    (already defined per theme for other components), so no per-theme
    override is needed here.
-   Pushed more transparent still (32%→16%→9%→4%) plus a stronger blur/
+   Pushed more transparent still (32%→16%→9%→4%→0%) plus a stronger blur/
    saturate each round, per repeated direct "more transparent, more like
-   glass" feedback. At 4% the background tint is nearly nothing — the
-   pill's shape now reads almost entirely off the box-shadow stack, not
-   the fill: an inset bright line along the top edge (light catching the
-   rim, the signature iOS highlight), a second fainter highlight tracing
-   the whole edge for a lensed/beveled feel, and a darker inset along the
-   bottom (the underside of the same bevel), all in white/black
-   regardless of theme (this is how iOS does it on dark glass too, not
-   just light) — plus a soft outer shadow so the pill still reads as a
-   lifted, lensed surface instead of just vanishing into the page. */
+   glass" feedback. The rotating ring tried in an earlier pass read as a
+   loading-spinner, not glass — dropped per direct "circular animation is
+   not looking good" feedback. The "this is glass, and it's alive" signal
+   now comes from the top rim highlight itself slowly breathing (a plain
+   opacity pulse via `@property --glass-shine`, not a second element) —
+   just the edge brightening and dimming like light shifting across a
+   lensed surface, nothing that reads as a spinner. Blur/saturate also
+   eased back down twice now (42px/230%→20px/160%→8px/115%), per repeated
+   "more transparent" feedback landing on "like clear glass" specifically
+   — frosted glass blurs what's behind it into soft color; clear glass
+   barely blurs at all, just a slight refraction, so blur had to come
+   down close to a window-pane minimum rather than a frosted-shower-door
+   one. Every edge/shadow opacity trimmed again to match. */
 .site-header,
 .lab-header {
   position: fixed;
@@ -145,17 +149,68 @@ main#main,
   z-index: 90;
   width: calc(100% - var(--space-3) * 2);
   max-width: var(--max-width);
-  border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 2%, transparent);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 4%, transparent);
+  background: transparent;
+  /* A plain, always-on ring — the resting edge definition every browser
+     sees, animated or not. */
   box-shadow:
-    inset 0 1px 0 color-mix(in srgb, white 60%, transparent),
-    inset 0 0 0 1px color-mix(in srgb, white 16%, transparent),
-    inset 0 -1px 1px color-mix(in srgb, black 12%, transparent),
-    0 8px 32px color-mix(in srgb, black 18%, transparent);
-  backdrop-filter: blur(38px) saturate(220%);
-  -webkit-backdrop-filter: blur(38px) saturate(220%);
+    inset 0 0 0 1px color-mix(in srgb, white 14%, transparent),
+    0 8px 32px color-mix(in srgb, black 3%, transparent);
+  backdrop-filter: blur(2px) saturate(105%);
+  -webkit-backdrop-filter: blur(2px) saturate(105%);
   transition: transform 0.3s var(--ease);
+}
+
+/* The breathing pulse read as decoration with no reason behind it, per
+   direct "not meaningful" feedback — real glass doesn't glow on a timer,
+   it catches light differently depending on where you're looking from.
+   This is the CSS-only stand-in for that: assets/js/nav-autohide.js
+   tracks the pointer and writes its position into --glass-mx/--glass-my
+   (same "cursor position drives a custom property" technique
+   .spotlight-text already uses elsewhere on this site), and this ring —
+   masked to just the border band, same two-layer content-box/exclude
+   trick used sitewide for "paint only the edge" — reads a bright glint
+   from a radial gradient centered there. Move the cursor near the nav
+   and the glint slides along the rim toward it, like light actually
+   grazing a glass edge; move away and it fades. Hidden outright for
+   touch/no-hover visitors (nav-autohide.js never sets the properties,
+   and `hover:hover` below covers anyone whose pointer can't move without
+   also tapping) and under reduced motion, where a moving highlight would
+   be exactly the kind of motion that preference is asking to skip. */
+.site-header::before,
+.lab-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    120px 120px at var(--glass-mx, 50%) var(--glass-my, 0%),
+    color-mix(in srgb, white 95%, transparent),
+    transparent 70%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .site-header:hover::before,
+  .lab-header:hover::before {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header::before,
+  .lab-header::before {
+    display: none;
+  }
 }
 
 /* Hides on scroll-down, returns on scroll-up (assets/js/nav-autohide.js) —
@@ -173,6 +228,24 @@ main#main,
   font-size: 1.15rem;
   text-decoration: none;
   letter-spacing: -0.01em;
+}
+
+/* Legibility floor for text sitting directly on the glass pill (the brand
+   mark, and any plain-text nav link with no button backing of its own —
+   .offset-btn/.galaxy-button already paint their own solid/near-solid
+   fill, so they don't need this). A blurred text-shadow halo here read as
+   exactly what it was — a dark glow stamped behind the letters to force
+   contrast — per direct "it looks bad" feedback. A thin, crisp stroke
+   (no blur radius) reads as the glyph's own edge instead of an added
+   effect, the same way subtitle text or an embossed label stays legible
+   over a photo without needing a visible shadow: the stroke, in the
+   page's own --bg, is what guarantees contrast against literally
+   anything behind the clear glass. */
+.brand,
+.site-header nav a:not(.offset-btn):not(.galaxy-button),
+.lab-header nav a {
+  -webkit-text-stroke: 0.6px var(--bg);
+  paint-order: stroke fill;
 }
 
 .site-header nav a,
