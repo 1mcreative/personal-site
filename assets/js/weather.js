@@ -110,97 +110,131 @@
 
   // Characters, per "add some character like" the Iconscout man-fighting-a-
   // thunderstorm Lottie (that page sits behind a bot check, so this is built
-  // from the idea, not the file). Tablet-and-up widget only (home.css
-  // .hero-weather-scene): each condition is a 76x64 scene (drawn at 92x77) where one
-  // pictogram person reacts to the weather. Shades and a wave in the sun, a
-  // sleepy nod under the moon, a walk through cloud and fog, an umbrella in
-  // the rain, a shiver in the snow, and a lean into the wind with a
-  // blown-about umbrella under lightning. Same hand-built SVG + CSS
-  // keyframes as the icons above; the compact mobile chip keeps the icons.
+  // from the idea, not the file), then "animation can be improved for the
+  // character". The first pass was a front-facing pictogram whose straight
+  // stick limbs scissored sideways. This one is drawn in profile, facing
+  // the way it walks, with a knee and an elbow on every limb, so the motion
+  // can be a real walk cycle (home.css .wxw-*): heel strike, knee flex
+  // through the swing, arms in antiphase with the legs, body lowest at
+  // contact and highest at passing, and ground dashes sized to the stride
+  // so the feet don't skate. Acting sits on top of that rig: blinking, a
+  // scarf that streams behind, a head that nods off, looks up or sets
+  // against the wind, a wave, a shiver, a gust that tugs the umbrella in
+  // time with the lightning. One person, a different performance per
+  // condition. Tablet and up only (home.css .hero-weather-scene); the
+  // compact mobile chip keeps the icons above.
   var INK = "#1f2733";
+  var INK_FAR = "#121821";
   var SKIN = "#f5cfa8";
+  var SKIN_FAR = "#e6b48a";
   var SHIRT = "#1d4ed8";
+  var SHIRT_FAR = "#1b42ad";
   var ROUND = ' stroke-linecap="round" stroke-linejoin="round"';
-  var STILL = "animation:none";
-  var WALK = "--a:24deg;animation-duration:.9s";
-  var WALK_B = WALK + ";animation-delay:-.45s";
-  // The outer <g> puts a joint at (x, y); the inner .wxc group rotates
-  // about its own origin (home.css), so a limb drawn hanging from (0, 0)
-  // swings about the shoulder or hip. --r is the resting angle, --a the
-  // swing around it, set inline per limb.
-  function pivot(x, y, vars, inner) {
-    return '<g transform="translate(' + x + " " + y + ')"><g class="wxc wxc-osc" style="' + vars + '">' + inner + "</g></g>";
+  var HOLD = "animation:none";
+  function line(col, w, d) {
+    return '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + w + '"' + ROUND + "/>";
   }
-  function leg(x, vars) {
-    return pivot(x, -15, vars, '<path d="M0 0V15" stroke="' + INK + '" stroke-width="3.4"' + ROUND + "/>");
+  // The outer <g> puts a joint at (x, y); the inner .wxc group rotates about
+  // its own origin (home.css), so anything drawn hanging from (0, 0) swings
+  // about that joint. --r is the resting angle, set inline; a class adds the
+  // motion. Joints nest (hip > knee, shoulder > elbow), so a limb's angle is
+  // always relative to the segment above it.
+  function joint(x, y, cls, vars, inner) {
+    return '<g transform="translate(' + x + " " + y + ')"><g class="wxc ' + cls + '" style="' + vars + '">' + inner + "</g></g>";
   }
-  function arm(x, vars) {
-    return pivot(x, -27.5, vars,
-      '<path d="M0 0V8.5" stroke="' + SHIRT + '" stroke-width="3.2"' + ROUND + '/><circle cy="10.4" r="1.9" fill="' + SKIN + '"/>');
+  // Hip at (0, -15): thigh 7.6, shin 7.4, a shoe pointing forward (+x).
+  // "far" is the limb behind the body: darker, and half a cycle out of phase.
+  function leg(far, tc, tv, sc, sv) {
+    var col = far ? INK_FAR : INK;
+    return joint(0, -15, tc, tv, line(col, 3.4, "M0 0V7.6") + joint(0, 7.6, sc, sv, line(col, 3.2, "M0 0V7.4M0 7.4H3.8")));
   }
-  var TORSO = '<rect x="-5.8" y="-30" width="11.6" height="16.5" rx="4.2" fill="' + SHIRT + '"/>';
-  var EYES = '<circle cx="-1.9" cy="-35.6" r=".8" fill="' + INK + '"/><circle cx="1.9" cy="-35.6" r=".8" fill="' + INK + '"/>';
-  var MOUTH = '<path d="M-1.5 -33.3q1.5 1.3 3 0" fill="none" stroke="' + INK + '" stroke-width=".8"' + ROUND + "/>";
-  var FACES = {
-    smile: EYES + MOUTH,
-    shades:
-      '<g fill="' + INK + '"><rect x="-5" y="-37.2" width="4.3" height="3" rx="1.3"/><rect x=".7" y="-37.2" width="4.3" height="3" rx="1.3"/>' +
-      '<rect x="-1" y="-36.4" width="2" height=".8"/></g>' + MOUTH,
-    sleep:
-      '<path d="M-3.2 -35.6q1.3 1 2.6 0M.6 -35.6q1.3 1 2.6 0" fill="none" stroke="' + INK + '" stroke-width=".8"' + ROUND + "/>" +
-      '<circle cy="-33" r=".7" fill="' + INK + '"/>',
-    grit:
-      EYES + '<path d="M-3.6 -37.4l2.6 .8M3.6 -37.4l-2.6 .8" fill="none" stroke="' + INK + '" stroke-width=".8"' + ROUND + "/>" +
-      '<circle cy="-33" r="1" fill="' + INK + '"/>',
+  // Shoulder at (.4, -27.6): upper arm 6.2 in shirt, forearm 5.2 and hand in skin.
+  function arm(far, uc, uv, fc, fv) {
+    var skin = far ? SKIN_FAR : SKIN;
+    return joint(0.4, -27.6, uc, uv, line(far ? SHIRT_FAR : SHIRT, 3.1, "M0 0V6.2") +
+      joint(0, 6.2, fc, fv, line(skin, 2.6, "M0 0V5.2") + '<circle cy="6.4" r="1.7" fill="' + skin + '"/>'));
+  }
+  var WALK = {
+    legF: leg(true, "wxw-thigh wxw-far", "", "wxw-shin wxw-far", ""),
+    legN: leg(false, "wxw-thigh", "", "wxw-shin", ""),
+    armF: arm(true, "wxw-arm wxw-far", "", "wxw-fore wxw-far", ""),
+    armN: arm(false, "wxw-arm", "", "wxw-fore", ""),
   };
-  function head(face) {
-    return (
-      '<circle cy="-36.5" r="5.4" fill="' + SKIN + '"/>' +
-      '<path d="M-5.5 -37A5.5 5.5 0 0 1 5.5 -37C3.2 -40 -2.8 -40 -5.5 -37Z" fill="' + INK + '"/>' + FACES[face]
-    );
+  var STILL = {
+    legF: leg(true, "", "--r:2deg;" + HOLD, "", "--r:0deg;" + HOLD),
+    legN: leg(false, "", "--r:-2deg;" + HOLD, "", "--r:0deg;" + HOLD),
+    armF: arm(true, "", "--r:5deg;" + HOLD, "", "--r:-10deg;" + HOLD),
+    armN: arm(false, "", "--r:-4deg;" + HOLD, "", "--r:-10deg;" + HOLD),
+  };
+  // Arms folded across the chest (snow) and the arm that holds an umbrella.
+  var HUG_F = arm(true, "", "--r:-24deg;" + HOLD, "", "--r:158deg;" + HOLD);
+  var HUG_N = arm(false, "", "--r:-28deg;" + HOLD, "", "--r:160deg;" + HOLD);
+  var UMB_ARM = arm(false, "", "--r:-100deg;" + HOLD, "", "--r:-45deg;" + HOLD);
+  var TORSO = '<rect x="-4.4" y="-30" width="8.8" height="16" rx="3.8" fill="' + SHIRT + '"/>';
+  var SKULL =
+    '<circle cx="1" cy="-36.6" r="5.3" fill="' + SKIN + '"/><circle cx="6.2" cy="-36" r="1" fill="' + SKIN + '"/>' +
+    '<circle cx=".2" cy="-36" r="1.2" fill="' + SKIN_FAR + '"/>' +
+    '<path d="M-4.3 -36.4A5.4 5.4 0 0 1 6.3 -38.3C4.6 -38.2 3 -37.6 2 -36.2C.6 -37.1 -1.5 -37.5 -4.3 -36.4Z" fill="' + INK + '"/>';
+  var EYE = '<circle class="wx wxs-blink" cx="3.8" cy="-37" r=".85" fill="' + INK + '"/>';
+  var SMILE = line(INK, 0.7, "M3.7 -34.3q1.1 .7 2.2 0");
+  var FACES = {
+    smile: EYE + SMILE,
+    shades: '<rect x="2.4" y="-38.6" width="4.6" height="3" rx="1.3" fill="' + INK + '"/>' + line(INK, 0.8, "M2.4 -37.4L-2.6 -37.9") + SMILE,
+    sleep: line(INK, 0.8, "M2.7 -37q1.1 .9 2.2 0") + '<circle cx="5" cy="-34.2" r=".65" fill="' + INK + '"/>',
+    grit: EYE + line(INK, 0.8, "M2.3 -38.9l3 .9") + line(INK, 0.9, "M3.6 -34.3h2.4"),
+  };
+  // The head pivots at the neck so it can nod or look up; its own coordinates
+  // are the figure's, shifted back by the pivot.
+  function head(face, cls, vars) {
+    return joint(0.8, -31.6, cls || "", vars || "--r:0deg;" + HOLD, '<g transform="translate(-0.8 31.6)">' + SKULL + FACES[face] + "</g>");
   }
-  var SCARF = '<rect x="-6.4" y="-31.8" width="12.8" height="3.4" rx="1.7" fill="' + SKY + '"/>';
+  var SCARF = '<rect x="-4.7" y="-32.3" width="9.4" height="3.4" rx="1.7" fill="' + SKY + '"/>';
   function scarfTail(vars) {
-    return pivot(-3.4, -29.6, vars, '<path d="M0 0q-3.8 3.4-1.8 9" fill="none" stroke="' + SKY + '" stroke-width="2.6"' + ROUND + "/>");
+    return joint(-3.9, -30.4, "wxc-osc", vars, line(SKY, 2.6, "M0 0q-4.2 .6 -6.4 4.4"));
   }
+  var GLINT = '<path class="wx wxs-glint" d="M5.6 -40.2L6.2 -38.8 7.6 -38.2 6.2 -37.6 5.6 -36.2 5 -37.6 3.6 -38.2 5 -38.8Z" fill="#fff"/>';
+  var BREATH = [0, 0.6, 1.2].map(function (d) {
+    return '<circle class="wx wxs-breath" style="animation-delay:-' + d + 's" cx="7.4" cy="-34.4" r="1.1" fill="' + SKY + '"/>';
+  }).join("");
   var CANOPY =
     '<path d="M-14 -14Q-12 -24 0 -25Q12 -24 14 -14Q10.5 -16.6 7 -14Q3.5 -16.6 0 -14Q-3.5 -16.6 -7 -14Q-10.5 -16.6 -14 -14Z" fill="' + AMBER + '"/>' +
-    '<path d="M0 -25V-14" stroke="rgba(20,23,28,.28)" stroke-width=".8"/>';
-  // Held in the near hand at (8, -32): pole and canopy rotate about it.
-  // flutter also squashes the canopy as the wind catches it.
-  function umbrella(vars, flutter) {
-    return (
-      '<path d="M5.2 -27.5L8 -32" stroke="' + SHIRT + '" stroke-width="3.2"' + ROUND + "/>" +
-      pivot(8, -32, vars,
-        '<path d="M0 4V-14" stroke="' + INK + '" stroke-width="1.2"' + ROUND + "/>" +
-        (flutter ? '<g class="wx wxs-flutter">' + CANOPY + "</g>" : CANOPY) +
-        '<circle r="1.9" fill="' + SKIN + '"/>')
-    );
+    line("rgba(20,23,28,.28)", 0.8, "M0 -25V-14");
+  // Held in the hand at (10.2, -33.9) (where UMB_ARM ends): `lean` is the slow
+  // movement (a sway, or the gust's pull), `shake` the fast one; flutter
+  // squashes the canopy as the wind catches it.
+  function umbrella(lean, shake, flutter) {
+    return joint(10.2, -33.9, lean[0], lean[1],
+      joint(0, 0, shake[0], shake[1], line(INK, 1.2, "M0 4V-14") + (flutter ? '<g class="wx wxs-flutter">' + CANOPY + "</g>" : CANOPY) +
+        '<circle r="1.8" fill="' + SKIN + '"/>'));
   }
   function zzz() {
     var out = "";
-    [[6, -44, 0.9, 0], [10, -49, 0.7, -0.9], [13, -53, 0.55, -1.8]].forEach(function (z) {
+    [[7, -44, 0.9, 0], [11, -49, 0.7, -0.9], [14, -53, 0.55, -1.8]].forEach(function (z) {
       out +=
         '<g transform="translate(' + z[0] + " " + z[1] + ") scale(" + z[2] + ')"><path class="wx wxs-zzz" style="animation-delay:' + z[3] +
         's" d="M0 0h4.6l-4.6 5.6h4.6" fill="none" stroke="' + SKY + '" stroke-width="1.3"' + ROUND + "/></g>";
     });
     return out;
   }
-  // The figure stands on the ground line at x. The body group's own class
-  // (bob, shiver, lean) moves the whole figure about the feet while the
-  // shadow stays put outside it.
-  function who(x, body, cls, vars) {
+  // Back to front: far limbs, torso, scarf, head, near leg and arm, props.
+  function fig(p) {
+    return p.legF + p.armF + TORSO + (p.scarf || "") + head(p.face, p.hc, p.hv) + p.legN + p.armN + (p.props || "");
+  }
+  // Stands the figure on the ground at x. The outer group leans or gusts it
+  // about the feet; the inner one carries the bob (walk), shiver or breathing,
+  // and the --T / --k (cycle length, stride size) every walking limb inherits.
+  function who(x, body, lean, bob) {
     return (
-      '<g transform="translate(' + x + ' 60) scale(.78)"><ellipse cy=".6" rx="9.5" ry="1.7" fill="rgba(20,23,28,.12)"/>' +
-      '<g class="wxc ' + cls + '" style="' + vars + '">' + body + "</g></g>"
+      '<g transform="translate(' + x + ' 60) scale(.78)"><ellipse cy=".6" rx="9" ry="1.6" fill="rgba(20,23,28,.12)"/>' +
+      '<g class="wxc ' + lean[0] + '" style="' + lean[1] + '"><g class="' + bob[0] + '" style="' + bob[1] + '">' + body + "</g></g></g>"
     );
   }
-  function walker(x) {
+  function walker(x, T, k, o) {
+    o = o || {};
     return who(
       x,
-      leg(-2.6, WALK) + leg(2.6, WALK_B) + arm(-5.2, "--a:20deg;animation-duration:.9s;animation-delay:-.45s") +
-        TORSO + head("smile") + arm(5.2, "--a:20deg;animation-duration:.9s"),
-      "wxc-bob", "animation-duration:.45s"
+      fig({ legF: WALK.legF, legN: WALK.legN, armF: WALK.armF, armN: o.armN || WALK.armN, face: o.face || "smile", hc: o.hc, hv: o.hv, scarf: o.scarf, props: o.props }),
+      ["", "--r:3deg;" + HOLD], ["wxw-bob", "--T:" + T + "s;--k:" + k]
     );
   }
   // Rain streaks fall from under the cloud bank to the ground, each loop
@@ -234,52 +268,68 @@
     );
   }
   var GROUND = '<path d="M3 61H73" stroke="rgba(20,23,28,.16)" stroke-width="1.2"' + ROUND + "/>";
-  // Dashes slide left under a walker (wxs-ground) so the walk goes somewhere.
-  var TREAD = '<path class="wxs-ground" d="M3 61H73" stroke="rgba(20,23,28,.26)" stroke-width="1.2" stroke-dasharray="5 6" stroke-linecap="round"/>';
+  // Dashes slide left under a walker: two dash periods per stride cycle (T
+  // seconds, stride k), so the loop is seamless and the planted foot keeps
+  // pace with the ground instead of skating over it.
+  function ground(T, k) {
+    var p = 11 * k;
+    return (
+      '<path class="wxs-ground" style="--gs:' + (2 * p).toFixed(2) + "px;animation-duration:" + T + 's" d="M3 61H73" stroke="rgba(20,23,28,.26)" stroke-width="1.2" stroke-dasharray="' +
+      (5 * k).toFixed(2) + " " + (6 * k).toFixed(2) + '" stroke-linecap="round"/>'
+    );
+  }
   var WIND = [32, 42, 51].map(function (y, i) {
     return (
       '<g transform="translate(70 ' + y + ')"><path class="wx wxs-wind" style="animation-delay:-' + (i * 0.27).toFixed(2) +
       's" d="M0 0h' + (12 + i * 3) + '" stroke="' + SKY + '" stroke-width="1.2"' + ROUND + "/></g>"
     );
   }).join("");
+  var RIPPLES = [[10, 0], [38, 0.8]].map(function (r) {
+    return '<ellipse class="wx wxs-ripple" style="animation-delay:-' + r[1] + 's" cx="' + r[0] + '" cy="60.8" rx="4" ry="1" fill="none" stroke="' + SKY + '" stroke-width=".8"/>';
+  }).join("");
+  var FOG =
+    '<g fill="rgba(214,229,247,.8)"><rect class="wx wxs-fog" x="2" y="34" width="34" height="4.4" rx="2.2"/>' +
+    '<rect class="wx wxs-fog wx-rev" style="animation-delay:-1.4s" x="30" y="43" width="40" height="4.4" rx="2.2"/>' +
+    '<rect class="wx wxs-fog" style="animation-delay:-2.6s" x="8" y="52" width="38" height="4.4" rx="2.2"/></g>';
   var SCENES = {
+    // Waving hello in shades, a glint off the lens now and then.
     sun:
       piece("sun", "translate(42 1) scale(1.1)") + GROUND +
-      who(22, leg(-2.6, STILL) + leg(2.6, STILL) + arm(-5.2, "--r:8deg;--a:4deg;animation-duration:2.4s") + TORSO +
-        head("shades") + arm(5.2, "--r:-140deg;--a:22deg;animation-duration:.75s"), "wxc-bob", "animation-duration:1.8s"),
+      who(24, fig({ legF: STILL.legF, legN: STILL.legN, armF: arm(true, "wxc-osc", "--r:6deg;--a:3deg;animation-duration:2.6s", "", "--r:-10deg;" + HOLD),
+          armN: arm(false, "", "--r:-100deg;" + HOLD, "wxc-osc", "--r:-35deg;--a:20deg;animation-duration:.55s"), face: "shades", props: GLINT }),
+        ["", "--r:2deg;" + HOLD], ["wxs-idle", ""]),
+    // Nodding off: a slow droop, a jerk awake, Zzz, and a breathing chest.
     moon:
       piece("moon", "translate(44 -1) scale(1.05)") + GROUND +
-      who(22, leg(-2.6, STILL) + leg(2.6, STILL) + arm(-5.2, "--r:5deg;" + STILL) + TORSO +
-        pivot(0, -31, "--a:7deg;animation-duration:2.8s", '<g transform="translate(0 31)">' + head("sleep") + "</g>") +
-        arm(5.2, "--r:-5deg;" + STILL) + zzz(), "wxc-bob", "animation-duration:2.8s"),
-    "cloud-sun": piece("cloud-sun", "translate(38 -1) scale(1.3)") + TREAD + walker(22),
-    "cloud-moon": piece("cloud-moon", "translate(38 -1) scale(1.3)") + TREAD + walker(22),
-    cloud: piece("cloud", "translate(36 0) scale(1.35)") + TREAD + walker(22),
-    // Bands drawn after the walker, so the figure is hazy behind them.
-    "cloud-fog":
-      cloud("translate(38 -1) scale(1.3)", "wx-drift", "currentColor") + TREAD + walker(24) +
-      '<g fill="rgba(214,229,247,.8)"><rect class="wx wxs-fog" x="2" y="34" width="34" height="4.4" rx="2.2"/>' +
-      '<rect class="wx wxs-fog wx-rev" style="animation-delay:-1.4s" x="30" y="43" width="40" height="4.4" rx="2.2"/>' +
-      '<rect class="wx wxs-fog" style="animation-delay:-2.6s" x="8" y="52" width="38" height="4.4" rx="2.2"/></g>',
+      who(24, fig({ legF: STILL.legF, legN: STILL.legN, armF: STILL.armF, armN: STILL.armN, face: "sleep", hc: "wxs-nod", hv: "--T:3.6s", props: zzz() }),
+        ["", "--r:1deg;" + HOLD], ["wxs-breathe", ""]),
+    "cloud-sun": piece("cloud-sun", "translate(38 -1) scale(1.3)") + ground(0.9, 1) + walker(24, 0.9, 1),
+    "cloud-moon": piece("cloud-moon", "translate(38 -1) scale(1.3)") + ground(1, 0.9) + walker(24, 1, 0.9),
+    // Strolling with a glance up at the clouds.
+    cloud: piece("cloud", "translate(36 0) scale(1.35)") + ground(1, 0.9) + walker(24, 1, 0.9, { hv: "--r:-10deg;" + HOLD }),
+    // Fog bands are drawn last, so the figure is hazy behind them.
+    "cloud-fog": cloud("translate(38 -1) scale(1.3)", "wx-drift", "currentColor") + ground(1.2, 0.8) + walker(24, 1.2, 0.8) + FOG,
     "cloud-rain":
-      bank() + drops(9, "M0 0l-1.4 4.4", 8, 70, 0.85, "--dx:-6px") + TREAD +
-      who(26, leg(-2.6, WALK) + leg(2.6, WALK_B) + arm(-5.2, "--a:16deg;animation-duration:.9s;animation-delay:-.45s") +
-        TORSO + head("smile") + umbrella("--r:-4deg;--a:3deg;animation-duration:1.8s"), "wxc-bob", "animation-duration:.45s"),
+      bank() + drops(9, "M0 0l-1.4 4.4", 8, 70, 0.85, "--dx:-6px") + RIPPLES + ground(0.85, 0.95) +
+      walker(24, 0.85, 0.95, { armN: UMB_ARM, props: umbrella(["wxc-osc", "--r:-3deg;--a:2.5deg;animation-duration:1.7s"], ["", "--r:0deg;" + HOLD], false) }),
+    // Stamping in place with arms wrapped round, shivering, breath puffing.
     "cloud-snow":
       bank() + flakes(9) + GROUND +
-      who(26, leg(-2.6, STILL) + leg(2.6, STILL) + TORSO + SCARF + scarfTail("--a:10deg;animation-duration:1.4s") + head("smile") +
-        arm(-5.2, "--r:-58deg;" + STILL) + arm(5.2, "--r:58deg;" + STILL), "wxc-shiver", ""),
-    // The reference's scene: heavy slanted rain, wind streaks, a flashing
-    // bolt with a warm glow behind it, and a figure leaning into it all,
-    // umbrella wrenched sideways and flapping.
+      who(24, fig({ legF: WALK.legF, legN: WALK.legN, armF: HUG_F, armN: HUG_N, face: "smile", scarf: SCARF + scarfTail("--r:-8deg;--a:7deg;animation-duration:1.4s"), props: BREATH }),
+        ["", "--r:2deg;" + HOLD], ["wxc-shiver", "--T:.7s;--k:.3"]),
+    // The reference's scene: heavy slanted rain, wind streaks, a bolt with a
+    // warm glow, and a figure leaning into it all with a scarf streaming and
+    // the umbrella wrenched back. Gust, bolt and glow share one 3.4s loop, so
+    // the wind shoves just as the lightning strikes.
     "cloud-lightning":
       '<circle class="wxs-glow" cx="58" cy="24" r="16" fill="' + AMBER + '"/>' + bank("#c7d4ec") +
-      '<g transform="translate(46 15) scale(.95)"><path class="wx wx-flash" d="M13 2L4 14h7l-1 8 10-13h-7Z" fill="' + AMBER +
+      '<g transform="translate(46 15) scale(.95)"><path class="wx wxs-bolt" d="M13 2L4 14h7l-1 8 10-13h-7Z" fill="' + AMBER +
       '" stroke="' + AMBER + '" stroke-width="1.6" stroke-linejoin="round"/></g>' +
-      drops(12, "M0 0l-3.2 4.4", 10, 76, 0.55, "--dx:-14px") + WIND + GROUND +
-      who(24, leg(-2.6, "--r:10deg;--a:5deg;animation-duration:.3s") + leg(2.6, "--r:-8deg;--a:5deg;animation-duration:.3s;animation-delay:-.15s") +
-        arm(-5.2, "--r:72deg;--a:12deg;animation-duration:.4s") + TORSO + SCARF + scarfTail("--r:62deg;--a:16deg;animation-duration:.3s") +
-        head("grit") + umbrella("--r:-26deg;--a:11deg;animation-duration:.35s", true), "wxc-osc", "--r:9deg;--a:1.6deg;animation-duration:.28s"),
+      drops(12, "M0 0l-3.2 4.4", 10, 76, 0.55, "--dx:-14px") + WIND + ground(0.62, 0.55) +
+      who(24, fig({ legF: WALK.legF, legN: WALK.legN, armF: arm(true, "wxc-osc", "--r:70deg;--a:10deg;animation-duration:.62s", "", "--r:-30deg;" + HOLD),
+          armN: UMB_ARM, face: "grit", scarf: SCARF + scarfTail("--r:58deg;--a:14deg;animation-duration:.3s"),
+          props: umbrella(["wxs-pull", "--r:-20deg"], ["wxc-osc", "--r:0deg;--a:8deg;animation-duration:.3s"], true) }),
+        ["wxs-gust", "--r:12deg"], ["wxw-bob", "--T:.62s;--k:.55"]),
   };
 
   // WMO weather codes (Open-Meteo's `weathercode`) collapsed into the

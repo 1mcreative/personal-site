@@ -1282,17 +1282,45 @@
   gap: var(--space-1);
 }
 
-/* flex-wrap + max-width: the weather widget is wider than a pill, and at
-   768px (iPad portrait) a long distance label ("6,999 km · a long flight
-   away") would run the row into .hero-bored-trigger. The cap reserves
-   that button's corner; past it the last chip drops to a second line
-   instead of overlapping. Wider screens never reach the cap. */
+/* Tablet and up: a two-by-two "bento" instead of a row. The weather widget
+   is a tall tile with a character scene in it, and next to the small clock
+   and distance pills it read as lopsided, the pills floating against the
+   middle of its height. Now the tile spans two rows in the first column and
+   the pills stack in the second (two 40px rows), so the cluster is one
+   rectangle whose top and bottom edges line up (40 + 8 gap + 40 = the
+   tile's 88px). The tile goes first on purpose: a pill's hover reveal grows
+   it to the right, and with the pills in the last column that growth
+   pushes nothing. The cost is that the pills move over when the tile
+   arrives, which normally happens while the intro splash still covers the
+   hero. Without a tile (weather failed or not here yet) the pills take the
+   first column themselves. */
 @media (min-width: 768px) {
   .hero-status {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    max-width: calc(100% - 210px);
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: repeat(2, 40px);
+    align-items: stretch;
+    justify-items: start;
+  }
+
+  .hero-weather-chip {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .hero-clock-chip {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .hero-distance-chip {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .hero-status:not(:has(.hero-weather-chip)) .hero-clock-chip,
+  .hero-status:not(:has(.hero-weather-chip)) .hero-distance-chip {
+    grid-column: 1;
   }
 }
 
@@ -1477,7 +1505,7 @@
 /* Weather widget (tablet and up), per "put lil big like widgets... widgets
    like animation in desktop and tab view" and then "add some character":
    the chip becomes a rounded card holding a character scene (a 76x64 SVG
-   drawn at 92x77; built in weather.js, see SCENES) with a big temperature
+   drawn at 90x76; built in weather.js, see SCENES) with a big temperature
    and the condition always visible beside it (the compact chip only
    reveals it on hover, which touch tablets can't do anyway). A light tint
    keyed off data-wx (amber for sun, indigo for moon, sky blue for
@@ -1512,32 +1540,133 @@
   white-space: pre;
 }
 
-/* Character rig (weather.js: pivot/leg/arm/who). .wxc rotates about its
-   own origin, which weather.js places on the joint (shoulder, hip, hand,
-   feet), so --r is a resting pose and --a a swing around it; walking,
-   waving, flapping and leaning are all this one keyframe with different
-   numbers set inline. */
+/* Character rig (weather.js: joint/leg/arm/who). .wxc rotates about its own
+   origin, which weather.js places on a joint (hip, knee, shoulder, elbow,
+   neck, hand, feet), so --r is a resting pose and a class adds motion.
+   --T (cycle length) and --k (stride size) are set once on the figure and
+   inherited by every limb. */
 .wxc {
   transform-box: view-box;
   transform-origin: 0 0;
   transform: rotate(var(--r, 0deg));
 }
 
+/* Walk cycle. Angles are CSS rotations of a limb hanging straight down on a
+   figure facing right, so negative swings forward and positive swings back.
+   Stance is the first half (the planted foot travelling back under the
+   body), swing the second (the knee folds to clear the ground, then the
+   leg extends for the next heel strike). Arms counter-swing, the elbow
+   closing as the arm comes forward. The far limbs run half a cycle behind
+   (.wxw-far). The body is lowest at heel strike and highest at passing,
+   which is what keeps the planted foot on the ground as the leg's reach
+   changes; the ground dashes (wxs-ground) move at the matching speed. */
+.wxw-thigh { animation: wxw-thigh var(--T, 0.9s) linear infinite; }
+.wxw-shin { animation: wxw-shin var(--T, 0.9s) ease-in-out infinite; }
+.wxw-arm { animation: wxw-arm var(--T, 0.9s) ease-in-out infinite; }
+.wxw-fore { animation: wxw-fore var(--T, 0.9s) ease-in-out infinite; }
+.wxw-bob { animation: wxw-bob calc(var(--T, 0.9s) / 2) ease-in-out infinite; }
+.wxw-far { animation-delay: calc(var(--T, 0.9s) / -2); }
+
+@keyframes wxw-thigh {
+  0% { transform: rotate(calc(var(--k, 1) * -24deg)); }
+  50% { transform: rotate(calc(var(--k, 1) * 22deg)); animation-timing-function: ease-in-out; }
+  100% { transform: rotate(calc(var(--k, 1) * -24deg)); }
+}
+@keyframes wxw-shin {
+  0% { transform: rotate(calc(var(--k, 1) * 4deg)); }
+  18% { transform: rotate(calc(var(--k, 1) * 12deg)); }
+  40% { transform: rotate(calc(var(--k, 1) * 4deg)); }
+  50% { transform: rotate(calc(var(--k, 1) * 28deg)); }
+  62% { transform: rotate(calc(var(--k, 1) * 66deg)); }
+  78% { transform: rotate(calc(var(--k, 1) * 40deg)); }
+  92% { transform: rotate(calc(var(--k, 1) * 10deg)); }
+  100% { transform: rotate(calc(var(--k, 1) * 4deg)); }
+}
+@keyframes wxw-arm {
+  0%, 100% { transform: rotate(calc(var(--k, 1) * 24deg)); }
+  50% { transform: rotate(calc(var(--k, 1) * -26deg)); }
+}
+@keyframes wxw-fore {
+  0%, 100% { transform: rotate(calc(var(--k, 1) * -14deg)); }
+  50% { transform: rotate(calc(var(--k, 1) * -46deg)); }
+}
+@keyframes wxw-bob {
+  0%, 100% { transform: translateY(calc(var(--k, 1) * 1.1px)); }
+  50% { transform: translateY(0); }
+}
+
+/* Generic swing around --r (waves, scarf tails, umbrella shake) and shiver. */
 .wxc-osc { animation: wxc-osc 1s ease-in-out infinite; }
-.wxc-bob { animation: wxc-bob 0.45s ease-in-out infinite; }
 .wxc-shiver { animation: wxc-shiver 0.12s linear infinite alternate; }
 
 @keyframes wxc-osc {
   0%, 100% { transform: rotate(calc(var(--r, 0deg) - var(--a, 0deg))); }
   50% { transform: rotate(calc(var(--r, 0deg) + var(--a, 0deg))); }
 }
-@keyframes wxc-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-0.9px); }
-}
 @keyframes wxc-shiver {
   from { transform: translateX(-0.6px); }
   to { transform: translateX(0.6px); }
+}
+
+/* Acting. nod: a slow droop, a jerk awake. gust and pull share the storm's
+   3.4s loop with the bolt and its glow, so the wind shoves as the lightning
+   strikes. */
+.wxs-idle { animation: wxs-idle 1.8s ease-in-out infinite; }
+.wxs-breathe { animation: wxs-breathe 2.6s ease-in-out infinite; }
+.wxs-nod { animation: wxs-nod var(--T, 3.6s) infinite; }
+.wxs-blink { animation: wxs-blink 3.8s infinite; }
+.wxs-glint { animation: wxs-glint 3.4s ease-out infinite; }
+.wxs-gust { animation: wxs-gust 3.4s ease-in-out infinite; }
+.wxs-pull { animation: wxs-pull 3.4s ease-in-out infinite; }
+.wxs-bolt { animation: wx-flash 3.4s linear infinite; }
+.wxs-ripple { animation: wxs-ripple 1.6s ease-out infinite; }
+.wxs-breath { animation: wxs-breath 1.8s ease-out infinite; }
+
+@keyframes wxs-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-0.5px); }
+}
+@keyframes wxs-breathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.018); }
+}
+@keyframes wxs-nod {
+  0% { transform: rotate(0deg); animation-timing-function: ease-in; }
+  54% { transform: rotate(20deg); }
+  60% { transform: rotate(22deg); animation-timing-function: ease-out; }
+  66% { transform: rotate(-4deg); }
+  76% { transform: rotate(1.5deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes wxs-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+@keyframes wxs-glint {
+  0%, 62%, 100% { transform: scale(0.2); opacity: 0; }
+  72% { transform: scale(1); opacity: 1; }
+  84% { transform: scale(0.4); opacity: 0; }
+}
+@keyframes wxs-gust {
+  0%, 48%, 100% { transform: translate(0, 0) rotate(var(--r, 0deg)); }
+  58% { transform: translate(-2.4px, -1.2px) rotate(calc(var(--r, 0deg) + 9deg)); }
+  72% { transform: translate(-0.6px, 0) rotate(calc(var(--r, 0deg) + 2deg)); }
+  86% { transform: translate(0, 0) rotate(var(--r, 0deg)); }
+}
+@keyframes wxs-pull {
+  0%, 48%, 100% { transform: rotate(var(--r, 0deg)); }
+  58% { transform: rotate(calc(var(--r, 0deg) - 24deg)); }
+  72% { transform: rotate(calc(var(--r, 0deg) - 8deg)); }
+  86% { transform: rotate(var(--r, 0deg)); }
+}
+@keyframes wxs-ripple {
+  0% { transform: scale(0.3); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+@keyframes wxs-breath {
+  0% { transform: translate(0, 0) scale(0.4); opacity: 0; }
+  20% { opacity: 0.9; }
+  100% { transform: translate(6px, -6px) scale(1.6); opacity: 0; }
 }
 
 /* Scene weather (weather.js: drops, flakes, WIND, fog bands, zzz, glow) */
@@ -1548,7 +1677,7 @@
 .wxs-zzz { animation: wxs-zzz 2.6s ease-out infinite; }
 .wxs-flutter { animation: wxs-flutter 0.32s ease-in-out infinite; }
 .wxs-ground { animation: wxs-ground 0.9s linear infinite; }
-.wxs-glow { opacity: 0; animation: wxs-glow 3s linear infinite; }
+.wxs-glow { opacity: 0; animation: wxs-glow 3.4s linear infinite; }
 
 @keyframes wxs-rain {
   0% { transform: translate(0, -6px); opacity: 0; }
@@ -1578,8 +1707,10 @@
   0%, 100% { transform: scale(1, 1); }
   50% { transform: scale(0.88, 1.1); }
 }
+/* --gs (set per scene in weather.js) is two dash periods: the ground
+   travels exactly that far per stride cycle, so the loop is seamless. */
 @keyframes wxs-ground {
-  to { stroke-dashoffset: 11; }
+  to { stroke-dashoffset: var(--gs, 22px); }
 }
 /* Same double stutter as wx-flash, as a warm bloom behind the bolt. */
 @keyframes wxs-glow {
@@ -1598,10 +1729,17 @@
   color: var(--accent);
 }
 
+/* Cloud outlines are stroke-width 2 for a 24px glyph; scaled up 1.2-1.5x
+   inside a scene they outweigh the figure's line work, so thin them here
+   (CSS beats the presentation attribute). */
+.hero-weather-scene path[stroke-width="2"] {
+  stroke-width: 1.45;
+}
+
 @media (min-width: 768px) {
   .hero-weather-chip {
     display: inline-grid;
-    grid-template-columns: 92px auto;
+    grid-template-columns: 90px auto;
     column-gap: 0.7rem;
     row-gap: 0.2rem;
     align-items: center;
@@ -1616,8 +1754,8 @@
   .hero-weather-scene {
     display: block;
     grid-row: 1 / span 2;
-    width: 92px;
-    height: 77px;
+    width: 90px;
+    height: 76px;
   }
 
   .hero-weather-temp {
