@@ -4,7 +4,7 @@
      One shared include either way, rather than duplicating this markup:
      reads the page's own theme tokens (see assets/js/slice-blade.js),
      not scoped to one theme, same as the contact modal it mirrors. -->
-<div class="contact-modal" data-slice-blade-modal hidden>
+<div class="contact-modal slice-blade-modal" data-slice-blade-modal hidden>
   <div class="contact-modal-backdrop" data-slice-blade-close></div>
   <div class="contact-modal-panel slice-blade-panel" role="dialog" aria-modal="true" aria-labelledby="slice-blade-title">
     <button type="button" class="contact-modal-close slice-blade-close" data-slice-blade-close aria-label="Close">
@@ -18,28 +18,37 @@
           <path d="M5 19L19 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           <path d="M13 5h6v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        Slice Blade
+        <span class="slice-blade-title-text">Slice Blade</span>
       </h2>
-    </div>
-    <p class="slice-blade-sub">Drag through the falling letters. Skip the amber bombs. Leave it alone and it'll play itself.</p>
-    <p class="slice-blade-challenge" data-slice-blade-challenge hidden></p>
-    <div class="slice-blade-host" data-slice-blade-host>
-      <canvas data-slice-blade-canvas></canvas>
       <div class="slice-blade-hud">
         <span class="slice-blade-hud-chip" data-slice-blade-score>Score 0</span>
         <span class="slice-blade-hud-chip slice-blade-hud-lives" data-slice-blade-lives aria-label="Lives remaining"></span>
+      </div>
+    </div>
+    <div class="slice-blade-host" data-slice-blade-host>
+      <canvas data-slice-blade-canvas></canvas>
+      <!-- Rules live on the canvas, not in a block above it: the old
+           paragraph wrapped to 4-5 lines on a phone and took more room
+           than the game. It fades out after a human's first slice (see
+           updateHud in slice-blade.js) and comes back when the demo
+           takes over again. Pieces never rise into the top quarter of
+           the canvas, so this never covers the action. -->
+      <div class="slice-blade-notes">
+        <p class="slice-blade-challenge" data-slice-blade-challenge hidden></p>
+        <p class="slice-blade-hint" data-slice-blade-hint>Swipe across the letters to slice them. Avoid the X bombs.</p>
       </div>
       <!-- Overlaid on the canvas, not a block below it — a block below
            added real height to the modal panel and pushed the share
            buttons past the viewport on short screens, forcing a scroll
            right when they should be the one thing in view. Overlaying
-           inside .slice-blade-host (same technique .slice-blade-hud
-           already uses) means game-over adds zero new height: whatever
+           inside .slice-blade-host (same technique .slice-blade-notes
+           uses) means game-over adds zero new height: whatever
            already fit without scrolling still fits. -->
       <div class="slice-blade-share" data-slice-blade-share hidden>
-        <p class="slice-blade-share-score">Score <strong data-slice-blade-share-score>0</strong> — share it?</p>
+        <p class="slice-blade-share-score">Score <strong data-slice-blade-share-score>0</strong>. Share it?</p>
         <div class="slice-blade-share-actions">
-          <button type="button" class="slice-blade-share-btn slice-blade-share-btn-primary" data-slice-blade-share-native hidden>Share</button>
+          <button type="button" class="slice-blade-share-btn slice-blade-share-btn-primary" data-slice-blade-again>Play again</button>
+          <button type="button" class="slice-blade-share-btn" data-slice-blade-share-native hidden>Share</button>
           <button type="button" class="slice-blade-share-btn" data-slice-blade-share-whatsapp>WhatsApp</button>
           <button type="button" class="slice-blade-share-btn" data-slice-blade-share-instagram>Instagram</button>
           <button type="button" class="slice-blade-share-btn" data-slice-blade-share-linkedin>LinkedIn</button>

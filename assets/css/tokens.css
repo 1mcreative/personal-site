@@ -717,32 +717,77 @@ p {
   }
 }
 
-.slice-blade-panel {
-  width: min(900px, 100%);
-  max-height: min(80vh, 720px);
-  /* Flex column so a short/landscape viewport shrinks the canvas host
-     to make room for the title/sub text instead of letting the host's
-     own fixed vh height push everything (including the game-over share
-     overlay inside it) past the panel's bottom edge, forcing a scroll. */
-  display: flex;
-  flex-direction: column;
+/* The game is the product, so the play area gets everything the chrome
+   doesn't need. Desktop: a large near-full-window stage. Phones and
+   short landscape windows: genuinely full-screen (no margin, no radius,
+   no border), since every pixel of padding there is pixels of game lost.
+   `100%` heights resolve against .contact-modal's fixed inset:0 box,
+   which tracks the dynamic viewport (browser toolbars) on mobile, unlike
+   100vh. overscroll-behavior stops a downward swipe from turning into
+   pull-to-refresh behind the game. */
+.slice-blade-modal {
+  padding: var(--space-2);
+  overscroll-behavior: contain;
 }
 
+.slice-blade-panel {
+  width: min(1200px, 100%);
+  height: min(100%, 860px);
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  /* The canvas paints an opaque --bg over the whole stage, so the shared
+     panel's 28px backdrop blur has nothing to show through and only
+     costs GPU on a phone running a 60fps canvas. */
+  background: var(--bg);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+@media (max-width: 640px), (max-height: 520px) {
+  .slice-blade-modal {
+    padding: 0;
+  }
+
+  .slice-blade-panel {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* One slim bar: title on the left, score and lives on the right, with
+   room reserved for the 44px close button. Replaces a title row, a
+   4-5 line rules paragraph and a floating HUD that together cost about
+   as much height as the game itself did on a phone. */
 .slice-blade-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-2);
+  gap: var(--space-1);
+  min-height: 52px;
+  padding: 0 56px 0 var(--space-2);
   flex-shrink: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.slice-blade-close {
+  top: 4px;
+  right: 4px;
 }
 
 .slice-blade-title {
   display: flex;
   align-items: center;
   gap: 0.5em;
+  flex: 1 1 auto;
+  min-width: 0;
   margin: 0;
-  padding-right: 3.5rem;
-  font-size: 1.15rem;
+  font-size: 1rem;
 }
 
 .slice-blade-title svg {
@@ -750,91 +795,43 @@ p {
   color: var(--accent);
 }
 
-.slice-blade-sub {
-  margin: 0 0 var(--space-2);
-  color: var(--muted);
-  font-size: 0.85rem;
-  flex-shrink: 0;
-}
-
-/* A short viewport (a phone in landscape) has so little height that the
-   panel's own fixed padding and header/sub margins — fine on a normal
-   screen — are what push the share overlay past the fold, not the game
-   host itself. Tighten just the chrome around it rather than the host's
-   own touch-target-compliant floor, which can't shrink any further. */
-@media (max-height: 480px) {
-  .slice-blade-panel {
-    padding: var(--space-2);
-  }
-
-  .slice-blade-header {
-    margin-bottom: var(--space-1);
-  }
-
-  .slice-blade-sub {
-    margin-bottom: var(--space-1);
-  }
-}
-
-.slice-blade-host {
-  position: relative;
-  width: 100%;
-  flex: 1 1 auto;
-  /* Floor tall enough that the game-over share overlay's own worst
-     case (6 pills at the 44px touch-target floor, wrapped 2-per-row)
-     always fits inside the host box instead of getting silently
-     clipped by overflow: hidden below. */
-  min-height: 220px;
-  max-height: min(60vh, 560px);
+.slice-blade-title-text {
   overflow: hidden;
-  border-radius: var(--radius);
-  background: var(--bg);
-  touch-action: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.slice-blade-host canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  cursor: crosshair;
+/* On the narrowest phones the chips need the room more than the word
+   does; the icon stays and the heading remains the dialog's accessible
+   name (visually hidden, not display:none). */
+@media (max-width: 340px) {
+  .slice-blade-title-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip: rect(0, 0, 0, 0);
+  }
 }
 
-/* Real HTML score/lives readout, not drawn on the canvas — per direct
-   feedback that the canvas-drawn version ("SCORE n" in the same bitmap
-   font as the falling letters) read as too big and overlapped both
-   itself and the pieces behind it, worst on a narrow mobile canvas
-   where there was never enough width for both blocks of text at once.
-   Small pills using the same "text over moving content" recipe
-   .hero-status-chip already proved on the homepage, just built from
-   this component set's own theme-agnostic tokens (--surface/--border)
-   instead of home.css's own --muted, since this modal has to look
-   native on every theme, not just the homepage's. */
 .slice-blade-hud {
-  position: absolute;
-  top: var(--space-1);
-  left: var(--space-1);
-  right: var(--space-1);
-  z-index: 1;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-1);
-  pointer-events: none;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
 }
 
 .slice-blade-hud-chip {
   display: inline-flex;
   padding: 0.3em 0.7em;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 70%, transparent);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg));
   border: 1px solid var(--border);
   color: var(--text);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   line-height: 1.4;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .slice-blade-hud-lives {
@@ -842,19 +839,81 @@ p {
   letter-spacing: 0.15em;
 }
 
+/* The stage. A definite flex-filled box with the canvas absolutely
+   filling it: the canvas used to be height:100% of an auto-height
+   parent, which a replaced element resolves from its own intrinsic
+   ratio instead, so it stayed a 2:1 strip (245x123 on a 375x812 phone)
+   inside a taller box, and the strip below it was visible but never
+   received pointer input. */
+.slice-blade-host {
+  position: relative;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg);
+  touch-action: none;
+}
+
+.slice-blade-host canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+/* Rules and challenge banner, floated over the empty top of the stage
+   (pieces peak at about a quarter of the way down, never above it).
+   pointer-events:none so they can never block a slice. */
+.slice-blade-notes {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  right: var(--space-2);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  pointer-events: none;
+}
+
+.slice-blade-hint,
 .slice-blade-challenge {
-  margin: 0 0 var(--space-2);
-  padding: 0.5em 0.9em;
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  margin: 0;
+  max-width: 36rem;
+  text-wrap: balance;
+  padding: 0.4em 0.9em;
+  border: 1px solid var(--border);
+  border-radius: 1.2rem;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
   color: var(--text);
   font-size: 0.85rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.slice-blade-challenge {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
   font-weight: 600;
-  flex-shrink: 0;
+}
+
+/* visibility is delayed past the fade so a dismissed hint is also gone
+   from the accessibility tree, not just transparent. */
+.slice-blade-hint {
+  transition: opacity 0.3s var(--ease), visibility 0s;
+}
+
+.slice-blade-hint.is-dismissed {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s var(--ease), visibility 0s 0.3s;
 }
 
 /* Game-over share panel — overlaid on the bottom of .slice-blade-host
-   (same absolute-inside-the-relative-host technique .slice-blade-hud
+   (same absolute-inside-the-relative-host technique .slice-blade-notes
    already uses), not a block below it, so it adds zero height to the
    modal panel: whatever already fit on screen without scrolling still
    fits, on a phone, a tablet, or a desktop window. Reuses
@@ -866,11 +925,13 @@ p {
   position: absolute;
   left: var(--space-1);
   right: var(--space-1);
-  bottom: var(--space-1);
+  bottom: max(var(--space-1), env(safe-area-inset-bottom));
+  max-width: 760px;
+  margin-inline: auto;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
   padding: 0.6rem;
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--surface) 75%, transparent);
@@ -903,7 +964,7 @@ p {
 .slice-blade-share-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .slice-blade-share-btn {
@@ -919,6 +980,7 @@ p {
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
+  touch-action: manipulation;
   transition: border-color var(--speed) var(--ease), transform var(--speed) var(--ease);
 }
 
