@@ -20,6 +20,12 @@
 //     since this site is tested down to 375px throughout and a fixed
 //     1200px box would force horizontal overflow on a phone.
 //
+// Layout (reworked after a 375x812 phone measured a 245x123 playing
+// strip): the stage is a flex-filled box with the canvas absolutely
+// filling it, so the whole visible area takes pointer input; the modal
+// is full-screen on phones; the rules are a dismissing hint over the
+// canvas, not a paragraph above it.
+//
 // Reuses this site's own established modal shell (open/close, focus
 // trap, Escape, backdrop click — the exact pattern contact-modal.js
 // already uses) rather than building new modal plumbing from scratch.
@@ -215,7 +221,15 @@
 
   var engine = null; // built once, first time the modal opens
 
-  function buildEngine(host, canvas, scoreEl, livesEl, shareDom) {
+  // Touch hit-radius padding: a fingertip covers far more than the 4px a
+  // mouse pointer is precise to, and glyphs shrink with the stage on a phone.
+  var COARSE = !!(window.matchMedia && matchMedia("(pointer: coarse)").matches);
+  // Ignore restart taps this long after a human's game ends, so a tap that
+  // was already on its way when the last life went doesn't skip the score
+  // and share panel. The Play again button bypasses it.
+  var RESTART_GRACE = 0.7;
+
+  function buildEngine(host, canvas, scoreEl, livesEl, shareDom, hintEl) {
     var ctx = canvas.getContext("2d");
     var w = 0;
     var h = 0;
@@ -229,11 +243,23 @@
     var hudLives = 0;
     var hudLivesSet = 0;
     var hudShareShown = false;
+    var hintDone = false;
+    var humanSliced = false;
 
     // Real HTML text, not canvas-drawn — see the comment above paint()'s
     // old HUD code for why. Only touches the DOM when a value actually
     // changed, not every frame.
     function updateHud() {
+      // The rules hint stays up until a human lands a slice (not the
+      // demo's own score, which is already running when they arrive), and
+      // returns when the demo takes over again after IDLE_RESUME seconds.
+      if (hintEl) {
+        var done = world.played && humanSliced;
+        if (done !== hintDone) {
+          hintDone = done;
+          hintEl.classList.toggle("is-dismissed", done);
+        }
+      }
       if (scoreEl && hudScore !== world.score) {
         hudScore = world.score;
         scoreEl.textContent = "Score " + hudScore;
@@ -280,7 +306,7 @@
       return Math.max(2, Math.min(w, h) * 0.017);
     }
     function radius() {
-      return (gpx() * GH) / 2 + 4;
+      return (gpx() * GH) / 2 + 4 + (COARSE ? 8 : 0);
     }
     function ramp() {
       return Math.min(MAX_RAMP, 1 + RAMP * world.score);
@@ -404,7 +430,10 @@
         world.idle = 0;
       }
       world.idle += dt;
-      if (world.idle > IDLE_RESUME) world.played = false;
+      if (world.idle > IDLE_RESUME) {
+        world.played = false;
+        humanSliced = false;
+      }
 
       if (world.flash > 0) world.flash = Math.max(0, world.flash - dt * 3);
       if (world.comboT > 0) {
@@ -428,6 +457,7 @@
           q.life -= dt;
         }
         var auto = !world.played && world.overT > OVER_AUTOPLAY;
+        if (wantRestart && world.played && world.overT < RESTART_GRACE) wantRestart = false;
         if (wantRestart || auto) {
           wantRestart = false;
           restart();
@@ -474,7 +504,11 @@
           var bx = stroke[si];
           var by = stroke[si + 1];
           world.trail.push(bx, by, 0);
-          if (ax || ay) sweep(ax, ay, bx, by);
+          if (ax || ay) {
+            var scoreBefore = world.score;
+            sweep(ax, ay, bx, by);
+            if (world.score > scoreBefore) humanSliced = true;
+          }
           world.prevX = bx;
           world.prevY = by;
         }
@@ -600,15 +634,23 @@
       // with the falling pieces for space.
       if (world.over) {
         var bp2 = Math.max(4, Math.min(10, Math.round(w / 150)));
+        var spx = Math.max(2, Math.round(bp2 / 2));
         var s = "GAME OVER";
+        var sub = "SCORE " + world.score;
+        // Centre on the stage, except on a short one (a phone in landscape)
+        // where the share panel would cover the middle: then centre the
+        // text block in the space above the panel instead.
+        var cy = h / 2;
+        if (hudShareShown && shareDom.wrap) {
+          var blockH = GH * bp2 * 1.6 + GH * spx;
+          cy = Math.max(GH * bp2 + 4, Math.min(cy, (shareDom.wrap.offsetTop - blockH) / 2 + GH * bp2));
+        }
         ctx.globalAlpha = 1;
         ctx.fillStyle = colors.accent;
-        drawText(ctx, s, (w - textWidth(s, bp2)) / 2, h / 2 - GH * bp2, bp2);
-        var sub = "SCORE " + world.score;
-        var spx = Math.max(2, Math.round(bp2 / 2));
+        drawText(ctx, s, (w - textWidth(s, bp2)) / 2, cy - GH * bp2, bp2);
         ctx.globalAlpha = 0.6;
         ctx.fillStyle = colors.ink;
-        drawText(ctx, sub, (w - textWidth(sub, spx)) / 2, h / 2 + GH * bp2 * 0.6, spx);
+        drawText(ctx, sub, (w - textWidth(sub, spx)) / 2, cy + GH * bp2 * 0.6, spx);
         ctx.globalAlpha = 1;
       }
 
@@ -665,6 +707,9 @@
       getScore: function () {
         return world.score;
       },
+      playAgain: function () {
+        if (world.over) restart();
+      },
       start: function () {
         if (running) return;
         running = true;
@@ -707,6 +752,10 @@
   var scoreEl = modal.querySelector("[data-slice-blade-score]");
   var livesEl = modal.querySelector("[data-slice-blade-lives]");
   var challengeEl = modal.querySelector("[data-slice-blade-challenge]");
+  var hintEl = modal.querySelector("[data-slice-blade-hint]");
+  var againBtn = modal.querySelector("[data-slice-blade-again]");
+  // Default copy says "swipe"; a mouse needs no press, it slices on hover.
+  if (hintEl && !COARSE) hintEl.textContent = "Sweep your mouse across the letters to slice them. Avoid the X bombs.";
   var openers = document.querySelectorAll("[data-slice-blade-open]");
   var closers = modal.querySelectorAll("[data-slice-blade-close]");
   var lastFocused = null;
@@ -796,6 +845,15 @@
     window.open(buildHref(shareText(score), shareUrl(score)), "_blank", "noopener");
   }
 
+  if (againBtn) {
+    againBtn.addEventListener("click", function () {
+      if (engine) engine.playAgain();
+      // The button just hid itself with the share panel; park focus on
+      // the close button (where open() puts it) instead of on <body>.
+      var closeBtn = panel.querySelector(".slice-blade-close");
+      if (closeBtn) closeBtn.focus();
+    });
+  }
   if (shareNativeBtn) shareNativeBtn.addEventListener("click", doNativeShare);
   if (shareWhatsappBtn) {
     shareWhatsappBtn.addEventListener("click", function () {
@@ -845,7 +903,7 @@
         doNativeShare();
       } else {
         saveScreenshot(function () {
-          setShareNote("Image saved — open Instagram and share it from your gallery.");
+          setShareNote("Image saved. Open Instagram and share it from your gallery.");
         });
       }
     });
@@ -888,7 +946,7 @@
     document.body.style.overflow = "hidden";
     document.addEventListener("keydown", onKeydown);
 
-    if (!engine) engine = buildEngine(host, canvas, scoreEl, livesEl, shareDom);
+    if (!engine) engine = buildEngine(host, canvas, scoreEl, livesEl, shareDom, hintEl);
     // Canvas can't measure a real size while [hidden] — start once the
     // panel is actually visible, same reflow-then-act pattern used
     // throughout this codebase for exactly this class of bug.
