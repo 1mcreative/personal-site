@@ -43,4 +43,18 @@
 
   window.addEventListener("scroll", onScroll, { passive: true });
   document.body.addEventListener("scroll", onScroll, { passive: true });
+
+  // Glass-edge glint (tokens.css's .site-header::before/.lab-header::before)
+  // — same "cursor position drives a CSS custom property" technique
+  // assets/js/spotlight-text.js already uses. Gated to real pointers so a
+  // touch tap never leaves --glass-mx/--glass-my stuck wherever it last
+  // landed; the matching CSS media query is the actual on/off switch, this
+  // guard just avoids doing pointless work on devices that can't hover.
+  if (window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    header.addEventListener("pointermove", function (e) {
+      var r = header.getBoundingClientRect();
+      header.style.setProperty("--glass-mx", ((e.clientX - r.left) / r.width) * 100 + "%");
+      header.style.setProperty("--glass-my", ((e.clientY - r.top) / r.height) * 100 + "%");
+    });
+  }
 })();
