@@ -875,12 +875,20 @@ html:has(body.theme-personal) {
   width: min(460px, 100%);
 }
 
+/* .contact-modal-close is absolutely positioned at top:8px, 44px tall, so
+   its bottom edge sits ~52px down the panel — the title-bearing modals
+   (contact/slice-blade) clear it via their own title's padding-right, but
+   this modal's first real content is the image itself, with nothing above
+   it to push it down. Without this margin the image's top-right corner
+   sat directly under the close button (confirmed directly: overlapping
+   rects at mobile width, not just a close guess). */
 .photo-modal-image {
   display: block;
   width: 100%;
   max-height: 50vh;
   object-fit: contain;
   border-radius: var(--radius);
+  margin-top: 1rem;
   margin-bottom: var(--space-2);
   background: color-mix(in srgb, var(--bg) 40%, transparent);
   -webkit-touch-callout: none;
