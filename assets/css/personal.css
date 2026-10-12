@@ -149,6 +149,44 @@ html:has(body.theme-personal) {
   opacity: 1;
 }
 
+/* Pure-CSS failsafe, independent of life-intro.js entirely: if that script
+   never completes for any reason in some visitor's browser (a security
+   setting, a content blocker, any JS error), everything below would stay
+   stuck at opacity:0 forever, with no way to recover without reloading.
+   This forces the veil hidden and every .js-intro-gated element to its
+   normal, visible state a few seconds after load regardless of whether
+   the JS ever ran or finished. Harmless when JS succeeds normally (it
+   always does well under 6s) — the animation's end state just matches
+   where .is-visible already put things.
+   shortcut: a blunt timed reveal, not a real "JS actually failed" check;
+   upgrade to a <script> no-js class removal if a real cause is ever found. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes js-intro-failsafe-reveal {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes js-intro-failsafe-hide {
+    to {
+      opacity: 0;
+    }
+  }
+
+  .theme-personal.js-intro .life-hero-inner h1,
+  .theme-personal.js-intro .life-hero-inner p,
+  .theme-personal.js-intro .site-header,
+  .theme-personal.js-intro .life-section,
+  .theme-personal.js-intro .section-nav,
+  .theme-personal.js-intro .section-nav-link {
+    animation: js-intro-failsafe-reveal 0.6s var(--ease) 6s forwards;
+  }
+
+  .theme-personal.js-intro .life-intro-veil {
+    animation: js-intro-failsafe-hide 0.5s var(--ease) 6s forwards;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .theme-personal.js-intro .life-intro-veil {
     display: none;
