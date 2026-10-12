@@ -936,7 +936,10 @@
   outline-offset: 6px;
 }
 
-@media (max-width: 640px) {
+/* Hover-only hint: touch tablets (no hover, but wider than 640px) used to
+   fall through to the plain-text fallback above and show it permanently.
+   No hover means nothing can ever reveal it, so hide it like on phones. */
+@media (max-width: 640px), (hover: none) {
   .spotlight-text {
     display: none;
   }

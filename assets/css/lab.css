@@ -254,6 +254,13 @@
   cursor: pointer;
 }
 
+@media (pointer: coarse) {
+  .lab-btn {
+    min-height: 44px;
+    padding-inline: 1rem;
+  }
+}
+
 .lab-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
