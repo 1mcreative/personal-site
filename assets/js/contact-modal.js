@@ -3,38 +3,19 @@
 // upgrades its click to open the modal instead, so no-JS visitors still
 // have a working way to reach out.
 //
-// Submission PREFERS EmailJS (https://emailjs.com, loaded via CDN in
-// footer.html) since this is a static GitHub Pages site with no backend of
-// its own — sends straight from the browser via emailjs.sendForm(), no
-// page reload, no email client switch. The three IDs below ship as
-// placeholders until replaced with real ones:
-//   1. Sign up free at emailjs.com, connect an email service (e.g. Gmail).
-//   2. Create an email template. Its body can reference {{name}}, {{email}},
-//      and {{message}} — sendForm() maps this form's own `name` attributes
-//      to those template variables automatically, so the template's
-//      variable names must match this form's field names exactly. Set the
-//      template's "To email" to where you want messages delivered.
-//   3. Paste the resulting Service ID, Template ID, and Public Key (Account
-//      tab) into the three constants below.
-// Until that's done — and as a fallback if a real send ever fails (network
-// issue, misconfigured template, etc.) — this builds a mailto: link from
-// the same address already on the page's trigger link and hands the
-// filled-in message to the visitor's own email app to actually send. Real,
-// working delivery either way; only the "how" changes.
+// Submission goes to Web3Forms (https://web3forms.com): free, no backend,
+// 250 messages/month, emails each one to the address you register. This is
+// a static GitHub Pages site, so the access key below is public by design
+// (Web3Forms locks it to your inbox, it can't read anything).
+//   1. Enter your email at web3forms.com, copy the access key they mail you.
+//   2. Paste it into WEB3FORMS_KEY below.
+// Until then, and if a send ever fails, this hands the filled-in message to
+// the visitor's own email app via mailto: so nothing is lost.
 (function () {
-  var EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
-  var EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
-  var EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
+  var WEB3FORMS_KEY = "7450d3b1-2f61-458c-ac9e-257e1cade3c7";
 
-  function emailjsReady() {
-    return !!(window.emailjs
-      && EMAILJS_SERVICE_ID.indexOf("YOUR_") !== 0
-      && EMAILJS_TEMPLATE_ID.indexOf("YOUR_") !== 0
-      && EMAILJS_PUBLIC_KEY.indexOf("YOUR_") !== 0);
-  }
-
-  if (emailjsReady()) {
-    window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  function sendReady() {
+    return WEB3FORMS_KEY.indexOf("YOUR_") !== 0;
   }
 
   var modal = document.querySelector("[data-contact-modal]");
@@ -146,7 +127,7 @@
   form.addEventListener("submit", function (event) {
     event.preventDefault();
 
-    if (!emailjsReady()) {
+    if (!sendReady()) {
       if (openMailtoFallback()) {
         setStatus("Opening your email app with this message ready to go. Hit send there and it'll reach me directly.");
       } else {
@@ -159,7 +140,22 @@
     submitBtn.disabled = true;
     setStatus("Sending…");
 
-    window.emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, form)
+    var data = {
+      access_key: WEB3FORMS_KEY,
+      subject: "Message from bhaveshnakum.com",
+      from_name: "bhaveshnakum.com",
+      name: form.elements.name.value,
+      email: form.elements.email.value,
+      message: form.elements.message.value,
+      botcheck: form.elements.botcheck.checked
+    };
+    fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(data)
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (res) { if (!res.success) throw new Error(res.message); })
       .then(function () {
         setStatus("Thanks, got it. I'll get back to you soon.");
         if (typeof gtag === "function") gtag("event", "contact_form_submit");
