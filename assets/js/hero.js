@@ -63,6 +63,12 @@
       month: "short",
       day: "numeric",
     });
+    var longDateFormatter = new Intl.DateTimeFormat(undefined, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
+    var longDateEl = clockChip && clockChip.querySelector("[data-date]");
     // The clock character (_includes/clock-mascot.svg) has no hands over
     // its face; the time is read off the dial instead. The white dot on the
     // ticks is the hour and the white bead on the rim is the minute, both
@@ -95,6 +101,7 @@
       var now = new Date();
       clockEl.textContent = timeFormatter.format(now);
       if (clockDateEl) clockDateEl.textContent = dateFormatter.format(now);
+      if (longDateEl) longDateEl.textContent = longDateFormatter.format(now);
       setHands(now);
       // A hop and a sparkle on each new minute (not on load, when the
       // page is still behind the intro splash anyway).
@@ -130,14 +137,16 @@
     }, msToNextMinute);
 
     // The popover (.hero-clock-pop): the time to "the nanosecond", and how
-    // long since the Big Bang. Only runs while the tile is hovered or open.
-    // The first six digits after the point are real (a browser's clock is
-    // only good to about 0.1 ms; some blur it further on purpose), the last
-    // five are random and are labelled as such on the popover. The universe
-    // is 13.787 billion years old give or take 20 million (Planck 2018), so
-    // the "and N days" tail is the current year's progress, a gag.
+    // long the universe has been going. Only runs while the tile is hovered
+    // or open. The first four digits after the point are real (a browser's
+    // clock is only good to about 0.1 ms; some blur it further on purpose),
+    // the last five are random and are labelled as such on the popover. The
+    // universe's age is not known to the digit (13.787 billion years, give or
+    // take 20 million, Planck 2018), so it is printed as measured instead of
+    // padded with made-up digits; the live part is the one thing here that is
+    // exact, how long this visitor has been on the page.
     var nsEl = clockChip && clockChip.querySelector("[data-ns]");
-    var uniRestEl = clockChip && clockChip.querySelector("[data-uni-rest]");
+    var hereEl = clockChip && clockChip.querySelector("[data-here]");
     var pad = function (n, w) {
       n = String(n);
       while (n.length < w) n = "0" + n;
@@ -146,15 +155,16 @@
     var drawPop = function () {
       var ms = performance.timeOrigin + performance.now();
       var d = new Date(ms);
-      var clock = pad(d.getHours(), 2) + ":" + pad(d.getMinutes(), 2) + ":" + pad(d.getSeconds(), 2);
       if (nsEl) {
-        nsEl.textContent = clock + "." + pad(Math.floor((ms % 1000) * 10), 4) + pad(Math.floor(Math.random() * 1e5), 5);
+        nsEl.textContent =
+          pad(d.getHours(), 2) + ":" + pad(d.getMinutes(), 2) + ":" + pad(d.getSeconds(), 2) + "." +
+          pad(Math.floor((ms % 1000) * 10), 4) + pad(Math.floor(Math.random() * 1e5), 5);
       }
-      if (uniRestEl) {
-        var days = Math.round(
-          (Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(d.getFullYear(), 0, 1)) / 864e5
-        );
-        uniRestEl.textContent = "and " + days + " days, " + clock + "." + pad(Math.floor(ms % 1000), 3);
+      if (hereEl) {
+        var here = Math.floor(performance.now() / 1000);
+        hereEl.textContent =
+          "and you have spent " + (here >= 3600 ? Math.floor(here / 3600) + ":" + pad(Math.floor(here / 60) % 60, 2) : Math.floor(here / 60)) +
+          ":" + pad(here % 60, 2) + " of it here";
       }
     };
     var tickRaf = 0;
@@ -172,7 +182,7 @@
     var startTick = function () {
       if (!tickRaf) tickRaf = requestAnimationFrame(tick);
     };
-    if (clockChip && (nsEl || uniRestEl)) {
+    if (clockChip && (nsEl || hereEl)) {
       drawPop();
       clockChip.addEventListener("pointerenter", startTick);
     }
