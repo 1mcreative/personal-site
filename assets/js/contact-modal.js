@@ -20,6 +20,88 @@
   var openers = document.querySelectorAll("[data-contact-open]");
   var closers = modal.querySelectorAll("[data-contact-close]");
 
+  var starters = modal.querySelector("[data-contact-starters]");
+  var counter = modal.querySelector("[data-contact-count]");
+  var done = modal.querySelector("[data-contact-done]");
+  var message = form.elements.message;
+
+  // Per-topic prompts: the placeholder shows what a good message looks like,
+  // the chips drop a ready opening line into the box.
+  var PROMPTS = {
+    "Work / hiring": {
+      hint: "Tell me about the role, the team and the timeline.",
+      starters: ["I'm hiring for ", "A contract project: ", "A quick call about "]
+    },
+    "Creative project": {
+      hint: "Describe the video, edit or shoot, and when you need it.",
+      starters: ["I need a video edited: ", "A shoot on ", "I loved "]
+    },
+    "Feedback": {
+      hint: "What worked, what didn't, what would you change?",
+      starters: ["I really liked ", "One thing that confused me was ", "A suggestion: "]
+    },
+    "Problem report": {
+      hint: "What happened, on which page, and on what device?",
+      starters: ["Broken page: ", "On my phone, ", "Broken link: "]
+    },
+    "Hello": {
+      hint: "Say anything. I read everything.",
+      starters: ["Hi! ", "Found you via ", "Your work made me think of "]
+    }
+  };
+
+  function updateCount() {
+    counter.textContent = message.value.length + " / " + message.maxLength;
+  }
+
+  function showStarters(topic) {
+    var p = PROMPTS[topic];
+    message.placeholder = p.hint;
+    starters.innerHTML = "";
+    p.starters.forEach(function (text) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = text.trim();
+      b.addEventListener("click", function () {
+        message.value = text + message.value;
+        message.focus();
+        message.setSelectionRange(message.value.length, message.value.length);
+        updateCount();
+      });
+      starters.appendChild(b);
+    });
+    starters.hidden = false;
+  }
+
+  function fieldError(name, show) {
+    modal.querySelector('[data-error-for="' + name + '"]').hidden = !show;
+  }
+
+  // Inline errors next to the field (native validation bubbles anchor to the
+  // visually hidden radios), checked in page order so focus goes to the first.
+  function validate() {
+    var bad = null;
+    var topicOk = !!form.elements.topic.value;
+    var emailVal = form.elements.email.value.trim();
+    var emailOk = !emailVal || form.elements.email.checkValidity();
+    var msgOk = !!message.value.trim();
+    fieldError("topic", !topicOk);
+    fieldError("email", !emailOk);
+    fieldError("message", !msgOk);
+    if (!topicOk) bad = form.querySelector('input[name="topic"]');
+    else if (!emailOk) bad = form.elements.email;
+    else if (!msgOk) bad = message;
+    if (bad) bad.focus();
+    return !bad;
+  }
+
+  form.addEventListener("change", function (e) {
+    if (e.target.name === "topic") fieldError("topic", false);
+    if (e.target.name === "topic") showStarters(e.target.value);
+  });
+  message.addEventListener("input", function () { updateCount(); fieldError("message", false); });
+  form.elements.email.addEventListener("input", function () { fieldError("email", false); });
+
   var lastFocused = null;
   var closeTimer = 0;
 
@@ -120,6 +202,7 @@
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();
+    if (!validate()) return;
 
     var submitBtn = form.querySelector(".contact-submit");
     submitBtn.disabled = true;
@@ -143,10 +226,17 @@
       .then(function (r) { return r.json(); })
       .then(function (res) { if (!res.success) throw new Error(res.message); })
       .then(function () {
-        setStatus("Thanks, got it. I'll get back to you soon.");
+        setStatus("");
         if (typeof gtag === "function") gtag("event", "contact_form_submit");
         form.reset();
-        closeTimer = setTimeout(close, 1800);
+        updateCount();
+        starters.hidden = true;
+        form.hidden = true;
+        done.hidden = false;
+        closeTimer = setTimeout(function () {
+          close();
+          setTimeout(function () { form.hidden = false; done.hidden = true; }, 300);
+        }, 2200);
       })
       .catch(function () {
         if (openMailtoFallback()) {
