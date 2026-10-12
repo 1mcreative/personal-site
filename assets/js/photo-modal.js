@@ -33,6 +33,7 @@
     var location = btn.getAttribute("data-location") || "";
     var date = btn.getAttribute("data-date") || "";
 
+    img.classList.remove("photo-modal-image-broken");
     img.src = btn.getAttribute("data-full") || "";
     img.alt = btn.querySelector("img") ? btn.querySelector("img").alt : "";
     captionEl.textContent = caption;

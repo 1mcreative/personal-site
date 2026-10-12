@@ -821,6 +821,11 @@ html:has(body.theme-personal) {
    exact gradient-hue formula the original React component falls back to
    when it has no images either. */
 .theme-personal .photo-slider {
+  /* One token drives tile size everywhere (plain row, enhanced carousel,
+     and photo-slider.js, which reads this computed size directly instead
+     of a duplicated JS constant) — bigger from tablet up, since a 170px
+     tile read as too small on a real desktop (direct feedback). */
+  --tile-size: 170px;
   display: flex;
   gap: var(--space-2);
   width: 100vw;
@@ -835,14 +840,27 @@ html:has(body.theme-personal) {
   touch-action: pan-y;
 }
 
+@media (min-width: 640px) {
+  .theme-personal .photo-slider {
+    --tile-size: 240px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .theme-personal .photo-slider {
+    --tile-size: 320px;
+  }
+}
+
 .theme-personal .photo-slider::-webkit-scrollbar {
   display: none;
 }
 
 .theme-personal .photo-slide {
+  position: relative;
   flex: 0 0 auto;
-  width: 170px;
-  height: 170px;
+  width: var(--tile-size);
+  height: var(--tile-size);
   border-radius: var(--radius);
   overflow: hidden;
   scroll-snap-align: start;
@@ -882,6 +900,49 @@ html:has(body.theme-personal) {
   -webkit-touch-callout: none;
 }
 
+/* Always visible, not hover-only — hover has no equivalent on touch, so a
+   hover-only affordance would leave touch visitors with zero visual cue
+   that a photo is tappable (the same gap this project already fixed once
+   for the YouTube play badge). A small opacity/scale lift on hover/focus
+   is still a real enhancement on top, not the only signal. */
+.theme-personal .photo-slide-expand {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: var(--text);
+  pointer-events: none;
+  transition: transform var(--speed) var(--ease), background-color var(--speed) var(--ease);
+}
+
+.theme-personal button.photo-slide:hover .photo-slide-expand,
+.theme-personal button.photo-slide:focus-visible .photo-slide-expand {
+  transform: scale(1.12);
+  background: color-mix(in srgb, var(--accent) 65%, var(--bg));
+}
+
+/* Graceful failure: if a photo's own file ever fails to load (network
+   issue, anything), the <img> gets this class via its onerror attribute
+   (life/index.md) instead of showing the browser's own broken-image icon.
+   Falls back to the exact same gradient look already used for "no photos
+   yet" placeholder tiles — reusing an existing, honest-about-being-empty
+   visual rather than a new one, fixed hue so it never implies the photo's
+   actual color. */
+.theme-personal .photo-slide.photo-slide-broken img {
+  display: none;
+}
+
+.theme-personal .photo-slide.photo-slide-broken {
+  background: linear-gradient(150deg, hsl(212 30% 28%), hsl(255 30% 12%));
+}
+
 .theme-personal .photo-slide-placeholder {
   background: linear-gradient(150deg, hsl(var(--hue) 42% 34%), hsl(calc(var(--hue) + 45) 55% 10%));
 }
@@ -908,9 +969,13 @@ html:has(body.theme-personal) {
 }
 
 /* Photo info modal — reuses .contact-modal's own shell (tokens.css), only
-   the content area is specific to this one. */
+   the content area is specific to this one. Sized as a real lightbox, not
+   a small form-sized popup (direct feedback: "make it big... not like in
+   small window") — the photo is the dominant element, caption/metadata
+   secondary underneath. */
 .photo-modal-panel {
-  width: min(460px, 100%);
+  width: min(94vw, 1100px);
+  max-height: min(92vh, 920px);
 }
 
 /* .contact-modal-close is absolutely positioned at top:8px, 44px tall, so
@@ -919,24 +984,29 @@ html:has(body.theme-personal) {
    this modal's first real content is the image itself, with nothing above
    it to push it down. Without this margin the image's top-right corner
    sat directly under the close button (confirmed directly: overlapping
-   rects at mobile width, not just a close guess). */
+   rects at mobile width, not just a close guess) — re-verified the same
+   margin still clears it at this much wider panel size. */
 .photo-modal-image {
   display: block;
   width: 100%;
-  max-height: 50vh;
+  max-height: min(68vh, 640px);
   object-fit: contain;
   border-radius: var(--radius);
-  margin-top: 1rem;
+  margin-top: 1.25rem;
   margin-bottom: var(--space-2);
   background: color-mix(in srgb, var(--bg) 40%, transparent);
   -webkit-touch-callout: none;
 }
 
+.photo-modal-image.photo-modal-image-broken {
+  display: none;
+}
+
 .photo-modal-caption {
   margin: 0 0 var(--space-2);
   color: var(--text);
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-size: 1.1rem;
+  line-height: 1.55;
 }
 
 .photo-modal-caption[hidden],

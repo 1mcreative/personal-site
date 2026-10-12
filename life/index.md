@@ -256,7 +256,10 @@ permalink: /life/
     {% if photos.size > 0 %}
       {% for photo in photos %}
       <button type="button" class="photo-slide" data-photo-open data-full="{{ photo.src }}" data-caption="{{ photo.caption | default: '' | escape }}" data-location="{{ photo.location | default: '' | escape }}" data-date="{{ photo.date | default: '' | escape }}">
-        <img src="{{ photo.src }}" alt="{{ photo.alt | default: '' }}" decoding="async" width="170" height="170" draggable="false"{% if photo.offsetY %} style="--offset-y: {{ photo.offsetY }}px"{% endif %}>
+        <img src="{{ photo.src }}" alt="{{ photo.alt | default: '' }}" decoding="async" width="170" height="170" draggable="false" onerror="this.closest('.photo-slide').classList.add('photo-slide-broken')"{% if photo.offsetY %} style="--offset-y: {{ photo.offsetY }}px"{% endif %}>
+        <span class="photo-slide-expand" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 5V1h4M13 9v4H9M13 5V1H9M1 9v4h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
       </button>
       {% endfor %}
     {% else %}
@@ -282,7 +285,7 @@ permalink: /life/
         <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
     </button>
-    <img class="photo-modal-image" data-photo-modal-image alt="">
+    <img class="photo-modal-image" data-photo-modal-image alt="" onerror="this.classList.add('photo-modal-image-broken')">
     <p class="photo-modal-caption" id="photo-modal-caption" data-photo-modal-caption></p>
     <dl class="photo-modal-meta" data-photo-modal-meta></dl>
     <p class="photo-modal-request">Want this one in full resolution? <a href="mailto:{{ site.email }}" data-photo-modal-request>Email me</a> and I'll send it over.</p>
