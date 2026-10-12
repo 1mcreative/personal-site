@@ -1210,3 +1210,34 @@ p {
   z-index: 9999;
   pointer-events: none;
 }
+
+/* Touch-target floor (44px, WCAG 2.5.5/Apple HIG) for the small standalone
+   controls. Keyed on pointer type, not width, so tablets get it too and
+   mouse desktops keep the compact look. Inline links inside sentences are
+   exempt and left alone. */
+@media (pointer: coarse) {
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .contact-btn,
+  .bored-trigger {
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .site-footer .footer-dev-note a,
+  .ig-feed-links a,
+  .video-row-label {
+    display: inline-block;
+    padding-block: 0.8rem;
+  }
+
+  .keycap-btn,
+  summary {
+    min-height: 44px;
+  }
+}
