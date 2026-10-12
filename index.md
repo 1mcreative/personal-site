@@ -31,8 +31,17 @@ permalink: /
   <div class="hero-status" aria-hidden="true">
     <span class="hero-status-chip hero-clock-chip">
       {% include clock-mascot.svg %}
-      <span class="hero-clock-time"></span>
-      <span class="hero-status-detail hero-clock-detail"></span>
+      <span class="hero-tile-val hero-clock-time"></span>
+      <span class="hero-tile-sub hero-clock-date"></span>
+      <span class="hero-pop hero-clock-pop">
+        <span class="hero-pop-k">Right now, to the nanosecond*</span>
+        <span class="hero-pop-big" data-ns>--:--:--.---------</span>
+        <span class="hero-pop-k">Since the Big Bang</span>
+        <span class="hero-pop-big" data-uni>13,787,000,000 years</span>
+        <span class="hero-pop-small" data-uni-rest>and a few days</span>
+        <span class="hero-pop-line">All timelines accounted for.</span>
+        <span class="hero-pop-fine">*Browsers blur their clocks on purpose, so the last digits are for show. The universe is 13.787 billion years old, give or take 20 million.</span>
+      </span>
     </span>
   </div>
 

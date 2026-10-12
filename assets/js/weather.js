@@ -110,148 +110,164 @@
 
   // Characters, per "add some character like" the Iconscout man-fighting-a-
   // thunderstorm Lottie (that page sits behind a bot check, so this is built
-  // from the idea, not the file), then "animation can be improved for the
-  // character". The first pass was a front-facing pictogram whose straight
-  // stick limbs scissored sideways. This one is drawn in profile, facing
-  // the way it walks, with a knee and an elbow on every limb, so the motion
-  // can be a real walk cycle (home.css .wxw-*): heel strike, knee flex
-  // through the swing, arms in antiphase with the legs, body lowest at
-  // contact and highest at passing, and ground dashes sized to the stride
-  // so the feet don't skate. Acting sits on top of that rig: blinking, a
-  // scarf that streams behind, a head that nods off, looks up or sets
-  // against the wind, a wave, a shiver, a gust that tugs the umbrella in
-  // time with the lightning. One person, a different performance per
-  // condition. Tablet and up only (home.css .hero-weather-scene); the
-  // compact mobile chip keeps the icons above.
+  // from the idea, not the file). The first two passes were adult-proportioned
+  // pictograms, stick limbs facing the viewer and then a profile walker, and
+  // they read as funny, not cute ("looks funny not cute"). This one is a
+  // chibi: a big round head on a small body, glossy eyes with two highlights,
+  // blush, stubby limbs, white sneakers. It faces the viewer in every scene,
+  // and the walking ones are a waddle in place (home.css .wxb-*) instead of
+  // a stride. It does not wave on a loop either ("saying hi continuously is
+  // unnatural"): the greeting is one wave when the tile first appears and
+  // another when the pointer comes in (see the end of renderChip), in the
+  // scenes where a hand is free. Acting sits on top of the idle: blinking,
+  // breathing, a bobbing tuft of hair, a nightcap and a snot bubble for the
+  // sleeper, a beanie and shivering for the snow, a wrenched umbrella and a
+  // startled face in the storm. Tablet and up only (home.css
+  // .hero-weather-scene); the compact mobile chip keeps the icons above.
   var INK = "#1f2733";
-  var INK_FAR = "#121821";
-  var SKIN = "#f5cfa8";
-  var SKIN_FAR = "#e6b48a";
+  var SKIN = "#fbd9bd";
+  var SKIN_SH = "#efbc93";
+  var HAIR = "#3b2a20";
   var SHIRT = "#1d4ed8";
-  var SHIRT_FAR = "#1b42ad";
+  var PANTS = "#2a3550";
   var ROUND = ' stroke-linecap="round" stroke-linejoin="round"';
-  var HOLD = "animation:none";
   function line(col, w, d) {
     return '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + w + '"' + ROUND + "/>";
   }
   // The outer <g> puts a joint at (x, y); the inner .wxc group rotates about
   // its own origin (home.css), so anything drawn hanging from (0, 0) swings
   // about that joint. --r is the resting angle, set inline; a class adds the
-  // motion. Joints nest (hip > knee, shoulder > elbow), so a limb's angle is
-  // always relative to the segment above it.
+  // motion.
   function joint(x, y, cls, vars, inner) {
     return '<g transform="translate(' + x + " " + y + ')"><g class="wxc ' + cls + '" style="' + vars + '">' + inner + "</g></g>";
   }
-  // Hip at (0, -15): thigh 7.6, shin 7.4, a shoe pointing forward (+x).
-  // "far" is the limb behind the body: darker, and half a cycle out of phase.
-  function leg(far, tc, tv, sc, sv) {
-    var col = far ? INK_FAR : INK;
-    return joint(0, -15, tc, tv, line(col, 3.4, "M0 0V7.6") + joint(0, 7.6, sc, sv, line(col, 3.2, "M0 0V7.4M0 7.4H3.8")));
+  // Shoulder at (x, -12.4): a stubby sleeve and a hand. --r hangs it
+  // slightly out from the body; wxb-hi marks the arm that waves hello (--s
+  // is its side, see home.css .is-hello).
+  function arm(x, cls, vars, hand) {
+    return joint(x, -12.4, cls, vars, line(SHIRT, 3.3, "M0 0V5.2") + '<circle cy="6.4" r="2" fill="' + (hand || SKIN) + '"/>');
   }
-  // Shoulder at (.4, -27.6) in profile (x overrides it for a front-facing
-  // figure): upper arm 6.2 in shirt, forearm 5.2 and hand in skin.
-  function arm(far, uc, uv, fc, fv, x) {
-    var skin = far ? SKIN_FAR : SKIN;
-    return joint(x == null ? 0.4 : x, -27.6, uc, uv, line(far ? SHIRT_FAR : SHIRT, 3.1, "M0 0V6.2") +
-      joint(0, 6.2, fc, fv, line(skin, 2.6, "M0 0V5.2") + '<circle cy="6.4" r="1.7" fill="' + skin + '"/>'));
+  var ARM_L = arm(-6.4, "", "--r:11deg");
+  var ARM_R = arm(6.4, "", "--r:-11deg");
+  var HI_L = arm(-6.4, "wxb-hi", "--r:11deg;--s:-1");
+  var HI_R = arm(6.4, "wxb-hi", "--r:-11deg;--s:1");
+  // Two sneakers, or yellow boots; step makes them lift in turn.
+  function feet(step, boot) {
+    var fill = boot ? AMBER : "#fff";
+    var edge = boot ? "#b45309" : INK;
+    function one(x, cls) {
+      return (
+        '<g class="' + cls + '"><path d="M' + x + ' -6V-2.4" stroke="' + PANTS + '" stroke-width="2.9"' + ROUND + "/>" +
+        '<ellipse cx="' + x + '" cy="-1.5" rx="3.5" ry="2.1" fill="' + fill + '" stroke="' + edge + '" stroke-width=".9"/></g>'
+      );
+    }
+    return one(-3.7, step ? step + " wxb-far" : "") + one(3.7, step || "");
   }
-  var WALK = {
-    legF: leg(true, "wxw-thigh wxw-far", "", "wxw-shin wxw-far", ""),
-    legN: leg(false, "wxw-thigh", "", "wxw-shin", ""),
-    armF: arm(true, "wxw-arm wxw-far", "", "wxw-fore wxw-far", ""),
-    armN: arm(false, "wxw-arm", "", "wxw-fore", ""),
-  };
-  var STILL = {
-    legF: leg(true, "", "--r:2deg;" + HOLD, "", "--r:0deg;" + HOLD),
-    legN: leg(false, "", "--r:-2deg;" + HOLD, "", "--r:0deg;" + HOLD),
-    armF: arm(true, "", "--r:5deg;" + HOLD, "", "--r:-10deg;" + HOLD),
-    armN: arm(false, "", "--r:-4deg;" + HOLD, "", "--r:-10deg;" + HOLD),
-  };
-  // Arms folded across the chest (snow) and the arm that holds an umbrella.
-  var HUG_F = arm(true, "", "--r:-24deg;" + HOLD, "", "--r:158deg;" + HOLD);
-  var HUG_N = arm(false, "", "--r:-28deg;" + HOLD, "", "--r:160deg;" + HOLD);
-  var UMB_ARM = arm(false, "", "--r:-100deg;" + HOLD, "", "--r:-45deg;" + HOLD);
-  var TORSO = '<rect x="-4.4" y="-30" width="8.8" height="16" rx="3.8" fill="' + SHIRT + '"/>';
-  var SKULL =
-    '<circle cx="1" cy="-36.6" r="5.3" fill="' + SKIN + '"/><circle cx="6.2" cy="-36" r="1" fill="' + SKIN + '"/>' +
-    '<circle cx=".2" cy="-36" r="1.2" fill="' + SKIN_FAR + '"/>' +
-    '<path d="M-4.3 -36.4A5.4 5.4 0 0 1 6.3 -38.3C4.6 -38.2 3 -37.6 2 -36.2C.6 -37.1 -1.5 -37.5 -4.3 -36.4Z" fill="' + INK + '"/>';
-  var EYE = '<circle class="wx wxs-blink" cx="3.8" cy="-37" r=".85" fill="' + INK + '"/>';
-  var SMILE = line(INK, 0.7, "M3.7 -34.3q1.1 .7 2.2 0");
-  var FACES = {
-    smile: EYE + SMILE,
-    shades: '<rect x="2.4" y="-38.6" width="4.6" height="3" rx="1.3" fill="' + INK + '"/>' + line(INK, 0.8, "M2.4 -37.4L-2.6 -37.9") + SMILE,
-    sleep: line(INK, 0.8, "M2.7 -37q1.1 .9 2.2 0") + '<circle cx="5" cy="-34.2" r=".65" fill="' + INK + '"/>',
-    grit: EYE + line(INK, 0.8, "M2.3 -38.9l3 .9") + line(INK, 0.9, "M3.6 -34.3h2.4"),
-  };
-  // The head pivots at the neck so it can nod or look up; its own coordinates
-  // are the figure's, shifted back by the pivot.
-  function head(face, cls, vars) {
-    return joint(0.8, -31.6, cls || "", vars || "--r:0deg;" + HOLD, '<g transform="translate(-0.8 31.6)">' + SKULL + FACES[face] + "</g>");
+  var TORSO =
+    '<rect x="-6.3" y="-15" width="12.6" height="11.2" rx="5" fill="' + SHIRT + '"/>' +
+    '<path d="M-3.8 -8.2H3.8L4.6 -4.6H-4.6Z" fill="rgba(255,255,255,.16)"/>' +
+    '<path d="M-1.6 -13.8v2.6M1.6 -13.8v2.6" stroke="#fff" stroke-width=".9"' + ROUND + "/>";
+  // A black oval with a big and a small white highlight: the glossy look.
+  function glossy(x, y, rx, ry) {
+    return (
+      '<ellipse cx="' + x + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="' + INK + '"/>' +
+      '<circle cx="' + (x - rx * 0.32).toFixed(2) + '" cy="' + (y - ry * 0.34).toFixed(2) + '" r="' + (rx * 0.42).toFixed(2) + '" fill="#fff"/>' +
+      '<circle cx="' + (x + rx * 0.38).toFixed(2) + '" cy="' + (y + ry * 0.4).toFixed(2) + '" r="' + (rx * 0.2).toFixed(2) + '" fill="#fff"/>'
+    );
   }
-  var SCARF = '<rect x="-4.7" y="-32.3" width="9.4" height="3.4" rx="1.7" fill="' + SKY + '"/>';
+  function eyes(y, rx, ry) {
+    return '<g class="wx wxs-blink">' + glossy(-4.2, y, rx, ry) + glossy(4.2, y, rx, ry) + "</g>";
+  }
+  var EYES = {
+    open: eyes(-22.4, 1.9, 2.4),
+    up: eyes(-23.6, 1.9, 2.4),
+    wide: eyes(-22.4, 2.4, 3),
+    happy: line(INK, 1.2, "M-6.3 -21.4Q-4.2 -24.6 -2.1 -21.4M2.1 -21.4Q4.2 -24.6 6.3 -21.4"),
+    sleep: line(INK, 1.1, "M-6.2 -22.6Q-4.2 -20.4 -2.2 -22.6M2.2 -22.6Q4.2 -20.4 6.2 -22.6"),
+  };
+  var MOUTHS = {
+    smile: line(INK, 1, "M-1.8 -18.3Q0 -16.5 1.8 -18.3"),
+    grin: '<path d="M-2.5 -18.7Q0 -15.2 2.5 -18.7Z" fill="#7f1d1d"/><ellipse cy="-16.9" rx="1" ry=".55" fill="#f9a8b8"/>',
+    o: '<ellipse cy="-17.5" rx=".95" ry="1.2" fill="' + INK + '"/>',
+    flat: line(INK, 1, "M-1.1 -17.9h2.2"),
+  };
+  var BLUSH =
+    '<ellipse cx="-6.8" cy="-19.2" rx="2.2" ry="1.3" fill="rgba(244,114,150,.42)"/>' +
+    '<ellipse cx="6.8" cy="-19.2" rx="2.2" ry="1.3" fill="rgba(244,114,150,.42)"/>';
+  var HAIR_SHAPE =
+    '<path d="M-10.6 -23.4C-11.4 -38.4 11.4 -38.4 10.6 -23.4C8.8 -27.2 4.4 -29 .6 -27.8C-2.8 -29.2 -8.2 -27.6 -10.6 -23.4Z" fill="' + HAIR + '"/>' +
+    '<path class="wxb-tuft" d="M-.6 -34.3Q-1.5 -37.4 1.7 -37.7" stroke="' + HAIR + '" stroke-width="1.5" fill="none" stroke-linecap="round"/>';
+  // Nightcap (sky blue, white band and pom-pom) and beanie (amber, white
+  // cuff and pom-pom). They sit over the hair.
+  var HATS = {
+    cap:
+      '<path d="M-10.5 -26.6C-10.2 -36.2 -2.4 -41.2 6.6 -39.4C12 -38.2 14.6 -33.8 15 -29.8C11.8 -32.8 8 -32.4 6 -30.4C4 -28.4 6.2 -26.6 10.5 -26.6Z" fill="' + SKY + '"/>' +
+      line("#fff", 2.8, "M-10.6 -26.4Q0 -29.6 10.6 -26.4") + '<circle cx="15" cy="-28.4" r="2.4" fill="#fff"/>',
+    beanie:
+      '<path d="M-10.8 -26.6C-11 -41 11 -41 10.8 -26.6Z" fill="' + AMBER + '"/>' +
+      '<rect x="-11.4" y="-28.8" width="22.8" height="4.8" rx="2.4" fill="#fff"/><circle cy="-38.8" r="2.8" fill="#fff"/>',
+  };
+  var NOSE_BUBBLE =
+    '<circle cx=".6" cy="-20.6" r=".7" fill="' + SKIN_SH + '"/>' +
+    '<circle class="wx wxb-bubble" cx="2.6" cy="-19.4" r="2.3" fill="rgba(255,255,255,.55)" stroke="' + SKY + '" stroke-width=".7"/>';
+  var SWEAT = '<path d="M8.6 -30.4q-1.6 2.6 0 3.6q1.6 -1 0 -3.6Z" fill="' + SKY + '"/>';
+  // The head pivots at the neck so it can nod or tilt (.wxb-head).
+  function head(o) {
+    return (
+      '<g class="wxb-head ' + (o.hc || "") + '" style="' + (o.hv || "") + '">' +
+      '<circle cx="-10.1" cy="-23" r="2" fill="' + SKIN_SH + '"/><circle cx="10.1" cy="-23" r="2" fill="' + SKIN_SH + '"/>' +
+      '<circle cy="-23.5" r="10.2" fill="' + SKIN + '"/>' + (o.hat ? "" : HAIR_SHAPE) + EYES[o.eyes] + BLUSH + MOUTHS[o.mouth] +
+      (o.face || "") + (HATS[o.hat] || "") + "</g>"
+    );
+  }
+  var SCARF = line(SKY, 3.6, "M-6.6 -14.8Q0 -11.4 6.6 -14.8");
   function scarfTail(vars) {
-    return joint(-3.9, -30.4, "wxc-osc", vars, line(SKY, 2.6, "M0 0q-4.2 .6 -6.4 4.4"));
+    return joint(4.6, -13.4, "wxc-osc", vars, line(SKY, 2.8, "M0 0q3.4 .6 5.4 4.6"));
   }
-  var GLINT = '<path class="wx wxs-glint" d="M5.6 -40.2L6.2 -38.8 7.6 -38.2 6.2 -37.6 5.6 -36.2 5 -37.6 3.6 -38.2 5 -38.8Z" fill="#fff"/>';
-  // Front-facing figure, for the one scene where the person greets the
-  // viewer. In profile a wave reads as aimed at whatever sits to the right
-  // of them, which in the clear-day scene is the sun, so this one turns to
-  // face the screen instead.
-  var FRONT_LEGS =
-    line(INK, 3.4, "M-2.7 -15V-1.3M2.7 -15V-1.3") +
-    '<ellipse cx="-3.5" cy="-.4" rx="2.5" ry="1.4" fill="#0f1722"/><ellipse cx="3.5" cy="-.4" rx="2.5" ry="1.4" fill="#0f1722"/>';
-  var FRONT_TORSO = '<rect x="-5.9" y="-30" width="11.8" height="16.2" rx="4.4" fill="' + SHIRT + '"/>';
-  var FRONT_HEAD =
-    '<circle cx="-5.5" cy="-36.2" r="1.2" fill="' + SKIN_FAR + '"/><circle cx="5.5" cy="-36.2" r="1.2" fill="' + SKIN_FAR + '"/>' +
-    '<circle cy="-36.6" r="5.4" fill="' + SKIN + '"/>' +
-    '<path d="M-5.5 -37.1A5.5 5.5 0 0 1 5.5 -37.1C3.7 -40.6 -3.7 -40.6 -5.5 -37.1Z" fill="' + INK + '"/>' +
-    '<rect x="-5.1" y="-37.6" width="4.4" height="3.1" rx="1.3" fill="' + INK + '"/><rect x=".7" y="-37.6" width="4.4" height="3.1" rx="1.3" fill="' + INK + '"/>' +
-    '<rect x="-.8" y="-36.8" width="1.6" height=".8" fill="' + INK + '"/>' + line(INK, 0.8, "M-1.9 -33.5q1.9 1.8 3.8 0") +
-    '<path class="wx wxs-glint" d="M-3.2 -39.4L-2.6 -38 -1.2 -37.4 -2.6 -36.8 -3.2 -35.4 -3.8 -36.8 -5.2 -37.4 -3.8 -38Z" fill="#fff"/>';
-  var BREATH = [0, 0.6, 1.2].map(function (d) {
-    return '<circle class="wx wxs-breath" style="animation-delay:-' + d + 's" cx="7.4" cy="-34.4" r="1.1" fill="' + SKY + '"/>';
-  }).join("");
   var CANOPY =
-    '<path d="M-14 -14Q-12 -24 0 -25Q12 -24 14 -14Q10.5 -16.6 7 -14Q3.5 -16.6 0 -14Q-3.5 -16.6 -7 -14Q-10.5 -16.6 -14 -14Z" fill="' + AMBER + '"/>' +
-    line("rgba(20,23,28,.28)", 0.8, "M0 -25V-14");
-  // Held in the hand at (10.2, -33.9) (where UMB_ARM ends): `lean` is the slow
-  // movement (a sway, or the gust's pull), `shake` the fast one; flutter
-  // squashes the canopy as the wind catches it.
+    '<path d="M-14 -25Q-12 -35 0 -36Q12 -35 14 -25Q10.5 -27.6 7 -25Q3.5 -27.6 0 -25Q-3.5 -27.6 -7 -25Q-10.5 -27.6 -14 -25Z" fill="' + AMBER + '"/>' +
+    line("rgba(20,23,28,.28)", 0.8, "M0 -36V-25");
+  // Held in the right hand at (12, -15.4) (where the raised right arm ends).
+  // `lean` is the slow movement (a sway, or the gust's pull), `shake` the
+  // fast one; flutter squashes the canopy as the wind catches it.
   function umbrella(lean, shake, flutter) {
-    return joint(10.2, -33.9, lean[0], lean[1],
-      joint(0, 0, shake[0], shake[1], line(INK, 1.2, "M0 4V-14") + (flutter ? '<g class="wx wxs-flutter">' + CANOPY + "</g>" : CANOPY) +
-        '<circle r="1.8" fill="' + SKIN + '"/>'));
+    return joint(12, -15.4, lean[0], lean[1],
+      joint(0, 0, shake[0], shake[1], line(INK, 1.2, "M0 2V-25") +
+        (flutter ? '<g class="wx wxs-flutter">' + CANOPY + "</g>" : CANOPY) + '<circle r="2" fill="' + SKIN + '"/>'));
   }
+  var UMB_ARM = arm(6.4, "", "--r:-118deg");
+  var HUG_L = arm(-6.4, "", "--r:-64deg", "#fff");
+  var HUG_R = arm(6.4, "", "--r:64deg", "#fff");
+  var BREATH = [0, 0.6, 1.2].map(function (d) {
+    return '<circle class="wx wxs-breath" style="animation-delay:-' + d + 's" cx="4.6" cy="-17.2" r="1" fill="' + SKY + '"/>';
+  }).join("");
   function zzz() {
     var out = "";
-    [[7, -44, 0.9, 0], [11, -49, 0.7, -0.9], [14, -53, 0.55, -1.8]].forEach(function (z) {
+    [[12, -40, 0.9, 0], [15.5, -45, 0.7, -0.9], [18.5, -49.5, 0.55, -1.8]].forEach(function (z) {
       out +=
         '<g transform="translate(' + z[0] + " " + z[1] + ") scale(" + z[2] + ')"><path class="wx wxs-zzz" style="animation-delay:' + z[3] +
         's" d="M0 0h4.6l-4.6 5.6h4.6" fill="none" stroke="' + SKY + '" stroke-width="1.3"' + ROUND + "/></g>";
     });
     return out;
   }
-  // Back to front: far limbs, torso, scarf, head, near leg and arm, props.
-  function fig(p) {
-    return p.legF + p.armF + TORSO + (p.scarf || "") + head(p.face, p.hc, p.hv) + p.legN + p.armN + (p.props || "");
+  // Back to front: feet, torso, arms, scarf, head, props.
+  function kid(o) {
+    return feet(o.step, o.boot) + TORSO + (o.armL || ARM_L) + (o.armR || ARM_R) + (o.scarf || "") + head(o) + (o.props || "");
   }
-  // Stands the figure on the ground at x. The outer group leans or gusts it
-  // about the feet; the inner one carries the bob (walk), shiver or breathing,
-  // and the --T / --k (cycle length, stride size) every walking limb inherits.
-  function who(x, body, lean, bob) {
+  // Stands the figure on the ground at x. The .wxc group carries the body
+  // motion about the feet (waddle, gust, shiver, breathing) and the --T
+  // (cycle length) the waddling limbs inherit.
+  function who(x, body, cls, vars, scale) {
     return (
-      '<g transform="translate(' + x + ' 60) scale(.78)"><ellipse cy=".6" rx="9" ry="1.6" fill="rgba(20,23,28,.12)"/>' +
-      '<g class="wxc ' + lean[0] + '" style="' + lean[1] + '"><g class="' + bob[0] + '" style="' + bob[1] + '">' + body + "</g></g></g>"
+      '<g transform="translate(' + x + " 60) scale(" + (scale || 1.15) + ')"><ellipse cy=".6" rx="8.6" ry="1.5" fill="rgba(20,23,28,.12)"/>' +
+      '<g class="wxc ' + cls + '" style="' + vars + '">' + body + "</g></g>"
     );
   }
-  function walker(x, T, k, o) {
-    o = o || {};
-    return who(
-      x,
-      fig({ legF: WALK.legF, legN: WALK.legN, armF: WALK.armF, armN: o.armN || WALK.armN, face: o.face || "smile", hc: o.hc, hv: o.hv, scarf: o.scarf, props: o.props }),
-      ["", "--r:3deg;" + HOLD], ["wxw-bob", "--T:" + T + "s;--k:" + k]
-    );
+  // The waddle: the body rocks (the .wxc group), bobs twice a cycle (this
+  // wrapper), and the feet lift in turn (kid's `step`).
+  function waddle(x, T, o, scale) {
+    o.step = "wxb-step";
+    return who(x, '<g class="wxb-bob">' + kid(o) + "</g>", "wxb-waddle", "--T:" + T + "s", scale);
   }
   // Rain streaks fall from under the cloud bank to the ground, each loop
   // offset by a negative delay so it is already mid-fall on first paint.
@@ -284,16 +300,6 @@
     );
   }
   var GROUND = '<path d="M3 61H73" stroke="rgba(20,23,28,.16)" stroke-width="1.2"' + ROUND + "/>";
-  // Dashes slide left under a walker: two dash periods per stride cycle (T
-  // seconds, stride k), so the loop is seamless and the planted foot keeps
-  // pace with the ground instead of skating over it.
-  function ground(T, k) {
-    var p = 11 * k;
-    return (
-      '<path class="wxs-ground" style="--gs:' + (2 * p).toFixed(2) + "px;animation-duration:" + T + 's" d="M3 61H73" stroke="rgba(20,23,28,.26)" stroke-width="1.2" stroke-dasharray="' +
-      (5 * k).toFixed(2) + " " + (6 * k).toFixed(2) + '" stroke-linecap="round"/>'
-    );
-  }
   var WIND = [32, 42, 51].map(function (y, i) {
     return (
       '<g transform="translate(70 ' + y + ')"><path class="wx wxs-wind" style="animation-delay:-' + (i * 0.27).toFixed(2) +
@@ -308,48 +314,49 @@
     '<rect class="wx wxs-fog wx-rev" style="animation-delay:-1.4s" x="30" y="43" width="40" height="4.4" rx="2.2"/>' +
     '<rect class="wx wxs-fog" style="animation-delay:-2.6s" x="8" y="52" width="38" height="4.4" rx="2.2"/></g>';
   var SCENES = {
-    // Facing the viewer in shades and waving hello, head tilting in time,
-    // a glint off the lens now and then.
+    // Basking: eyes shut happily, a big grin, a tuft that bobs. Says hello
+    // with its free hand when the tile appears (and when you come in).
     sun:
       piece("sun", "translate(42 1) scale(1.1)") + GROUND +
-      who(24,
-        FRONT_LEGS + FRONT_TORSO +
-          arm(false, "wxc-osc", "--r:6deg;--a:2.5deg;animation-duration:2.6s", "", "--r:-8deg;" + HOLD, -5.4) +
-          joint(0, -31.6, "wxc-osc", "--r:0deg;--a:3deg;animation-duration:1.1s", '<g transform="translate(0 31.6)">' + FRONT_HEAD + "</g>") +
-          arm(false, "wxc-osc", "--r:-130deg;--a:3deg;animation-duration:.55s", "wxc-osc", "--r:-50deg;--a:27deg;animation-duration:.55s", 5.4),
-        ["", "--r:0deg;" + HOLD], ["wxs-idle", ""]),
-    // Nodding off: a slow droop, a jerk awake, Zzz, and a breathing chest.
+      who(22, kid({ eyes: "happy", mouth: "grin", hc: "wxb-idle", armR: HI_R }), "wxs-breathe", ""),
+    // Asleep standing up: nightcap, a nodding head, a snot bubble, Zzz.
     moon:
-      piece("moon", "translate(44 -1) scale(1.05)") + GROUND +
-      who(24, fig({ legF: STILL.legF, legN: STILL.legN, armF: STILL.armF, armN: STILL.armN, face: "sleep", hc: "wxs-nod", hv: "--T:3.6s", props: zzz() }),
-        ["", "--r:1deg;" + HOLD], ["wxs-breathe", ""]),
-    "cloud-sun": piece("cloud-sun", "translate(38 -1) scale(1.3)") + ground(0.9, 1) + walker(24, 0.9, 1),
-    "cloud-moon": piece("cloud-moon", "translate(38 -1) scale(1.3)") + ground(1, 0.9) + walker(24, 1, 0.9),
-    // Strolling with a glance up at the clouds.
-    cloud: piece("cloud", "translate(36 0) scale(1.35)") + ground(1, 0.9) + walker(24, 1, 0.9, { hv: "--r:-10deg;" + HOLD }),
+      piece("moon", "translate(47 -1) scale(1.05)") + GROUND +
+      who(22, kid({ eyes: "sleep", mouth: "flat", hat: "cap", hc: "wxb-nod", hv: "--T:4s", face: NOSE_BUBBLE, props: zzz() }), "wxs-breathe", ""),
+    "cloud-sun": piece("cloud-sun", "translate(38 -1) scale(1.3)") + GROUND + waddle(22, 0.9, { eyes: "open", mouth: "smile", hc: "wxb-idle", armR: HI_R }),
+    // The sleepwalker: eyes shut, still waddling, nightcap and all.
+    "cloud-moon": piece("cloud-moon", "translate(38 -1) scale(1.3)") + GROUND + waddle(22, 1.3, { eyes: "sleep", mouth: "flat", hat: "cap", props: zzz() }),
+    // Strolling along with a glance up at the clouds.
+    cloud: piece("cloud", "translate(36 0) scale(1.35)") + GROUND + waddle(22, 1, { eyes: "up", mouth: "o", hv: "transform:rotate(-8deg)", armR: HI_R }),
     // Fog bands are drawn last, so the figure is hazy behind them.
-    "cloud-fog": cloud("translate(38 -1) scale(1.3)", "wx-drift", "currentColor") + ground(1.2, 0.8) + walker(24, 1.2, 0.8) + FOG,
+    "cloud-fog": cloud("translate(38 -1) scale(1.3)", "wx-drift", "currentColor") + GROUND + waddle(22, 1.3, { eyes: "open", mouth: "smile", armR: HI_R }) + FOG,
+    // A yellow umbrella and boots; the free left hand waves hello.
     "cloud-rain":
-      bank() + drops(9, "M0 0l-1.4 4.4", 8, 70, 0.85, "--dx:-6px") + RIPPLES + ground(0.85, 0.95) +
-      walker(24, 0.85, 0.95, { armN: UMB_ARM, props: umbrella(["wxc-osc", "--r:-3deg;--a:2.5deg;animation-duration:1.7s"], ["", "--r:0deg;" + HOLD], false) }),
-    // Stamping in place with arms wrapped round, shivering, breath puffing.
+      bank() + drops(9, "M0 0l-1.4 4.4", 8, 70, 0.85, "--dx:-6px") + RIPPLES + GROUND +
+      waddle(22, 1, {
+        eyes: "open", mouth: "smile", boot: true, armL: HI_L, armR: UMB_ARM,
+        props: umbrella(["wxc-osc", "--r:-22deg;--a:2.5deg;animation-duration:1.9s"], ["", "--r:0deg"], false),
+      }, 1),
+    // Arms wrapped round, shivering, breath puffing, in a beanie and scarf.
     "cloud-snow":
       bank() + flakes(9) + GROUND +
-      who(24, fig({ legF: WALK.legF, legN: WALK.legN, armF: HUG_F, armN: HUG_N, face: "smile", scarf: SCARF + scarfTail("--r:-8deg;--a:7deg;animation-duration:1.4s"), props: BREATH }),
-        ["", "--r:2deg;" + HOLD], ["wxc-shiver", "--T:.7s;--k:.3"]),
+      who(22, kid({ eyes: "happy", mouth: "smile", hat: "beanie", scarf: SCARF + scarfTail("--r:-8deg;--a:7deg;animation-duration:1.4s"), armL: HUG_L, armR: HUG_R, props: BREATH }),
+        "wxc-shiver", "", 1),
     // The reference's scene: heavy slanted rain, wind streaks, a bolt with a
-    // warm glow, and a figure leaning into it all with a scarf streaming and
-    // the umbrella wrenched back. Gust, bolt and glow share one 3.4s loop, so
-    // the wind shoves just as the lightning strikes.
+    // warm glow, and a startled kid leaning into it all with the scarf
+    // streaming and the umbrella wrenched back. Gust, bolt and glow share one
+    // 3.4s loop, so the wind shoves just as the lightning strikes.
     "cloud-lightning":
       '<circle class="wxs-glow" cx="58" cy="24" r="16" fill="' + AMBER + '"/>' + bank("#c7d4ec") +
       '<g transform="translate(46 15) scale(.95)"><path class="wx wxs-bolt" d="M13 2L4 14h7l-1 8 10-13h-7Z" fill="' + AMBER +
       '" stroke="' + AMBER + '" stroke-width="1.6" stroke-linejoin="round"/></g>' +
-      drops(12, "M0 0l-3.2 4.4", 10, 76, 0.55, "--dx:-14px") + WIND + ground(0.62, 0.55) +
-      who(24, fig({ legF: WALK.legF, legN: WALK.legN, armF: arm(true, "wxc-osc", "--r:70deg;--a:10deg;animation-duration:.62s", "", "--r:-30deg;" + HOLD),
-          armN: UMB_ARM, face: "grit", scarf: SCARF + scarfTail("--r:58deg;--a:14deg;animation-duration:.3s"),
-          props: umbrella(["wxs-pull", "--r:-20deg"], ["wxc-osc", "--r:0deg;--a:8deg;animation-duration:.3s"], true) }),
-        ["wxs-gust", "--r:12deg"], ["wxw-bob", "--T:.62s;--k:.55"]),
+      drops(12, "M0 0l-3.2 4.4", 10, 76, 0.55, "--dx:-14px") + WIND + GROUND +
+      who(22, kid({
+          eyes: "wide", mouth: "o", boot: true, hc: "wxc-shiver", face: SWEAT,
+          scarf: SCARF + scarfTail("--r:58deg;--a:14deg;animation-duration:.3s"),
+          armL: arm(-6.4, "wxc-osc", "--r:34deg;--a:10deg;animation-duration:.62s"), armR: UMB_ARM,
+          props: umbrella(["wxs-pull", "--r:-22deg"], ["wxc-osc", "--r:0deg;--a:8deg;animation-duration:.3s"], true),
+        }), "wxs-gust", "--r:10deg", 1),
   };
 
   // WMO weather codes (Open-Meteo's `weathercode`) collapsed into the
@@ -399,7 +406,7 @@
     chip.setAttribute("data-wx", meta.icon);
 
     var label = document.createElement("span");
-    label.className = "hero-weather-temp";
+    label.className = "hero-weather-temp hero-tile-val";
     label.textContent = Math.round(temp) + "°" + unit;
     chip.appendChild(label);
 
@@ -408,7 +415,7 @@
     // second line from tablet width up. The " · " separator the compact
     // version needs is CSS (::before), so the widget line starts clean.
     var detail = document.createElement("span");
-    detail.className = "hero-status-detail";
+    detail.className = "hero-status-detail hero-tile-sub";
     detail.textContent = meta.label + (city ? ", " + city : "");
     chip.appendChild(detail);
 
@@ -419,6 +426,9 @@
     // for its own FLIP morph.
     void chip.offsetWidth;
     chip.classList.add("hero-status-chip-in");
+    // One wave hello once the intro is done (after the clock's), and
+    // another when the pointer comes in; see window.heroGreet in hero.js.
+    if (window.heroGreet) window.heroGreet(chip, chip, 3000);
   }
 
   function fetchWeather(lat, lon, unit, city) {
