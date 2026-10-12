@@ -517,7 +517,7 @@ p {
 .contact-modal-panel {
   position: relative;
   width: min(440px, 100%);
-  max-height: min(620px, 85vh);
+  max-height: 100%;
   overflow-y: auto;
   background: color-mix(in srgb, var(--surface) 45%, transparent);
   backdrop-filter: blur(28px) saturate(150%);
