@@ -30,8 +30,12 @@
   var original = Array.prototype.slice.call(root.children);
   if (original.length < 2) return; // nothing to loop or drag through
 
-  var SLIDE = 170;
-  var GAP = 16;
+  // Read the real, responsive tile size/gap from CSS (--tile-size,
+  // personal.css) instead of a duplicated JS constant — the tile grows at
+  // wider breakpoints, and this way there's one source of truth instead of
+  // two numbers that could silently drift apart.
+  var SLIDE = parseFloat(getComputedStyle(original[0]).width) || 170;
+  var GAP = parseFloat(getComputedStyle(root).columnGap) || 16;
   var STEP = SLIDE + GAP;
   var EASE = 0.12;
   var MAX_SCALE = 1.3;
