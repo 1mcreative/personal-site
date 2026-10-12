@@ -516,7 +516,7 @@ p {
    dropped onto the page. */
 .contact-modal-panel {
   position: relative;
-  width: min(440px, 100%);
+  width: min(520px, 100%);
   max-height: 100%;
   overflow-y: auto;
   background: color-mix(in srgb, var(--surface) 45%, transparent);
@@ -608,6 +608,10 @@ p {
   transition: border-color var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
 }
 
+.contact-field input {
+  min-height: 44px;
+}
+
 .contact-field input:focus-visible,
 .contact-field select:focus-visible,
 .contact-field textarea:focus-visible {
@@ -646,6 +650,151 @@ p {
   transform: none;
 }
 
+.contact-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  border: 0;
+}
+
+.contact-topics label {
+  cursor: pointer;
+}
+
+.contact-topics input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.contact-topics span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.9em;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 40%, transparent);
+  font-size: 0.85rem;
+  transition: transform var(--speed) var(--ease), border-color var(--speed) var(--ease), background var(--speed) var(--ease);
+}
+
+.contact-topics label:hover span {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.contact-topics input:checked + span {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  font-weight: 600;
+}
+
+.contact-topics input:focus-visible + span {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.contact-starters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 var(--space-2);
+}
+
+.contact-starters[hidden] {
+  display: none;
+}
+
+.contact-starters button {
+  min-height: 44px;
+  padding: 0 0.8em;
+  border: 1px dashed var(--accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background var(--speed) var(--ease);
+}
+
+.contact-starters button:hover,
+.contact-starters button:focus-visible {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.contact-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 0.6rem;
+}
+
+@media (max-width: 520px) {
+  .contact-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contact-error {
+  margin: 0 0 var(--space-2);
+  font-size: 0.8rem;
+  color: #e0575b;
+}
+
+.contact-error[hidden] {
+  display: none;
+}
+
+.contact-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.contact-count {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.contact-done {
+  text-align: center;
+  padding: var(--space-4) 0;
+  color: var(--accent);
+}
+
+.contact-done[hidden] {
+  display: none;
+}
+
+.contact-done h3 {
+  margin: var(--space-2) 0 0.25rem;
+  color: var(--text);
+}
+
+.contact-done p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.contact-done circle {
+  stroke-dasharray: 164;
+  stroke-dashoffset: 164;
+  animation: contact-draw 0.6s var(--ease) forwards;
+}
+
+.contact-done path {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: contact-draw 0.4s 0.4s var(--ease) forwards;
+}
+
+@keyframes contact-draw {
+  to { stroke-dashoffset: 0; }
+}
+
 .contact-status {
   margin: var(--space-2) 0 0;
   font-size: 0.85rem;
@@ -658,6 +807,11 @@ p {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .contact-done circle,
+  .contact-done path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
   .contact-modal,
   .contact-modal.is-open,
   .contact-modal-panel {
