@@ -35,14 +35,25 @@
       </svg>
       Get in touch
     </h2>
-    <p class="contact-modal-sub">Comments, feedback, appreciation, bug reports: whatever's on your mind.</p>
+    <p class="contact-modal-sub">Hiring, a creative project, feedback, a bug report, or just hello. Pick a topic and say what you need.</p>
     <form class="contact-form" data-contact-form>
+      <label class="contact-field">
+        <span>What's this about?</span>
+        <select name="topic" required>
+          <option value="" disabled selected>Choose one</option>
+          <option value="Work / hiring">Work or hiring (software engineering)</option>
+          <option value="Creative project">A creative project (video, edits, photos)</option>
+          <option value="Feedback">Feedback or a suggestion</option>
+          <option value="Problem report">Report a problem</option>
+          <option value="Hello">Just saying hi</option>
+        </select>
+      </label>
       <label class="contact-field">
         <span>Name <em>(optional)</em></span>
         <input type="text" name="name" autocomplete="name">
       </label>
       <label class="contact-field">
-        <span>Email <em>(optional)</em></span>
+        <span>Email <em>(optional, add it if you want a reply)</em></span>
         <input type="email" name="email" autocomplete="email">
       </label>
       <label class="contact-field">

@@ -94,11 +94,12 @@
     var mailtoBase = opener ? opener.getAttribute("href") : "";
     if (!mailtoBase) return false;
 
+    var topic = form.elements.topic.value;
     var name = (form.querySelector('[name="name"]').value || "").trim();
     var email = (form.querySelector('[name="email"]').value || "").trim();
     var message = (form.querySelector('[name="message"]').value || "").trim();
 
-    var subject = "Message from bhaveshnakum.com" + (name ? " - " + name : "");
+    var subject = "[" + topic + "] Message from bhaveshnakum.com" + (name ? " - " + name : "");
     var bodyLines = [];
     if (name) bodyLines.push("Name: " + name);
     if (email) bodyLines.push("Email: " + email);
@@ -126,7 +127,8 @@
 
     var data = {
       access_key: WEB3FORMS_KEY,
-      subject: "Message from bhaveshnakum.com",
+      subject: "[" + form.elements.topic.value + "] Message from bhaveshnakum.com",
+      topic: form.elements.topic.value,
       from_name: "bhaveshnakum.com",
       name: form.elements.name.value,
       email: form.elements.email.value,
