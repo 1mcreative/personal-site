@@ -148,10 +148,11 @@
     var col = far ? INK_FAR : INK;
     return joint(0, -15, tc, tv, line(col, 3.4, "M0 0V7.6") + joint(0, 7.6, sc, sv, line(col, 3.2, "M0 0V7.4M0 7.4H3.8")));
   }
-  // Shoulder at (.4, -27.6): upper arm 6.2 in shirt, forearm 5.2 and hand in skin.
-  function arm(far, uc, uv, fc, fv) {
+  // Shoulder at (.4, -27.6) in profile (x overrides it for a front-facing
+  // figure): upper arm 6.2 in shirt, forearm 5.2 and hand in skin.
+  function arm(far, uc, uv, fc, fv, x) {
     var skin = far ? SKIN_FAR : SKIN;
-    return joint(0.4, -27.6, uc, uv, line(far ? SHIRT_FAR : SHIRT, 3.1, "M0 0V6.2") +
+    return joint(x == null ? 0.4 : x, -27.6, uc, uv, line(far ? SHIRT_FAR : SHIRT, 3.1, "M0 0V6.2") +
       joint(0, 6.2, fc, fv, line(skin, 2.6, "M0 0V5.2") + '<circle cy="6.4" r="1.7" fill="' + skin + '"/>'));
   }
   var WALK = {
@@ -193,6 +194,21 @@
     return joint(-3.9, -30.4, "wxc-osc", vars, line(SKY, 2.6, "M0 0q-4.2 .6 -6.4 4.4"));
   }
   var GLINT = '<path class="wx wxs-glint" d="M5.6 -40.2L6.2 -38.8 7.6 -38.2 6.2 -37.6 5.6 -36.2 5 -37.6 3.6 -38.2 5 -38.8Z" fill="#fff"/>';
+  // Front-facing figure, for the one scene where the person greets the
+  // viewer. In profile a wave reads as aimed at whatever sits to the right
+  // of them, which in the clear-day scene is the sun, so this one turns to
+  // face the screen instead.
+  var FRONT_LEGS =
+    line(INK, 3.4, "M-2.7 -15V-1.3M2.7 -15V-1.3") +
+    '<ellipse cx="-3.5" cy="-.4" rx="2.5" ry="1.4" fill="#0f1722"/><ellipse cx="3.5" cy="-.4" rx="2.5" ry="1.4" fill="#0f1722"/>';
+  var FRONT_TORSO = '<rect x="-5.9" y="-30" width="11.8" height="16.2" rx="4.4" fill="' + SHIRT + '"/>';
+  var FRONT_HEAD =
+    '<circle cx="-5.5" cy="-36.2" r="1.2" fill="' + SKIN_FAR + '"/><circle cx="5.5" cy="-36.2" r="1.2" fill="' + SKIN_FAR + '"/>' +
+    '<circle cy="-36.6" r="5.4" fill="' + SKIN + '"/>' +
+    '<path d="M-5.5 -37.1A5.5 5.5 0 0 1 5.5 -37.1C3.7 -40.6 -3.7 -40.6 -5.5 -37.1Z" fill="' + INK + '"/>' +
+    '<rect x="-5.1" y="-37.6" width="4.4" height="3.1" rx="1.3" fill="' + INK + '"/><rect x=".7" y="-37.6" width="4.4" height="3.1" rx="1.3" fill="' + INK + '"/>' +
+    '<rect x="-.8" y="-36.8" width="1.6" height=".8" fill="' + INK + '"/>' + line(INK, 0.8, "M-1.9 -33.5q1.9 1.8 3.8 0") +
+    '<path class="wx wxs-glint" d="M-3.2 -39.4L-2.6 -38 -1.2 -37.4 -2.6 -36.8 -3.2 -35.4 -3.8 -36.8 -5.2 -37.4 -3.8 -38Z" fill="#fff"/>';
   var BREATH = [0, 0.6, 1.2].map(function (d) {
     return '<circle class="wx wxs-breath" style="animation-delay:-' + d + 's" cx="7.4" cy="-34.4" r="1.1" fill="' + SKY + '"/>';
   }).join("");
@@ -292,12 +308,16 @@
     '<rect class="wx wxs-fog wx-rev" style="animation-delay:-1.4s" x="30" y="43" width="40" height="4.4" rx="2.2"/>' +
     '<rect class="wx wxs-fog" style="animation-delay:-2.6s" x="8" y="52" width="38" height="4.4" rx="2.2"/></g>';
   var SCENES = {
-    // Waving hello in shades, a glint off the lens now and then.
+    // Facing the viewer in shades and waving hello, head tilting in time,
+    // a glint off the lens now and then.
     sun:
       piece("sun", "translate(42 1) scale(1.1)") + GROUND +
-      who(24, fig({ legF: STILL.legF, legN: STILL.legN, armF: arm(true, "wxc-osc", "--r:6deg;--a:3deg;animation-duration:2.6s", "", "--r:-10deg;" + HOLD),
-          armN: arm(false, "", "--r:-100deg;" + HOLD, "wxc-osc", "--r:-35deg;--a:20deg;animation-duration:.55s"), face: "shades", props: GLINT }),
-        ["", "--r:2deg;" + HOLD], ["wxs-idle", ""]),
+      who(24,
+        FRONT_LEGS + FRONT_TORSO +
+          arm(false, "wxc-osc", "--r:6deg;--a:2.5deg;animation-duration:2.6s", "", "--r:-8deg;" + HOLD, -5.4) +
+          joint(0, -31.6, "wxc-osc", "--r:0deg;--a:3deg;animation-duration:1.1s", '<g transform="translate(0 31.6)">' + FRONT_HEAD + "</g>") +
+          arm(false, "wxc-osc", "--r:-130deg;--a:3deg;animation-duration:.55s", "wxc-osc", "--r:-50deg;--a:27deg;animation-duration:.55s", 5.4),
+        ["", "--r:0deg;" + HOLD], ["wxs-idle", ""]),
     // Nodding off: a slow droop, a jerk awake, Zzz, and a breathing chest.
     moon:
       piece("moon", "translate(44 -1) scale(1.05)") + GROUND +

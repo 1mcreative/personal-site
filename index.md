@@ -30,11 +30,7 @@ permalink: /
 
   <div class="hero-status" aria-hidden="true">
     <span class="hero-status-chip hero-clock-chip">
-      <span class="hero-status-dot" aria-hidden="true"></span>
-      <svg class="hero-status-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"/>
-        <path d="M12 7.5v4.5l3 1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+      {% include clock-mascot.svg %}
       <span class="hero-clock-time"></span>
       <span class="hero-status-detail hero-clock-detail"></span>
     </span>

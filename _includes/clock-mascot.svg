@@ -1,0 +1,45 @@
+{% comment %}
+  Clock buddy for the homepage's time chip (index.md; styled as .hero-clock-mascot
+  in home.css; driven by assets/js/hero.js). An original little alarm-clock
+  character in the retro cartoon-clock spirit the owner pointed at, not a copy
+  of any one character. The two hands show the visitor's real local time (hero.js
+  sets --r on [data-hand] each minute), the white dot on the rim is the second
+  hand (a 60s loop started at the current second), the eyes follow the cursor,
+  the hands are short and a soft brown so the eyes and smile always read on top of them,
+  and on each new minute it hops and rings its bells.
+{% endcomment %}
+<svg class="hero-clock-mascot" viewBox="0 0 44 40" fill="none" aria-hidden="true">
+  <ellipse cx="22" cy="38.5" rx="9.5" ry="1.3" fill="rgba(20,23,28,.12)"/>
+  <g class="wx wxk-sway">
+    <path d="M17.2 32.6V36M26.8 32.6V36" stroke="#1f2733" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="14.6" cy="37.2" rx="3.4" ry="1.9" fill="#fff" stroke="#1f2733" stroke-width=".9"/>
+    <g class="wx wxk-tap"><ellipse cx="29.4" cy="37.2" rx="3.4" ry="1.9" fill="#fff" stroke="#1f2733" stroke-width=".9"/></g>
+    <path d="M8.3 21.4Q5.2 23.4 4.8 26.4" stroke="#1f2733" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="4.6" cy="27.8" r="2.5" fill="#fff" stroke="#1f2733" stroke-width=".9"/>
+    <g class="wx wxk-bell"><ellipse cx="12.6" cy="6.6" rx="3.4" ry="2.4" transform="rotate(-35 12.6 6.6)" fill="#d97706"/></g>
+    <g class="wx wxk-bell"><ellipse cx="31.4" cy="6.6" rx="3.4" ry="2.4" transform="rotate(35 31.4 6.6)" fill="#d97706"/></g>
+    <circle cx="23.1" cy="20.1" r="14.5" fill="#d97706"/>
+    <circle cx="22" cy="19" r="14.5" fill="#f59e0b"/>
+    <circle cx="22" cy="19" r="11.2" fill="#fff7e6"/>
+    <path d="M22 9.2V10.8M32.8 19H31.2M22 28.8V27.2M11.2 19H12.8" stroke="rgba(120,53,15,.55)" stroke-width="1" stroke-linecap="round"/>
+    <g fill="rgba(120,53,15,.4)">
+      <circle cx="26.8" cy="10.7" r=".45"/><circle cx="30.3" cy="14.2" r=".45"/><circle cx="30.3" cy="23.8" r=".45"/><circle cx="26.8" cy="27.3" r=".45"/>
+      <circle cx="17.2" cy="27.3" r=".45"/><circle cx="13.7" cy="23.8" r=".45"/><circle cx="13.7" cy="14.2" r=".45"/><circle cx="17.2" cy="10.7" r=".45"/>
+    </g>
+    <g transform="translate(22 19)"><g class="wxc wxk-hand" data-hand="h" style="--r:0deg"><path d="M0 1V-5.2" stroke="#b45309" stroke-width="1.9" stroke-linecap="round"/></g></g>
+    <g transform="translate(22 19)"><g class="wxc wxk-hand" data-hand="m" style="--r:0deg"><path d="M0 1.5V-7.8" stroke="#b45309" stroke-width="1.4" stroke-linecap="round"/></g></g>
+    <circle cx="14.4" cy="19.8" r="1.8" fill="rgba(217,119,6,.28)"/><circle cx="29.6" cy="19.8" r="1.8" fill="rgba(217,119,6,.28)"/>
+    <g class="wxk-eyes"><g class="wx wxk-blink">
+      <ellipse cx="17.6" cy="15.2" rx="1.7" ry="2.2" fill="#1f2733"/><circle cx="18.2" cy="14.4" r=".6" fill="#fff"/>
+      <ellipse cx="26.4" cy="15.2" rx="1.7" ry="2.2" fill="#1f2733"/><circle cx="27" cy="14.4" r=".6" fill="#fff"/>
+    </g></g>
+    <path d="M18.8 21.4Q22 24.4 25.2 21.4" stroke="#1f2733" stroke-width="1.1" stroke-linecap="round"/>
+    <circle cx="22" cy="19" r="1.2" fill="#1f2733"/>
+    <g transform="translate(22 19)"><g class="wxc wxk-orbit"><circle cy="-12.9" r="1" fill="#fff"/></g></g>
+    <g transform="translate(35.6 21.2)"><g class="wxc wxk-wave">
+      <path d="M0 0Q3.2 2.2 3.8 5.2" stroke="#1f2733" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="4" cy="6.7" r="2.5" fill="#fff" stroke="#1f2733" stroke-width=".9"/>
+    </g></g>
+    <path class="wx wxk-spark" d="M39 2Q39 5 42 5Q39 5 39 8Q39 5 36 5Q39 5 39 2Z" fill="#f59e0b"/>
+  </g>
+</svg>

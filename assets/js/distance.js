@@ -104,11 +104,26 @@
     // Trusted, hardcoded icon markup only — see weather.js's own comment
     // on why this is safe with innerHTML while the label text below still
     // goes through textContent instead.
+    // A tiny map: the visitor's own blue dot, a dashed route that draws
+    // itself across, a dot riding its head, and an amber pin (the same
+    // amber as the globe's marker, i.e. "me") that drops in when the dot
+    // arrives. No place name anywhere in it, same rule as the label. The
+    // keyframes (.wxd-* in home.css) all share one 4.6s loop; the rider's
+    // translate keyframes are sampled at equal arc lengths along this exact
+    // curve (M10 24 Q30 -2 50 24), so it stays at the head of the drawn line.
     var wrap = document.createElement("span");
     wrap.innerHTML =
-      '<svg class="hero-status-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-      '<path d="M12 21s-6.5-6.4-6.5-11.2A6.5 6.5 0 0 1 18.5 9.8C18.5 14.6 12 21 12 21Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>' +
-      '<circle cx="12" cy="9.8" r="2.2" stroke="currentColor" stroke-width="1.6"/>' +
+      '<svg class="hero-status-icon hero-distance-scene" viewBox="0 0 60 32" fill="none" aria-hidden="true">' +
+      '<rect x="1" y="3" width="58" height="26" rx="9" fill="rgba(110,193,255,.16)"/>' +
+      '<path d="M7 25L18 14 28 19 40 9 53 13" stroke="rgba(29,78,216,.13)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path d="M10 24Q30 -2 50 24" stroke="rgba(29,78,216,.3)" stroke-width="1.4" stroke-dasharray="1.6 2.6" stroke-linecap="round"/>' +
+      '<path class="wxd-route" d="M10 24Q30 -2 50 24" pathLength="1" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>' +
+      '<circle class="wx wxd-ping" cx="10" cy="24" r="2.6" stroke="currentColor" stroke-width="1"/>' +
+      '<circle cx="10" cy="24" r="2.7" fill="currentColor"/><circle cx="10" cy="24" r="1" fill="#fff"/>' +
+      '<ellipse class="wx wxd-land" cx="50" cy="24.3" rx="3" ry="1" stroke="#f59e0b" stroke-width=".9"/>' +
+      '<ellipse class="wx wxd-shadow" cx="50" cy="24.3" rx="2.8" ry=".9" fill="rgba(20,23,28,.2)"/>' +
+      '<g class="wx wxd-pin"><path d="M50 24C47.4 20.6 46.2 18.8 46.2 16.6A3.8 3.8 0 1 1 53.8 16.6C53.8 18.8 52.6 20.6 50 24Z" fill="#f59e0b"/><circle cx="50" cy="16.6" r="1.4" fill="#fff"/></g>' +
+      '<circle class="wxd-ride" cx="10" cy="24" r="1.9" fill="#fff" stroke="currentColor" stroke-width="1.2"/>' +
       "</svg>";
     chip.appendChild(wrap.firstChild);
 
