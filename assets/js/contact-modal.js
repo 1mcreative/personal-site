@@ -4,19 +4,12 @@
 // have a working way to reach out.
 //
 // Submission goes to Web3Forms (https://web3forms.com): free, no backend,
-// 250 messages/month, emails each one to the address you register. This is
-// a static GitHub Pages site, so the access key below is public by design
-// (Web3Forms locks it to your inbox, it can't read anything).
-//   1. Enter your email at web3forms.com, copy the access key they mail you.
-//   2. Paste it into WEB3FORMS_KEY below.
-// Until then, and if a send ever fails, this hands the filled-in message to
-// the visitor's own email app via mailto: so nothing is lost.
+// 250 messages/month, emailed to the address registered with the key. The
+// key is public by design (it can only send to that inbox). If a send
+// fails, the filled-in message is handed to the visitor's own email app
+// via mailto: so nothing is lost.
 (function () {
   var WEB3FORMS_KEY = "7450d3b1-2f61-458c-ac9e-257e1cade3c7";
-
-  function sendReady() {
-    return WEB3FORMS_KEY.indexOf("YOUR_") !== 0;
-  }
 
   var modal = document.querySelector("[data-contact-modal]");
   if (!modal) return;
@@ -105,7 +98,7 @@
     var email = (form.querySelector('[name="email"]').value || "").trim();
     var message = (form.querySelector('[name="message"]').value || "").trim();
 
-    var subject = "Message from bhaveshnakum.com" + (name ? " — " + name : "");
+    var subject = "Message from bhaveshnakum.com" + (name ? " - " + name : "");
     var bodyLines = [];
     if (name) bodyLines.push("Name: " + name);
     if (email) bodyLines.push("Email: " + email);
@@ -126,15 +119,6 @@
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();
-
-    if (!sendReady()) {
-      if (openMailtoFallback()) {
-        setStatus("Opening your email app with this message ready to go. Hit send there and it'll reach me directly.");
-      } else {
-        setStatus("This form isn't connected to anything yet, and there's no email link on the page to fall back to either.", "error");
-      }
-      return;
-    }
 
     var submitBtn = form.querySelector(".contact-submit");
     submitBtn.disabled = true;

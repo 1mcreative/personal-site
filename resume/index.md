@@ -19,6 +19,7 @@ permalink: /resume/
     <a href="mailto:bhaveshnakumcoed@gmail.com">bhaveshnakumcoed@gmail.com</a>
     <a href="https://www.linkedin.com/in/bhaveshnakum7" rel="me noopener" target="_blank">linkedin.com/in/bhaveshnakum7</a>
   </p>
+  <p class="contact-note">This Gmail address is for professional enquiries only. It is the same one on the PDF résumé. For anything else, use Contact me in the footer.</p>
   <div class="resume-actions">
     <a class="offset-btn" href="/assets/files/bhavesh-nakum-resume.pdf" download="Bhavesh-Nakum-Resume.pdf">
       Download Résumé
