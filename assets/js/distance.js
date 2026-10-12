@@ -1,4 +1,4 @@
-// Distance tile (index.md/home.css: the third .hero-status chip) — how far
+// Distance segment (index.md/home.css: the third .hero-status chip) — how far
 // the visitor is from Bhavesh's own location, per direct request: "show
 // user distance between them and me... calculate distance and animate and
 // show them." Shares assets/js/geo-locate.js's resolver with weather.js
@@ -12,16 +12,18 @@
 // up once, bake in the result" approach globe.js already uses for its
 // own continent data. No live geocoding call happens for real visitors.
 //
-// Redesigned twice on direct feedback. First ("km from me" read
+// Redesigned three times on direct feedback. First ("km from me" read
 // backwards, and the label named the home city): the number got a
 // plain-English proximity phrase and the home city was never rendered
 // anywhere. Then ("user can not figure out what does it mean... is it
-// some random distance? it is distance between me and my users"): the
-// scene now shows two labelled endpoints, YOU (a cursor arrow) and ME (a
-// pin with a face) with a route drawn between them, the label says
-// "between you and me", and hovering (or tapping) opens a popover with
-// what that distance means in travel times. HOME_LAT/HOME_LON's resolved
-// city is still never rendered, in the label, the popover or the scene.
+// some random distance? it is distance between me and my users"): a map
+// with two endpoints, YOU (a cursor arrow) and ME (a pin with a face) and a
+// route drawn between them, and a hover panel with what that distance
+// means in travel times. Then the cards became a single dock: the segment
+// is the little map, the number and "apart" (which says what the number
+// measures), and the panel's title says "between you and me".
+// HOME_LAT/HOME_LON's resolved city is never rendered, in the segment, the
+// panel or the scene.
 (function () {
   var container = document.querySelector(".hero-status");
   if (!container) return;
@@ -111,8 +113,9 @@
   // and the pin hops and ripples when it lands; YOU gets a small click as
   // the signal leaves. All parts share one 4.8s loop (.wxd-* in home.css);
   // the rider's keyframes there are sampled along this exact curve
-  // (M28 41 Q60 2 89 31). The YOU / ME labels only show in the tile; the
-  // compact phone pill shows the map small.
+  // (M28 41 Q60 2 89 31). It is drawn on a 116x76 grid and shown at 52x34;
+  // there are no YOU / ME labels (they were unreadable at that size), the
+  // panel's last line says which is which.
   var SCENE =
     '<svg class="hero-status-icon hero-distance-scene" viewBox="0 0 116 76" fill="none" aria-hidden="true">' +
     '<rect x="1" y="1" width="114" height="74" rx="16" fill="rgba(110,193,255,.16)"/>' +
@@ -123,13 +126,11 @@
     '<ellipse class="wx wxd-ping" cx="23" cy="55" rx="5.5" ry="1.7" stroke="currentColor" stroke-width="1"/>' +
     '<ellipse cx="23" cy="55" rx="5.5" ry="1.5" fill="rgba(29,78,216,.22)"/>' +
     '<g class="wxd-you"><path d="M17 34V49L21 45.2 23.8 51.4 26.2 50.3 23.5 44.4H28.8Z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></g>' +
-    '<text class="wxd-lbl" x="23" y="67" text-anchor="middle" font-size="8" font-weight="700" letter-spacing=".08em" fill="currentColor">YOU</text>' +
     '<ellipse class="wx wxd-land" cx="92" cy="52.3" rx="5" ry="1.4" stroke="#f59e0b" stroke-width=".9"/>' +
     '<ellipse class="wx wxd-shadow" cx="92" cy="52.3" rx="4.8" ry="1.3" fill="rgba(20,23,28,.2)"/>' +
     '<g class="wxd-pin"><path d="M92 52C86.6 45.4 84.4 42.2 84.4 38.4A7.6 7.6 0 1 1 99.6 38.4C99.6 42.2 97.4 45.4 92 52Z" fill="#f59e0b"/>' +
     '<circle cx="89.3" cy="37.2" r="1.15" fill="#1f2733"/><circle cx="94.7" cy="37.2" r="1.15" fill="#1f2733"/>' +
     '<path d="M89.4 40.3Q92 42.8 94.6 40.3" stroke="#1f2733" stroke-width="1.1" stroke-linecap="round"/></g>' +
-    '<text class="wxd-lbl" x="92" y="67" text-anchor="middle" font-size="8" font-weight="700" letter-spacing=".08em" fill="#b45309">ME</text>' +
     '<circle class="wxd-ride" cx="28" cy="41" r="2.3" fill="#fff" stroke="currentColor" stroke-width="1.4"/>' +
     "</svg>";
 
@@ -153,8 +154,8 @@
     // visitor's own city) goes in through textContent below.
     chip.innerHTML =
       SCENE +
-      '<span class="hero-tile-val">0 ' + unit + "</span>" +
-      '<span class="hero-tile-sub"><span class="hero-sub-short">between us</span><span class="hero-sub-long">between you and me</span></span>' +
+      '<span class="hero-seg-val">0 ' + unit + "</span>" +
+      '<span class="hero-seg-sub">apart</span>' +
       '<span class="hero-pop hero-distance-pop">' +
       '<span class="hero-pop-k">Between you and me</span>' +
       '<span class="hero-pop-big">' + value.toLocaleString() + " " + unit + "</span>" +
@@ -170,7 +171,7 @@
     void chip.offsetWidth;
     chip.classList.add("hero-status-chip-in");
 
-    animateCount(chip.querySelector(".hero-tile-val"), value, unit, reduceMotion);
+    animateCount(chip.querySelector(".hero-seg-val"), value, unit, reduceMotion);
   }
 
   window.resolveVisitorLocation(function (loc) {
