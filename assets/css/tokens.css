@@ -594,6 +594,7 @@ p {
 }
 
 .contact-field input,
+.contact-field select,
 .contact-field textarea {
   width: 100%;
   padding: 0.6em 0.75em;
@@ -608,6 +609,7 @@ p {
 }
 
 .contact-field input:focus-visible,
+.contact-field select:focus-visible,
 .contact-field textarea:focus-visible {
   outline: none;
   border-color: var(--accent);
