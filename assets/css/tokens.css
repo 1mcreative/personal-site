@@ -737,6 +737,16 @@ p {
   }
 }
 
+.contact-note {
+  margin: calc(var(--space-1) * -1) 0 var(--space-2);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.contact-note a {
+  color: var(--accent);
+}
+
 .contact-error {
   margin: 0 0 var(--space-2);
   font-size: 0.8rem;
