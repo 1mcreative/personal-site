@@ -36,21 +36,97 @@
       month: "short",
       day: "numeric",
     });
-    var updateClock = function () {
+    // The clock buddy (_includes/clock-mascot.svg): its hands are the real
+    // time, so the number above and the face agree. The angles keep
+    // counting past 360 (the turn counters below) instead of wrapping,
+    // since the hands ease between values with a CSS transition and a wrap
+    // from 354deg back to 0 would spin the minute hand almost a full
+    // circle backwards at every hour. Hands are information, not motion,
+    // so like the digits they update under reduced motion too (home.css
+    // just drops the easing there).
+    var mascot = document.querySelector(".hero-clock-mascot");
+    var hourHand = mascot && mascot.querySelector('[data-hand="h"]');
+    var minHand = mascot && mascot.querySelector('[data-hand="m"]');
+    var lastMin = -1;
+    var lastHour = -1;
+    var minTurns = 0;
+    var hourTurns = 0;
+    var dingTimer = 0;
+    var setHands = function (now) {
+      if (!hourHand) return;
+      var m = now.getMinutes();
+      var h = now.getHours() % 12;
+      if (m < lastMin) minTurns++;
+      if (h < lastHour) hourTurns++;
+      lastMin = m;
+      lastHour = h;
+      minHand.style.setProperty("--r", m * 6 + minTurns * 360 + "deg");
+      hourHand.style.setProperty("--r", (h + m / 60) * 30 + hourTurns * 360 + "deg");
+    };
+    var updateClock = function (ding) {
       var now = new Date();
       clockEl.textContent = timeFormatter.format(now);
       if (clockDetailEl) clockDetailEl.textContent = " · " + dateFormatter.format(now);
+      setHands(now);
+      // A hop and a bell ring on each new minute (not on load, when the
+      // page is still behind the intro splash anyway).
+      if (ding === true && mascot && !reduceMotion) {
+        mascot.classList.remove("is-ding");
+        void mascot.getBoundingClientRect();
+        mascot.classList.add("is-ding");
+        clearTimeout(dingTimer);
+        dingTimer = setTimeout(function () {
+          mascot.classList.remove("is-ding");
+        }, 950);
+      }
     };
     updateClock();
+    // The white dot on the rim is the second hand: a 60s CSS loop, started
+    // here at the current second so it matches the visitor's own clock.
+    var orbit = mascot && mascot.querySelector(".wxk-orbit");
+    if (orbit) {
+      var t0 = new Date();
+      orbit.style.animationDelay = "-" + (t0.getSeconds() + t0.getMilliseconds() / 1000) + "s";
+    }
     // No seconds shown, so once a minute is plenty — aligned to the next
     // real minute boundary first (rather than a plain setInterval from
     // page-load instant) so it can't slowly drift out of sync with the
     // visitor's own system clock over a long visit.
     var msToNextMinute = 60000 - (Date.now() % 60000);
     setTimeout(function () {
-      updateClock();
-      setInterval(updateClock, 60000);
+      updateClock(true);
+      setInterval(function () {
+        updateClock(true);
+      }, 60000);
     }, msToNextMinute);
+    // The buddy's eyes follow the pointer, easing in as it gets within
+    // ~90px so a far-away cursor doesn't pin them to the edge. Needs a real
+    // hover-capable pointer and motion allowed; everyone else just gets
+    // the blink.
+    if (mascot && !reduceMotion && window.matchMedia("(hover: hover)").matches) {
+      var eyeRaf = 0;
+      var px = 0;
+      var py = 0;
+      var aim = function () {
+        eyeRaf = 0;
+        var r = mascot.getBoundingClientRect();
+        var dx = px - (r.left + r.width / 2);
+        var dy = py - (r.top + r.height * 0.45);
+        var d = Math.hypot(dx, dy) || 1;
+        var k = Math.min(d / 90, 1) * 1.4;
+        mascot.style.setProperty("--ex", ((dx / d) * k).toFixed(2) + "px");
+        mascot.style.setProperty("--ey", ((dy / d) * k).toFixed(2) + "px");
+      };
+      window.addEventListener(
+        "pointermove",
+        function (e) {
+          px = e.clientX;
+          py = e.clientY;
+          if (!eyeRaf) eyeRaf = requestAnimationFrame(aim);
+        },
+        { passive: true }
+      );
+    }
   }
 
   // Blobs drift a few px toward the cursor — purely decorative, skipped
