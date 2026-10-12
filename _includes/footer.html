@@ -61,6 +61,7 @@
         <span class="sr-only">Message</span>
         <textarea name="message" rows="5" required maxlength="1500" placeholder="Pick a topic above and I'll suggest how to start."></textarea>
       </label>
+      <p class="contact-note">Need to send a photo or file? Email <a href="mailto:{{ site.email }}">{{ site.email }}</a> instead, this form is text only.</p>
       <p class="contact-error" data-error-for="message" role="alert" hidden>Write a short message so I know how to help.</p>
       <p class="contact-error" data-error-for="email" role="alert" hidden>That email doesn't look right. Fix it or leave it blank.</p>
       <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none">
