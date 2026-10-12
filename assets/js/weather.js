@@ -44,9 +44,9 @@
   var RAIN_CLOUD = "translate(1.4 -3.4) scale(.9)";
   var MOON_PATH = "M20.3 14.7A8.5 8.5 0 1 1 11.9 3.5A7 7 0 0 0 20.3 14.7Z";
   // Four-point sparkle, concave sides, centered on (x, y).
-  function spark(x, y, r, delay) {
+  function spark(x, y, r, delay, col) {
     return (
-      '<path class="wx wx-twinkle" style="animation-delay:' + delay + 's" fill="' + SKY + '" d="M' + x + " " + (y - r) +
+      '<path class="wx wx-twinkle" style="animation-delay:' + delay + 's" fill="' + (col || SKY) + '" d="M' + x + " " + (y - r) +
       "Q" + x + " " + y + " " + (x + r) + " " + y + "Q" + x + " " + y + " " + x + " " + (y + r) +
       "Q" + x + " " + y + " " + (x - r) + " " + y + "Q" + x + " " + y + " " + x + " " + (y - r) + 'Z"/>'
     );
@@ -110,27 +110,21 @@
 
   // Characters, per "add some character like" the Iconscout man-fighting-a-
   // thunderstorm Lottie (that page sits behind a bot check, so this is built
-  // from the idea, not the file). The first two passes were adult-proportioned
-  // pictograms, stick limbs facing the viewer and then a profile walker, and
-  // they read as funny, not cute ("looks funny not cute"). This one is a
-  // chibi: a big round head on a small body, glossy eyes with two highlights,
-  // blush, stubby limbs, white sneakers. It faces the viewer in every scene,
-  // and the walking ones are a waddle in place (home.css .wxb-*) instead of
-  // a stride. It does not wave on a loop either ("saying hi continuously is
-  // unnatural"): the greeting is one wave when the tile first appears and
-  // another when the pointer comes in (see the end of renderChip), in the
-  // scenes where a hand is free. Acting sits on top of the idle: blinking,
-  // breathing, a bobbing tuft of hair, a nightcap and a snot bubble for the
-  // sleeper, a beanie and shivering for the snow, a wrenched umbrella and a
-  // startled face in the storm. Tablet and up only (home.css
+  // from the idea, not the file). Three passes so far. A stick-figure person
+  // read as "funny, not cute"; a chibi kid was cute but "has a personality
+  // like a kid, I don't like it", which also sat oddly on a senior
+  // engineer's portfolio. So now the weather itself is the character, drawn
+  // like the clock character beside it (thick ink outline, flat fills, big
+  // glossy eyes, white gloves) so the tiles read as one cast: a bubbly sun
+  // with a wave, a sleepy moon in a nightcap, a lazy overcast cloud that
+  // yawns, a moody rain cloud, a cosy snow cloud in a beanie, a grumpy storm
+  // cloud with its arms crossed. They float, blink, glance about and say
+  // hello once when the tile appears and once when the pointer comes in (see
+  // the end of renderChip), never on a loop. Tablet and up only (home.css
   // .hero-weather-scene); the compact mobile chip keeps the icons above.
   var INK = "#1f2733";
-  var SKIN = "#fbd9bd";
-  var SKIN_SH = "#efbc93";
-  var HAIR = "#3b2a20";
-  var SHIRT = "#1d4ed8";
-  var PANTS = "#2a3550";
   var ROUND = ' stroke-linecap="round" stroke-linejoin="round"';
+  var OUT = 2.4; // outline layer width: half of it shows outside the fill
   function line(col, w, d) {
     return '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + w + '"' + ROUND + "/>";
   }
@@ -141,222 +135,240 @@
   function joint(x, y, cls, vars, inner) {
     return '<g transform="translate(' + x + " " + y + ')"><g class="wxc ' + cls + '" style="' + vars + '">' + inner + "</g></g>";
   }
-  // Shoulder at (x, -12.4): a stubby sleeve and a hand. --r hangs it
-  // slightly out from the body; wxb-hi marks the arm that waves hello (--s
-  // is its side, see home.css .is-hello).
-  function arm(x, cls, vars, hand) {
-    return joint(x, -12.4, cls, vars, line(SHIRT, 3.3, "M0 0V5.2") + '<circle cy="6.4" r="2" fill="' + (hand || SKIN) + '"/>');
+  // A noodle arm from a shoulder at (x, y) with a white glove on the end.
+  // --r hangs it out from the body; wxm-hi marks the arm that waves hello
+  // (--s is its side, see home.css .is-hello).
+  function arm(x, y, cls, vars) {
+    var s = x < 0 ? -1 : 1;
+    return joint(x, y, cls, vars,
+      line(INK, 1.8, "M0 0Q" + 2.4 * s + " 4.6 0 8.8") + '<circle cy="10.6" r="3.1" fill="#fff" stroke="' + INK + '" stroke-width=".9"/>');
   }
-  var ARM_L = arm(-6.4, "", "--r:11deg");
-  var ARM_R = arm(6.4, "", "--r:-11deg");
-  var HI_L = arm(-6.4, "wxb-hi", "--r:11deg;--s:-1");
-  var HI_R = arm(6.4, "wxb-hi", "--r:-11deg;--s:1");
-  // Two sneakers, or yellow boots; step makes them lift in turn.
-  function feet(step, boot) {
-    var fill = boot ? AMBER : "#fff";
-    var edge = boot ? "#b45309" : INK;
-    function one(x, cls) {
-      return (
-        '<g class="' + cls + '"><path d="M' + x + ' -6V-2.4" stroke="' + PANTS + '" stroke-width="2.9"' + ROUND + "/>" +
-        '<ellipse cx="' + x + '" cy="-1.5" rx="3.5" ry="2.1" fill="' + fill + '" stroke="' + edge + '" stroke-width=".9"/></g>'
-      );
+  function arms(x, y, hi, rest) {
+    rest = rest == null ? 22 : rest;
+    return arm(-x, y, hi === "L" ? "wxm-hi" : "", "--r:" + rest + "deg;--s:-1") + arm(x, y, hi === "R" ? "wxm-hi" : "", "--r:" + -rest + "deg;--s:1");
+  }
+  // Big white eyes outlined in ink, pupils that drift side to side, and a
+  // blink. `lid` (the body colour) drops a lid over the top half for sleepy
+  // faces; brows are separate so a blink doesn't squash them.
+  function eyes(o) {
+    o = o || {};
+    var gap = o.gap || 6.4, rx = o.rx || 4.5, ry = o.ry || 5.5, y = o.y == null ? -1 : o.y, out = "", sides = [-1, 1];
+    sides.forEach(function (s) {
+      out += '<ellipse cx="' + s * gap + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="#fff"/>';
+    });
+    out += '<g class="wxm-look">';
+    sides.forEach(function (s) {
+      var cx = s * gap;
+      out += '<circle cx="' + cx + '" cy="' + (y + ry * 0.16).toFixed(2) + '" r="' + (rx * 0.6).toFixed(2) + '" fill="' + INK + '"/>' +
+        '<circle cx="' + (cx - rx * 0.2).toFixed(2) + '" cy="' + (y - ry * 0.1).toFixed(2) + '" r="' + (rx * 0.2).toFixed(2) + '" fill="#fff"/>';
+    });
+    out += "</g>";
+    if (o.lid) {
+      sides.forEach(function (s) {
+        var cx = s * gap;
+        out += '<path d="M' + (cx - rx) + " " + y + "A" + rx + " " + ry + " 0 0 1 " + (cx + rx) + " " + y + 'Z" fill="' + o.lid + '"/>' +
+          line(INK, 1.1, "M" + (cx - rx) + " " + y + "H" + (cx + rx));
+      });
     }
-    return one(-3.7, step ? step + " wxb-far" : "") + one(3.7, step || "");
+    sides.forEach(function (s) {
+      out += '<ellipse cx="' + s * gap + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="none" stroke="' + INK + '" stroke-width=".9"/>';
+    });
+    var brows = "";
+    if (o.brow) {
+      // "angry" slants down toward the nose (the inner end is the lower), "sad" the other way.
+      var a = o.brow === "angry" ? 1 : -1;
+      sides.forEach(function (s) {
+        var cx = s * gap;
+        brows += line(INK, 1.6, "M" + (cx - s * rx - s * 0.4) + " " + (y - ry + 1.6 * a) + "L" + (cx + s * rx * 0.8) + " " + (y - ry - 2.2 * a));
+      });
+    }
+    return '<g class="wx wxs-blink">' + out + "</g>" + brows;
   }
-  var TORSO =
-    '<rect x="-6.3" y="-15" width="12.6" height="11.2" rx="5" fill="' + SHIRT + '"/>' +
-    '<path d="M-3.8 -8.2H3.8L4.6 -4.6H-4.6Z" fill="rgba(255,255,255,.16)"/>' +
-    '<path d="M-1.6 -13.8v2.6M1.6 -13.8v2.6" stroke="#fff" stroke-width=".9"' + ROUND + "/>";
-  // A black oval with a big and a small white highlight: the glossy look.
-  function glossy(x, y, rx, ry) {
+  // Eyes shut: "happy" is ^ ^, "sleep" is u u.
+  function shut(kind, gap, y) {
+    var up = kind === "happy" ? -1 : 1, d = "";
+    [-1, 1].forEach(function (s) {
+      var cx = s * (gap || 6.4);
+      d += "M" + (cx - 3.6) + " " + y + "Q" + cx + " " + (y + 4.4 * up) + " " + (cx + 3.6) + " " + y;
+    });
+    return line(INK, 1.5, d);
+  }
+  function cheeks(x, y) {
+    return '<ellipse cx="' + -x + '" cy="' + y + '" rx="2.7" ry="1.6" fill="rgba(244,114,150,.42)"/><ellipse cx="' + x + '" cy="' + y + '" rx="2.7" ry="1.6" fill="rgba(244,114,150,.42)"/>';
+  }
+  var MOUTH = {
+    smile: line(INK, 1.1, "M-2.6 7.6Q0 10.2 2.6 7.6"),
+    grin: '<path d="M-4 6.8Q0 13.4 4 6.8Z" fill="#7f1d1d" stroke="' + INK + '" stroke-width=".9" stroke-linejoin="round"/><ellipse cy="10.8" rx="1.7" ry=".9" fill="#f9a8b8"/>',
+    o: '<ellipse cy="8.8" rx="1.5" ry="1.9" fill="' + INK + '"/>',
+    flat: line(INK, 1.1, "M-2.2 8.6h4.4"),
+    frown: line(INK, 1.1, "M-2.6 9.8Q0 7.2 2.6 9.8"),
+    scowl: line(INK, 1.3, "M-3.6 10.2Q0 6.8 3.6 10.2"),
+    sleep: line(INK, 1, "M-1.6 8.4Q0 9.8 1.6 8.4"),
+    none: "",
+  };
+  // The sun: 12 outlined rays that turn slowly behind a disc that doesn't.
+  function sunBody() {
+    var d = "";
+    for (var i = 0; i < 12; i++) {
+      var c = Math.cos((i * Math.PI) / 6), s = Math.sin((i * Math.PI) / 6);
+      d += "M" + (c * 19.6).toFixed(2) + " " + (s * 19.6).toFixed(2) + "L" + (c * 25.4).toFixed(2) + " " + (s * 25.4).toFixed(2);
+    }
     return (
-      '<ellipse cx="' + x + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="' + INK + '"/>' +
-      '<circle cx="' + (x - rx * 0.32).toFixed(2) + '" cy="' + (y - ry * 0.34).toFixed(2) + '" r="' + (rx * 0.42).toFixed(2) + '" fill="#fff"/>' +
-      '<circle cx="' + (x + rx * 0.38).toFixed(2) + '" cy="' + (y + ry * 0.4).toFixed(2) + '" r="' + (rx * 0.2).toFixed(2) + '" fill="#fff"/>'
+      '<g class="wx wxm-rays"><path d="' + d + '" fill="none" stroke="' + INK + '" stroke-width="5.2"' + ROUND + '/><path d="' + d +
+      '" fill="none" stroke="#f59e0b" stroke-width="3"' + ROUND + "/></g>" +
+      '<circle r="16.5" fill="#fbbf24" stroke="' + INK + '" stroke-width="1.2"/>' +
+      '<ellipse cx="-6.4" cy="-9.6" rx="6.2" ry="3" transform="rotate(-32 -6.4 -9.6)" fill="#fff" opacity=".28"/>'
     );
   }
-  function eyes(y, rx, ry) {
-    return '<g class="wx wxs-blink">' + glossy(-4.2, y, rx, ry) + glossy(4.2, y, rx, ry) + "</g>";
+  function sunChar(o) {
+    return sunBody() + '<g transform="translate(0 -1)">' +
+      (o.shut ? shut("happy", 5.6, -1) : eyes({ gap: 5.6, rx: 4.1, ry: 5 })) + cheeks(10.4, 5.2) + MOUTH[o.mouth || "grin"] + "</g>" +
+      (o.noArms ? "" : arms(16, 4.4, o.hi));
   }
-  var EYES = {
-    open: eyes(-22.4, 1.9, 2.4),
-    up: eyes(-23.6, 1.9, 2.4),
-    wide: eyes(-22.4, 2.4, 3),
-    happy: line(INK, 1.2, "M-6.3 -21.4Q-4.2 -24.6 -2.1 -21.4M2.1 -21.4Q4.2 -24.6 6.3 -21.4"),
-    sleep: line(INK, 1.1, "M-6.2 -22.6Q-4.2 -20.4 -2.2 -22.6M2.2 -22.6Q4.2 -20.4 6.2 -22.6"),
-  };
-  var MOUTHS = {
-    smile: line(INK, 1, "M-1.8 -18.3Q0 -16.5 1.8 -18.3"),
-    grin: '<path d="M-2.5 -18.7Q0 -15.2 2.5 -18.7Z" fill="#7f1d1d"/><ellipse cy="-16.9" rx="1" ry=".55" fill="#f9a8b8"/>',
-    o: '<ellipse cy="-17.5" rx=".95" ry="1.2" fill="' + INK + '"/>',
-    flat: line(INK, 1, "M-1.1 -17.9h2.2"),
-  };
-  var BLUSH =
-    '<ellipse cx="-6.8" cy="-19.2" rx="2.2" ry="1.3" fill="rgba(244,114,150,.42)"/>' +
-    '<ellipse cx="6.8" cy="-19.2" rx="2.2" ry="1.3" fill="rgba(244,114,150,.42)"/>';
-  var HAIR_SHAPE =
-    '<path d="M-10.6 -23.4C-11.4 -38.4 11.4 -38.4 10.6 -23.4C8.8 -27.2 4.4 -29 .6 -27.8C-2.8 -29.2 -8.2 -27.6 -10.6 -23.4Z" fill="' + HAIR + '"/>' +
-    '<path class="wxb-tuft" d="M-.6 -34.3Q-1.5 -37.4 1.7 -37.7" stroke="' + HAIR + '" stroke-width="1.5" fill="none" stroke-linecap="round"/>';
-  // Nightcap (sky blue, white band and pom-pom) and beanie (amber, white
-  // cuff and pom-pom). They sit over the hair.
-  var HATS = {
-    cap:
-      '<path d="M-10.5 -26.6C-10.2 -36.2 -2.4 -41.2 6.6 -39.4C12 -38.2 14.6 -33.8 15 -29.8C11.8 -32.8 8 -32.4 6 -30.4C4 -28.4 6.2 -26.6 10.5 -26.6Z" fill="' + SKY + '"/>' +
-      line("#fff", 2.8, "M-10.6 -26.4Q0 -29.6 10.6 -26.4") + '<circle cx="15" cy="-28.4" r="2.4" fill="#fff"/>',
-    beanie:
-      '<path d="M-10.8 -26.6C-11 -41 11 -41 10.8 -26.6Z" fill="' + AMBER + '"/>' +
-      '<rect x="-11.4" y="-28.8" width="22.8" height="4.8" rx="2.4" fill="#fff"/><circle cy="-38.8" r="2.8" fill="#fff"/>',
-  };
-  var NOSE_BUBBLE =
-    '<circle cx=".6" cy="-20.6" r=".7" fill="' + SKIN_SH + '"/>' +
-    '<circle class="wx wxb-bubble" cx="2.6" cy="-19.4" r="2.3" fill="rgba(255,255,255,.55)" stroke="' + SKY + '" stroke-width=".7"/>';
-  var SWEAT = '<path d="M8.6 -30.4q-1.6 2.6 0 3.6q1.6 -1 0 -3.6Z" fill="' + SKY + '"/>';
-  // The head pivots at the neck so it can nod or tilt (.wxb-head).
-  function head(o) {
+  // The moon: a fat crescent (a big circle with a bite out of the top
+  // right), asleep. Its face sits on the thick left side.
+  var CRESCENT = "M10.02 -18.46A21 21 0 1 0 20.96 -1.26A11.5 11.5 0 1 1 10.02 -18.46Z";
+  function moonBody() {
     return (
-      '<g class="wxb-head ' + (o.hc || "") + '" style="' + (o.hv || "") + '">' +
-      '<circle cx="-10.1" cy="-23" r="2" fill="' + SKIN_SH + '"/><circle cx="10.1" cy="-23" r="2" fill="' + SKIN_SH + '"/>' +
-      '<circle cy="-23.5" r="10.2" fill="' + SKIN + '"/>' + (o.hat ? "" : HAIR_SHAPE) + EYES[o.eyes] + BLUSH + MOUTHS[o.mouth] +
-      (o.face || "") + (HATS[o.hat] || "") + "</g>"
+      '<path d="' + CRESCENT + '" fill="#fde68a" stroke="' + INK + '" stroke-width="1.2" stroke-linejoin="round"/>' +
+      '<ellipse cx="-12" cy="-8" rx="5.6" ry="2.6" transform="rotate(-48 -12 -8)" fill="#fff" opacity=".4"/>'
     );
   }
-  var SCARF = line(SKY, 3.6, "M-6.6 -14.8Q0 -11.4 6.6 -14.8");
-  function scarfTail(vars) {
-    return joint(4.6, -13.4, "wxc-osc", vars, line(SKY, 2.8, "M0 0q3.4 .6 5.4 4.6"));
+  function moonChar(o) {
+    o = o || {};
+    return moonBody() +
+      '<g transform="translate(-6.6 4)">' + shut("sleep", 5.2, -1) + cheeks(9.4, 4.6) + MOUTH.sleep + "</g>" + (o.cap === false ? "" : NIGHTCAP);
   }
-  var CANOPY =
-    '<path d="M-14 -25Q-12 -35 0 -36Q12 -35 14 -25Q10.5 -27.6 7 -25Q3.5 -27.6 0 -25Q-3.5 -27.6 -7 -25Q-10.5 -27.6 -14 -25Z" fill="' + AMBER + '"/>' +
-    line("rgba(20,23,28,.28)", 0.8, "M0 -36V-25");
-  // Held in the right hand at (12, -15.4) (where the raised right arm ends).
-  // `lean` is the slow movement (a sway, or the gust's pull), `shake` the
-  // fast one; flutter squashes the canopy as the wind catches it.
-  function umbrella(lean, shake, flutter) {
-    return joint(12, -15.4, lean[0], lean[1],
-      joint(0, 0, shake[0], shake[1], line(INK, 1.2, "M0 2V-25") +
-        (flutter ? '<g class="wx wxs-flutter">' + CANOPY + "</g>" : CANOPY) + '<circle r="2" fill="' + SKIN + '"/>'));
+  // Nightcap: sky blue, white band and pom-pom; the pom-pom swings.
+  var NIGHTCAP =
+    '<g transform="translate(-10 -13) rotate(-30)">' +
+    '<path d="M-10 4C-10 -8 0 -15 12 -13C17 -12 19 -7 19.4 -2C15.8 -5.6 11 -5.2 8.4 -2.2C6 0.6 8 4 12 4Z" fill="#6ec1ff" stroke="' + INK + '" stroke-width="1.1" stroke-linejoin="round"/>' +
+    '<rect x="-11" y="2" width="24" height="5" rx="2.5" fill="#fff" stroke="' + INK + '" stroke-width="1"/>' +
+    joint(19.4, -2, "wxc-osc", "--r:0deg;--a:14deg;animation-duration:2.6s", '<circle cy="2.4" r="3" fill="#fff" stroke="' + INK + '" stroke-width="1"/>') + "</g>";
+  // Clouds: circles and a flat base, outlined by drawing them twice (ink
+  // with a stroke, then the fill on top) so only the silhouette gets a line.
+  var CLOUD = '<circle cx="-11" cy="3" r="10"/><circle cx="-1" cy="-5" r="13"/><circle cx="12" cy="-1" r="10.5"/><rect x="-19" y="3" width="41" height="10" rx="5"/>';
+  function cloudBody(fill) {
+    return (
+      '<g fill="' + INK + '" stroke="' + INK + '" stroke-width="' + OUT + '" stroke-linejoin="round">' + CLOUD + "</g>" +
+      '<g fill="' + fill + '">' + CLOUD + "</g>" +
+      '<ellipse cx="1" cy="10.6" rx="16" ry="2.4" fill="rgba(90,115,170,.16)"/>' +
+      '<ellipse cx="-8" cy="-9" rx="5.4" ry="2.6" transform="rotate(-32 -8 -9)" fill="#fff" opacity=".7"/>'
+    );
   }
-  var UMB_ARM = arm(6.4, "", "--r:-118deg");
-  var HUG_L = arm(-6.4, "", "--r:-64deg", "#fff");
-  var HUG_R = arm(6.4, "", "--r:64deg", "#fff");
-  var BREATH = [0, 0.6, 1.2].map(function (d) {
-    return '<circle class="wx wxs-breath" style="animation-delay:-' + d + 's" cx="4.6" cy="-17.2" r="1" fill="' + SKY + '"/>';
-  }).join("");
-  function zzz() {
+  // o: fill, eyes (an eyes() options object, or "happy"/"sleep" for shut
+  // eyes), mouth, brow, hat, scarf, hi/hug (arm pose), and extra face bits.
+  function cloudChar(o) {
+    var face =
+      (typeof o.eyes === "string" ? shut(o.eyes, 6.4, -1) : eyes(o.eyes)) + cheeks(11.4, 5.6) + MOUTH[o.mouth || "smile"] + (o.face || "");
+    var hug = o.hug
+      ? arm(-19, 6, "", "--r:-66deg") + arm(19, 6, "", "--r:66deg")
+      : "";
+    return (o.hug ? "" : arms(19, 7, o.hi)) + cloudBody(o.fill) + (o.scarf || "") + '<g transform="translate(0 ' + (o.faceY == null ? 1 : o.faceY) + ')">' + face + "</g>" + hug + (o.hat || "");
+  }
+  var BEANIE =
+    '<path d="M-10 -14C-10 -29 8 -29 8 -14Z" fill="#f59e0b" stroke="' + INK + '" stroke-width="1.1" stroke-linejoin="round"/>' +
+    '<rect x="-11.4" y="-16.4" width="21.8" height="5" rx="2.5" fill="#fff" stroke="' + INK + '" stroke-width="1"/>' +
+    '<circle cx="-1" cy="-26.6" r="3" fill="#fff" stroke="' + INK + '" stroke-width="1"/>';
+  var SCARF =
+    line(INK, 5.6, "M-15 9Q1 14.6 17 9") + line("#6ec1ff", 3.4, "M-15 9Q1 14.6 17 9") +
+    joint(12, 11.4, "wxc-osc", "--r:-8deg;--a:7deg;animation-duration:1.4s", line(INK, 5.4, "M0 0q1 6 -1.4 11") + line("#6ec1ff", 3.2, "M0 0q1 6 -1.4 11"));
+  var SWEAT = '<path d="M13.6 -9.6q-1.8 3 0 4.2q1.8 -1.2 0 -4.2Z" fill="#6ec1ff" stroke="' + INK + '" stroke-width=".7"/>';
+  function zzz(x, y) {
     var out = "";
-    [[12, -40, 0.9, 0], [15.5, -45, 0.7, -0.9], [18.5, -49.5, 0.55, -1.8]].forEach(function (z) {
+    [[0, 0, 0.9, 0], [4.4, -5, 0.7, -0.9], [7.6, -9.4, 0.55, -1.8]].forEach(function (z) {
       out +=
-        '<g transform="translate(' + z[0] + " " + z[1] + ") scale(" + z[2] + ')"><path class="wx wxs-zzz" style="animation-delay:' + z[3] +
-        's" d="M0 0h4.6l-4.6 5.6h4.6" fill="none" stroke="' + SKY + '" stroke-width="1.3"' + ROUND + "/></g>";
+        '<g transform="translate(' + (x + z[0]) + " " + (y + z[1]) + ") scale(" + z[2] + ')"><path class="wx wxs-zzz" style="animation-delay:' + z[3] +
+        's" d="M0 0h4.6l-4.6 5.6h4.6" fill="none" stroke="#6ec1ff" stroke-width="1.3"' + ROUND + "/></g>";
     });
     return out;
   }
-  // Back to front: feet, torso, arms, scarf, head, props.
-  function kid(o) {
-    return feet(o.step, o.boot) + TORSO + (o.armL || ARM_L) + (o.armR || ARM_R) + (o.scarf || "") + head(o) + (o.props || "");
-  }
-  // Stands the figure on the ground at x. The .wxc group carries the body
-  // motion about the feet (waddle, gust, shiver, breathing) and the --T
-  // (cycle length) the waddling limbs inherit.
-  function who(x, body, cls, vars, scale) {
-    return (
-      '<g transform="translate(' + x + " 60) scale(" + (scale || 1.15) + ')"><ellipse cy=".6" rx="8.6" ry="1.5" fill="rgba(20,23,28,.12)"/>' +
-      '<g class="wxc ' + cls + '" style="' + vars + '">' + body + "</g></g>"
-    );
-  }
-  // The waddle: the body rocks (the .wxc group), bobs twice a cycle (this
-  // wrapper), and the feet lift in turn (kid's `step`).
-  function waddle(x, T, o, scale) {
-    o.step = "wxb-step";
-    return who(x, '<g class="wxb-bob">' + kid(o) + "</g>", "wxb-waddle", "--T:" + T + "s", scale);
-  }
-  // Rain streaks fall from under the cloud bank to the ground, each loop
-  // offset by a negative delay so it is already mid-fall on first paint.
-  function drops(n, d, x0, x1, dur, vars) {
+  // Rain streaks fall from under the cloud to the ground, each loop offset
+  // by a negative delay so it is already mid-fall on first paint. --dy is
+  // how far they fall before fading, so they stop at the ground line.
+  function drops(n, d, x0, x1, dur, vars, y0) {
     var out = "";
     for (var i = 0; i < n; i++) {
       out +=
-        '<g transform="translate(' + (x0 + ((x1 - x0) * i) / (n - 1)).toFixed(1) + ' 18)"><path class="wx wxs-rain" style="' + vars +
+        '<g transform="translate(' + (x0 + ((x1 - x0) * i) / (n - 1)).toFixed(1) + " " + y0 + ')"><path class="wx wxs-rain" style="' + vars +
         ";animation-duration:" + dur + "s;animation-delay:-" + ((i * 0.37) % dur).toFixed(2) + 's" d="' + d +
-        '" stroke="' + SKY + '" stroke-width="1.2"' + ROUND + "/></g>";
+        '" stroke="#6ec1ff" stroke-width="1.3"' + ROUND + "/></g>";
     }
     return out;
   }
-  function flakes(n) {
+  function flakes(n, x0, x1, y0, dy) {
     var out = "";
     for (var i = 0; i < n; i++) {
       out +=
-        '<circle class="wx wxs-snow" style="animation-delay:-' + ((i * 0.83) % 2.6).toFixed(2) + 's" cx="' +
-        (9 + (58 * i) / (n - 1)).toFixed(1) + '" cy="20" r="' + (i % 2 ? 1.1 : 1.5) + '" fill="' + SKY + '"/>';
+        '<circle class="wx wxs-snow" style="--dy:' + dy + "px;animation-delay:-" + ((i * 0.83) % 2.6).toFixed(2) + 's" cx="' +
+        (x0 + ((x1 - x0) * i) / (n - 1)).toFixed(1) + '" cy="' + y0 + '" r="' + (i % 2 ? 1.1 : 1.5) + '" fill="#6ec1ff"/>';
     }
     return out;
   }
-  function piece(kind, place) {
-    return '<g transform="' + place + '">' + ICONS[kind] + "</g>";
+  // x, y, scale: puts a character at a spot; its own group floats (cls).
+  function char(x, y, s, body, cls, vars) {
+    return '<g transform="translate(' + x + " " + y + ") scale(" + s + ')"><g class="' + cls + '" style="' + (vars || "") + '">' + body + "</g></g>";
   }
-  function bank(fill) {
-    return (
-      cloud("translate(3 -2) scale(1.2)", "wx-drift", "currentColor", fill) +
-      cloud("translate(31 -5) scale(1.45)", "wx-drift wx-rev", "currentColor", fill)
-    );
+  function shadow(x, y, rx) {
+    return '<ellipse class="wx wxm-shadow" cx="' + x + '" cy="' + y + '" rx="' + rx + '" ry="1.7" fill="rgba(20,23,28,.12)"/>';
   }
-  var GROUND = '<path d="M3 61H73" stroke="rgba(20,23,28,.16)" stroke-width="1.2"' + ROUND + "/>";
-  var WIND = [32, 42, 51].map(function (y, i) {
+  var GROUND = '<path d="M3 61H73" stroke="rgba(20,23,28,.14)" stroke-width="1.2"' + ROUND + "/>";
+  var WIND = [30, 40, 49].map(function (y, i) {
     return (
       '<g transform="translate(70 ' + y + ')"><path class="wx wxs-wind" style="animation-delay:-' + (i * 0.27).toFixed(2) +
-      's" d="M0 0h' + (12 + i * 3) + '" stroke="' + SKY + '" stroke-width="1.2"' + ROUND + "/></g>"
+      's" d="M0 0h' + (12 + i * 3) + '" stroke="#6ec1ff" stroke-width="1.2"' + ROUND + "/></g>"
     );
   }).join("");
-  var RIPPLES = [[10, 0], [38, 0.8]].map(function (r) {
-    return '<ellipse class="wx wxs-ripple" style="animation-delay:-' + r[1] + 's" cx="' + r[0] + '" cy="60.8" rx="4" ry="1" fill="none" stroke="' + SKY + '" stroke-width=".8"/>';
+  var RIPPLES = [[24, 0], [46, 0.8]].map(function (r) {
+    return '<ellipse class="wx wxs-ripple" style="animation-delay:-' + r[1] + 's" cx="' + r[0] + '" cy="60.8" rx="4" ry="1" fill="none" stroke="#6ec1ff" stroke-width=".8"/>';
   }).join("");
   var FOG =
-    '<g fill="rgba(214,229,247,.8)"><rect class="wx wxs-fog" x="2" y="34" width="34" height="4.4" rx="2.2"/>' +
-    '<rect class="wx wxs-fog wx-rev" style="animation-delay:-1.4s" x="30" y="43" width="40" height="4.4" rx="2.2"/>' +
-    '<rect class="wx wxs-fog" style="animation-delay:-2.6s" x="8" y="52" width="38" height="4.4" rx="2.2"/></g>';
+    '<g fill="rgba(214,229,247,.82)"><rect class="wx wxs-fog" x="2" y="30" width="38" height="4.6" rx="2.3"/>' +
+    '<rect class="wx wxs-fog wx-rev" style="animation-delay:-1.4s" x="34" y="39" width="40" height="4.6" rx="2.3"/>' +
+    '<rect class="wx wxs-fog" style="animation-delay:-2.6s" x="8" y="48" width="40" height="4.6" rx="2.3"/></g>';
   var SCENES = {
-    // Basking: eyes shut happily, a big grin, a tuft that bobs. Says hello
-    // with its free hand when the tile appears (and when you come in).
+    // Cheerful and a bit show-off: rays turning, a big grin, little sparkles.
     sun:
-      piece("sun", "translate(42 1) scale(1.1)") + GROUND +
-      who(22, kid({ eyes: "happy", mouth: "grin", hc: "wxb-idle", armR: HI_R }), "wxs-breathe", ""),
-    // Asleep standing up: nightcap, a nodding head, a snot bubble, Zzz.
+      shadow(38, 59, 13) + spark(14, 14, 2.2, 0, "#f59e0b") + spark(63, 50, 1.8, -1.1, "#f59e0b") +
+      char(38, 32, 0.95, sunChar({ hi: "R" }), "wxm-float", ""),
+    // Fast asleep in a nightcap, Zzz drifting out of the bite, stars twinkling.
     moon:
-      piece("moon", "translate(47 -1) scale(1.05)") + GROUND +
-      who(22, kid({ eyes: "sleep", mouth: "flat", hat: "cap", hc: "wxb-nod", hv: "--T:4s", face: NOSE_BUBBLE, props: zzz() }), "wxs-breathe", ""),
-    "cloud-sun": piece("cloud-sun", "translate(38 -1) scale(1.3)") + GROUND + waddle(22, 0.9, { eyes: "open", mouth: "smile", hc: "wxb-idle", armR: HI_R }),
-    // The sleepwalker: eyes shut, still waddling, nightcap and all.
-    "cloud-moon": piece("cloud-moon", "translate(38 -1) scale(1.3)") + GROUND + waddle(22, 1.3, { eyes: "sleep", mouth: "flat", hat: "cap", props: zzz() }),
-    // Strolling along with a glance up at the clouds.
-    cloud: piece("cloud", "translate(36 0) scale(1.35)") + GROUND + waddle(22, 1, { eyes: "up", mouth: "o", hv: "transform:rotate(-8deg)", armR: HI_R }),
-    // Fog bands are drawn last, so the figure is hazy behind them.
-    "cloud-fog": cloud("translate(38 -1) scale(1.3)", "wx-drift", "currentColor") + GROUND + waddle(22, 1.3, { eyes: "open", mouth: "smile", armR: HI_R }) + FOG,
-    // A yellow umbrella and boots; the free left hand waves hello.
+      shadow(36, 59, 12) + spark(61, 14, 2.4, 0) + spark(66, 38, 1.5, -1.1) + spark(11, 12, 1.7, -0.5) +
+      char(36, 34, 1, moonChar(), "wxm-float", "") + zzz(48, 22),
+    "cloud-sun":
+      shadow(31, 59, 13) +
+      char(54, 22, 0.5, sunChar({ noArms: true, mouth: "smile" }), "wxm-float", "animation-delay:-1.3s") +
+      char(31, 36, 0.98, cloudChar({ fill: "#f4f8ff", eyes: {}, mouth: "smile", hi: "R" }), "wxm-float", ""),
+    "cloud-moon":
+      shadow(31, 59, 13) + spark(66, 12, 1.8, -0.6) +
+      char(55, 20, 0.5, moonChar({ cap: false }), "wxm-float", "animation-delay:-1.3s") +
+      char(31, 36, 0.98, cloudChar({ fill: "#eef1ff", eyes: "sleep", mouth: "sleep" }), "wxm-float", "") + zzz(46, 22),
+    // Lazy and unbothered: half-lidded, a flat mouth, a yawn now and then, a
+    // smaller friend drifting along behind.
+    cloud:
+      shadow(34, 59, 13) +
+      char(58, 22, 0.5, cloudBody("#dfe8f7"), "wxm-float", "animation-delay:-1.6s") +
+      char(33, 34, 1.02, cloudChar({ fill: "#f4f8ff", eyes: { lid: "#f4f8ff" }, mouth: "none", hi: "R", face: '<g class="wxm-calm">' + MOUTH.flat + '</g><g class="wxm-yawn">' + MOUTH.o + "</g>" }), "wxm-float", ""),
+    // Dreamy, half hidden behind the fog bands.
+    "cloud-fog":
+      shadow(34, 59, 13) +
+      char(34, 34, 1.02, cloudChar({ fill: "#eef3fb", eyes: { lid: "#eef3fb" }, mouth: "sleep", hi: "R" }), "wxm-float", "") + FOG,
+    // Gloomy but sweet: droopy brows, a small frown, a steady drip.
     "cloud-rain":
-      bank() + drops(9, "M0 0l-1.4 4.4", 8, 70, 0.85, "--dx:-6px") + RIPPLES + GROUND +
-      waddle(22, 1, {
-        eyes: "open", mouth: "smile", boot: true, armL: HI_L, armR: UMB_ARM,
-        props: umbrella(["wxc-osc", "--r:-22deg;--a:2.5deg;animation-duration:1.9s"], ["", "--r:0deg"], false),
-      }, 1),
-    // Arms wrapped round, shivering, breath puffing, in a beanie and scarf.
+      shadow(36, 60, 12) + GROUND + RIPPLES + drops(8, "M0 0l-1.2 4.2", 20, 54, 0.85, "--dx:-4px;--dy:15px", 44) +
+      char(36, 27, 1.02, cloudChar({ fill: "#c4d3ee", eyes: { brow: "sad" }, mouth: "frown", hi: "L" }), "wxm-float", ""),
+    // Cosy in a beanie and scarf, arms wrapped round, shivering, flakes drifting down.
     "cloud-snow":
-      bank() + flakes(9) + GROUND +
-      who(22, kid({ eyes: "happy", mouth: "smile", hat: "beanie", scarf: SCARF + scarfTail("--r:-8deg;--a:7deg;animation-duration:1.4s"), armL: HUG_L, armR: HUG_R, props: BREATH }),
-        "wxc-shiver", "", 1),
-    // The reference's scene: heavy slanted rain, wind streaks, a bolt with a
-    // warm glow, and a startled kid leaning into it all with the scarf
-    // streaming and the umbrella wrenched back. Gust, bolt and glow share one
-    // 3.4s loop, so the wind shoves just as the lightning strikes.
+      GROUND + flakes(9, 14, 62, 42, 18) +
+      char(36, 29, 1, cloudChar({ fill: "#eaf4ff", eyes: "happy", mouth: "smile", hat: BEANIE, scarf: SCARF, hug: true, faceY: 0 }), "wxc-shiver", ""),
+    // The reference's scene: slanted rain, wind streaks, a bolt with a warm
+    // glow and a grumpy dark cloud with its arms crossed. Gust, bolt and glow
+    // share one 3.4s loop, so the wind shoves just as the lightning strikes.
     "cloud-lightning":
-      '<circle class="wxs-glow" cx="58" cy="24" r="16" fill="' + AMBER + '"/>' + bank("#c7d4ec") +
-      '<g transform="translate(46 15) scale(.95)"><path class="wx wxs-bolt" d="M13 2L4 14h7l-1 8 10-13h-7Z" fill="' + AMBER +
-      '" stroke="' + AMBER + '" stroke-width="1.6" stroke-linejoin="round"/></g>' +
-      drops(12, "M0 0l-3.2 4.4", 10, 76, 0.55, "--dx:-14px") + WIND + GROUND +
-      who(22, kid({
-          eyes: "wide", mouth: "o", boot: true, hc: "wxc-shiver", face: SWEAT,
-          scarf: SCARF + scarfTail("--r:58deg;--a:14deg;animation-duration:.3s"),
-          armL: arm(-6.4, "wxc-osc", "--r:34deg;--a:10deg;animation-duration:.62s"), armR: UMB_ARM,
-          props: umbrella(["wxs-pull", "--r:-22deg"], ["wxc-osc", "--r:0deg;--a:8deg;animation-duration:.3s"], true),
-        }), "wxs-gust", "--r:10deg", 1),
+      '<circle class="wxs-glow" cx="52" cy="44" r="15" fill="#f59e0b"/>' + GROUND +
+      drops(10, "M0 0l-3 4.2", 8, 70, 0.55, "--dx:-12px;--dy:16px", 42) + WIND +
+      '<g transform="translate(46 33) scale(.95)"><path class="wx wxs-bolt" d="M13 2L4 14h7l-1 8 10-13h-7Z" fill="#f59e0b" stroke="' + INK + '" stroke-width="1.2" stroke-linejoin="round"/></g>' +
+      char(32, 25, 1.02, cloudChar({ fill: "#8493b2", eyes: { brow: "angry", rx: 4.2, ry: 4.6 }, mouth: "scowl", hug: true, face: SWEAT, faceY: 0 }), "wxm-gust", ""),
   };
 
   // WMO weather codes (Open-Meteo's `weathercode`) collapsed into the
