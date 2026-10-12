@@ -13,8 +13,36 @@
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Shared with weather.js. The status tiles' characters say hello once
+  // the intro splash is gone (`delay` ms after it, so two characters take
+  // turns instead of waving together) and again when the pointer comes
+  // into their tile, at most every nine seconds, never on a loop. Adds
+  // .is-hello to `target` for two seconds; home.css plays the wave off it.
+  window.heroGreet = function (chip, target, delay) {
+    if (reduceMotion || !chip || !target) return;
+    var last = 0;
+    var hello = function () {
+      if (Date.now() - last < 9000) return;
+      last = Date.now();
+      target.classList.remove("is-hello");
+      void target.getBoundingClientRect();
+      target.classList.add("is-hello");
+      setTimeout(function () {
+        target.classList.remove("is-hello");
+      }, 2100);
+    };
+    chip.addEventListener("pointerenter", hello);
+    if (window.heroIntroDone) {
+      setTimeout(hello, delay);
+    } else {
+      document.addEventListener("hero:intro-done", function () {
+        setTimeout(hello, delay);
+      }, { once: true });
+    }
+  };
+
   // .hero-clock-time (index.md, styled in home.css as one of .hero-status's
-  // chips): the visitor's own local time, read straight off their browser —
+  // tiles): the visitor's own local time, read straight off their browser —
   // Intl/Date already know the system time zone with zero permission
   // prompt, nothing sent anywhere. Locale left as `undefined` (the
   // browser's own default) so 12h-vs-24h and AM/PM formatting matches
@@ -23,27 +51,27 @@
   // minute isn't motion, and a visitor who wants less animation has no
   // reason to also want a frozen, slowly-wrong clock.
   var clockEl = document.querySelector(".hero-clock-time");
-  var clockDetailEl = document.querySelector(".hero-clock-detail");
+  var clockDateEl = document.querySelector(".hero-clock-date");
+  var clockChip = document.querySelector(".hero-clock-chip");
   if (clockEl && window.Intl && Intl.DateTimeFormat) {
     var timeFormatter = new Intl.DateTimeFormat(undefined, {
       hour: "numeric",
       minute: "2-digit",
     });
-    // The full weekday + date, revealed on hover only (see .hero-status-
-    // detail in home.css) — real extra info, not just a bigger clock.
     var dateFormatter = new Intl.DateTimeFormat(undefined, {
-      weekday: "long",
+      weekday: "short",
       month: "short",
       day: "numeric",
     });
-    // The clock buddy (_includes/clock-mascot.svg): its hands are the real
-    // time, so the number above and the face agree. The angles keep
-    // counting past 360 (the turn counters below) instead of wrapping,
-    // since the hands ease between values with a CSS transition and a wrap
-    // from 354deg back to 0 would spin the minute hand almost a full
-    // circle backwards at every hour. Hands are information, not motion,
-    // so like the digits they update under reduced motion too (home.css
-    // just drops the easing there).
+    // The clock character (_includes/clock-mascot.svg) has no hands over
+    // its face; the time is read off the dial instead. The white dot on the
+    // ticks is the hour and the white bead on the rim is the minute, both
+    // driven here through --r. The angles keep counting past 360 (the turn
+    // counters below) instead of wrapping, since the markers ease between
+    // values with a CSS transition and a wrap from 354deg back to 0 would
+    // spin the minute bead almost a full circle backwards at every hour.
+    // Like the digits they update under reduced motion too (home.css just
+    // drops the easing there).
     var mascot = document.querySelector(".hero-clock-mascot");
     var hourHand = mascot && mascot.querySelector('[data-hand="h"]');
     var minHand = mascot && mascot.querySelector('[data-hand="m"]');
@@ -66,9 +94,9 @@
     var updateClock = function (ding) {
       var now = new Date();
       clockEl.textContent = timeFormatter.format(now);
-      if (clockDetailEl) clockDetailEl.textContent = " · " + dateFormatter.format(now);
+      if (clockDateEl) clockDateEl.textContent = dateFormatter.format(now);
       setHands(now);
-      // A hop and a bell ring on each new minute (not on load, when the
+      // A hop and a sparkle on each new minute (not on load, when the
       // page is still behind the intro splash anyway).
       if (ding === true && mascot && !reduceMotion) {
         mascot.classList.remove("is-ding");
@@ -81,8 +109,9 @@
       }
     };
     updateClock();
-    // The white dot on the rim is the second hand: a 60s CSS loop, started
-    // here at the current second so it matches the visitor's own clock.
+    // The brown dot on the rim is the second hand: a 60-step CSS loop,
+    // started here at the current second so it ticks with the visitor's own
+    // clock.
     var orbit = mascot && mascot.querySelector(".wxk-orbit");
     if (orbit) {
       var t0 = new Date();
@@ -99,10 +128,81 @@
         updateClock(true);
       }, 60000);
     }, msToNextMinute);
-    // The buddy's eyes follow the pointer, easing in as it gets within
-    // ~90px so a far-away cursor doesn't pin them to the edge. Needs a real
-    // hover-capable pointer and motion allowed; everyone else just gets
-    // the blink.
+
+    // The popover (.hero-clock-pop): the time to "the nanosecond", and how
+    // long since the Big Bang. Only runs while the tile is hovered or open.
+    // The first six digits after the point are real (a browser's clock is
+    // only good to about 0.1 ms; some blur it further on purpose), the last
+    // five are random and are labelled as such on the popover. The universe
+    // is 13.787 billion years old give or take 20 million (Planck 2018), so
+    // the "and N days" tail is the current year's progress, a gag.
+    var nsEl = clockChip && clockChip.querySelector("[data-ns]");
+    var uniRestEl = clockChip && clockChip.querySelector("[data-uni-rest]");
+    var pad = function (n, w) {
+      n = String(n);
+      while (n.length < w) n = "0" + n;
+      return n;
+    };
+    var drawPop = function () {
+      var ms = performance.timeOrigin + performance.now();
+      var d = new Date(ms);
+      var clock = pad(d.getHours(), 2) + ":" + pad(d.getMinutes(), 2) + ":" + pad(d.getSeconds(), 2);
+      if (nsEl) {
+        nsEl.textContent = clock + "." + pad(Math.floor((ms % 1000) * 10), 4) + pad(Math.floor(Math.random() * 1e5), 5);
+      }
+      if (uniRestEl) {
+        var days = Math.round(
+          (Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(d.getFullYear(), 0, 1)) / 864e5
+        );
+        uniRestEl.textContent = "and " + days + " days, " + clock + "." + pad(Math.floor(ms % 1000), 3);
+      }
+    };
+    var tickRaf = 0;
+    var lastTick = 0;
+    var tick = function (ts) {
+      tickRaf = 0;
+      if (!clockChip.matches(":hover, .is-open")) return;
+      // Reduced motion: a once-a-second snapshot instead of a blur of digits.
+      if (!reduceMotion || ts - lastTick >= 1000) {
+        lastTick = ts;
+        drawPop();
+      }
+      tickRaf = requestAnimationFrame(tick);
+    };
+    var startTick = function () {
+      if (!tickRaf) tickRaf = requestAnimationFrame(tick);
+    };
+    if (clockChip && (nsEl || uniRestEl)) {
+      drawPop();
+      clockChip.addEventListener("pointerenter", startTick);
+    }
+
+    // Touch has no hover, so a tap opens a tile's popover (and a tap
+    // anywhere else closes it). Pointer devices get the CSS :hover instead.
+    if (window.matchMedia("(hover: none)").matches) {
+      document.addEventListener("click", function (e) {
+        var chip = e.target.closest && e.target.closest(".hero-status-chip");
+        var open = document.querySelectorAll(".hero-status-chip.is-open");
+        for (var i = 0; i < open.length; i++) {
+          if (open[i] !== chip) open[i].classList.remove("is-open");
+        }
+        if (chip && chip.querySelector(".hero-pop")) {
+          chip.classList.toggle("is-open");
+          if (chip === clockChip) startTick();
+        }
+      });
+    }
+
+    window.heroGreet(clockChip, mascot, 900);
+
+    // The character's eyes follow the pointer, easing in as it gets within
+    // ~90px so a far-away cursor doesn't pin them to the edge. --ex/--ey
+    // are in the SVG's own units (the pupils have about 2.6 of room
+    // sideways). Once the pointer has stayed close (170px, released at
+    // 230px so it doesn't flicker on the boundary) she goes .is-watching:
+    // lids a notch lower, smirk instead of smile, fingers tapping. Needs a
+    // real hover-capable pointer and motion allowed; everyone else just
+    // gets the blink.
     if (mascot && !reduceMotion && window.matchMedia("(hover: hover)").matches) {
       var eyeRaf = 0;
       var px = 0;
@@ -111,11 +211,12 @@
         eyeRaf = 0;
         var r = mascot.getBoundingClientRect();
         var dx = px - (r.left + r.width / 2);
-        var dy = py - (r.top + r.height * 0.45);
+        var dy = py - (r.top + r.height * 0.37);
         var d = Math.hypot(dx, dy) || 1;
-        var k = Math.min(d / 90, 1) * 1.4;
-        mascot.style.setProperty("--ex", ((dx / d) * k).toFixed(2) + "px");
-        mascot.style.setProperty("--ey", ((dy / d) * k).toFixed(2) + "px");
+        var k = Math.min(d / 90, 1);
+        mascot.style.setProperty("--ex", ((dx / d) * k * 2.6).toFixed(2) + "px");
+        mascot.style.setProperty("--ey", ((dy / d) * k * 2.1).toFixed(2) + "px");
+        mascot.classList.toggle("is-watching", d < (mascot.classList.contains("is-watching") ? 230 : 170));
       };
       window.addEventListener(
         "pointermove",
@@ -126,6 +227,11 @@
         },
         { passive: true }
       );
+      document.addEventListener("mouseleave", function () {
+        mascot.style.setProperty("--ex", "0px");
+        mascot.style.setProperty("--ey", "0px");
+        mascot.classList.remove("is-watching");
+      });
     }
   }
 

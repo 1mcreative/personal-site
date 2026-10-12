@@ -46,6 +46,10 @@
     if (typeof window.globeRevealDots === "function") {
       window.globeRevealDots();
     }
+    // The status tiles' characters (hero.js, weather.js) wait for this to
+    // say hello, so the wave happens on screen and not behind the splash.
+    window.heroIntroDone = true;
+    document.dispatchEvent(new Event("hero:intro-done"));
   }
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {

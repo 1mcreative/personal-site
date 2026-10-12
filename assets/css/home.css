@@ -1259,18 +1259,10 @@
 /* Status chips — top-left, the one hero corner nothing else claims
    (.page-corner/.portal-orb, both deprecated, used to own top-right;
    .spotlight-text sits top-right on desktop; .hero-copyright/.scroll-cue
-   own the bottom). Built to hold more than the clock: per explicit
-   request ("we will add more UI features like this"), .hero-status is a
-   plain flex column so a second chip (weather, next) just stacks below
-   without any layout rework. Each chip shares one pill treatment — same
-   blurred-glass idea as .scroll-cue's own backdrop, sized down to fit a
-   corner instead of straddling the globe.
-   Row instead of column from tablet width up: a 3-tall stack reads much
-   heavier than the single .hero-bored-trigger pill sitting opposite it
-   top-right, which is the actual "unbalanced" thing about this corner —
-   a single-line cluster matches that pill's own shape and weight instead
-   of towering over it. Stays a column below 768px, where three chips
-   side by side wouldn't fit next to each other on a phone width. */
+   own the bottom). A flex container so more can be added later: a column
+   of small glass pills on a phone, a wrapping row of tiles from tablet
+   width up (next block). Each chip shares one treatment, the same
+   blurred-glass idea as .scroll-cue's own backdrop. */
 .hero-status {
   position: absolute;
   z-index: 2;
@@ -1282,45 +1274,16 @@
   gap: var(--space-1);
 }
 
-/* Tablet and up: a two-by-two "bento" instead of a row. The weather widget
-   is a tall tile with a character scene in it, and next to the small clock
-   and distance pills it read as lopsided, the pills floating against the
-   middle of its height. Now the tile spans two rows in the first column and
-   the pills stack in the second (two 40px rows), so the cluster is one
-   rectangle whose top and bottom edges line up (40 + 8 gap + 40 = the
-   tile's 88px). The tile goes first on purpose: a pill's hover reveal grows
-   it to the right, and with the pills in the last column that growth
-   pushes nothing. The cost is that the pills move over when the tile
-   arrives, which normally happens while the intro splash still covers the
-   hero. Without a tile (weather failed or not here yet) the pills take the
-   first column themselves. */
+/* Tablet and up: three equal tiles in a row that wraps. Each tile is a
+   rounded card holding a character or a map (88px tall; the block after
+   .hero-status-icon below). max-width keeps the last tile off the Getting
+   bored? button on the right: a narrow tablet wraps to a second row
+   instead of running underneath it. */
 @media (min-width: 768px) {
   .hero-status {
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-template-rows: repeat(2, 40px);
-    align-items: stretch;
-    justify-items: start;
-  }
-
-  .hero-weather-chip {
-    grid-column: 1;
-    grid-row: 1 / span 2;
-  }
-
-  .hero-clock-chip {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .hero-distance-chip {
-    grid-column: 2;
-    grid-row: 2;
-  }
-
-  .hero-status:not(:has(.hero-weather-chip)) .hero-clock-chip,
-  .hero-status:not(:has(.hero-weather-chip)) .hero-distance-chip {
-    grid-column: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: calc(100% - 190px);
   }
 }
 
@@ -1379,13 +1342,13 @@
 /* Bolder, more present treatment than the original quiet pill, per
    direct feedback that the chips "look boring... make it interactive
    more visible." Solid-er glass, a real shadow, darker text, a hint of
-   the accent color in the border instead of plain gray — reads as a
-   deliberate UI element rather than faint fine print. The hover lift
-   plus each chip's own .hero-status-detail span (below) are the actual
-   "interactive" part: hovering doesn't just look different, it reveals
-   a fuller line of real info instead of relying only on a plain native
-   `title` tooltip. */
+   the accent color in the border instead of plain gray, so it reads as a
+   deliberate UI element rather than faint fine print. The hover lift is
+   one half of "interactive"; the other is what each chip reveals: the
+   clock and distance open popovers (.hero-pop, shared block below) and
+   the weather pill shows its condition line. */
 .hero-status-chip {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -1535,67 +1498,83 @@
   --wx-tint: rgba(29, 78, 216, 0.12);
 }
 
-.hero-weather-chip .hero-status-detail::before {
-  content: " · ";
-  white-space: pre;
-}
-
-/* Character rig (weather.js: joint/leg/arm/who). .wxc rotates about its own
-   origin, which weather.js places on a joint (hip, knee, shoulder, elbow,
-   neck, hand, feet), so --r is a resting pose and a class adds motion.
-   --T (cycle length) and --k (stride size) are set once on the figure and
-   inherited by every limb. */
+/* Character rig (weather.js: joint, arm, kid, who). .wxc rotates about its
+   own origin, which weather.js places on a joint (shoulder) or the figure's
+   feet, so --r is a resting pose and a class adds motion. The figure is a
+   chibi: a big round head on a small body, glossy eyes, blush, stubby
+   limbs, the proportions that read as cute rather than funny. The walking
+   scenes are a front-on waddle (--T is the cycle length): the body rocks
+   side to side, bobs twice per cycle, and the feet lift in turn. */
 .wxc {
   transform-box: view-box;
   transform-origin: 0 0;
   transform: rotate(var(--r, 0deg));
 }
 
-/* Walk cycle. Angles are CSS rotations of a limb hanging straight down on a
-   figure facing right, so negative swings forward and positive swings back.
-   Stance is the first half (the planted foot travelling back under the
-   body), swing the second (the knee folds to clear the ground, then the
-   leg extends for the next heel strike). Arms counter-swing, the elbow
-   closing as the arm comes forward. The far limbs run half a cycle behind
-   (.wxw-far). The body is lowest at heel strike and highest at passing,
-   which is what keeps the planted foot on the ground as the leg's reach
-   changes; the ground dashes (wxs-ground) move at the matching speed. */
-.wxw-thigh { animation: wxw-thigh var(--T, 0.9s) linear infinite; }
-.wxw-shin { animation: wxw-shin var(--T, 0.9s) ease-in-out infinite; }
-.wxw-arm { animation: wxw-arm var(--T, 0.9s) ease-in-out infinite; }
-.wxw-fore { animation: wxw-fore var(--T, 0.9s) ease-in-out infinite; }
-.wxw-bob { animation: wxw-bob calc(var(--T, 0.9s) / 2) ease-in-out infinite; }
-.wxw-far { animation-delay: calc(var(--T, 0.9s) / -2); }
+.wxb-waddle { animation: wxb-waddle var(--T, 0.9s) ease-in-out infinite; }
+.wxb-bob { animation: wxb-bob calc(var(--T, 0.9s) / 2) ease-in-out infinite; }
+.wxb-step { animation: wxb-step var(--T, 0.9s) ease-in-out infinite; }
+.wxb-far { animation-delay: calc(var(--T, 0.9s) / -2); }
+.wxb-head { transform-origin: 0px -14px; }
+.wxb-idle { animation: wxb-idle 4.6s ease-in-out infinite; }
+.wxb-tuft { transform-origin: -0.6px -34.4px; animation: wxb-tuft 2.6s ease-in-out infinite; }
+.wxb-nod { animation: wxb-nod var(--T, 4s) infinite; }
+.wxb-bubble { animation: wxb-bubble 3.4s ease-in-out infinite; }
 
-@keyframes wxw-thigh {
-  0% { transform: rotate(calc(var(--k, 1) * -24deg)); }
-  50% { transform: rotate(calc(var(--k, 1) * 22deg)); animation-timing-function: ease-in-out; }
-  100% { transform: rotate(calc(var(--k, 1) * -24deg)); }
+/* The greeting. weather.js adds .is-hello to the chip for about two
+   seconds when it first appears and when the pointer comes in (not on a
+   loop, that read as nagging). --s is the arm's side: 1 raises the
+   right-hand arm anticlockwise, -1 mirrors it for the left. */
+.is-hello .wxb-hi { animation: wxb-hello 2s ease-in-out both; }
+
+@keyframes wxb-waddle {
+  0%, 100% { transform: rotate(-3.6deg); }
+  50% { transform: rotate(3.6deg); }
 }
-@keyframes wxw-shin {
-  0% { transform: rotate(calc(var(--k, 1) * 4deg)); }
-  18% { transform: rotate(calc(var(--k, 1) * 12deg)); }
-  40% { transform: rotate(calc(var(--k, 1) * 4deg)); }
-  50% { transform: rotate(calc(var(--k, 1) * 28deg)); }
-  62% { transform: rotate(calc(var(--k, 1) * 66deg)); }
-  78% { transform: rotate(calc(var(--k, 1) * 40deg)); }
-  92% { transform: rotate(calc(var(--k, 1) * 10deg)); }
-  100% { transform: rotate(calc(var(--k, 1) * 4deg)); }
+@keyframes wxb-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.3px); }
 }
-@keyframes wxw-arm {
-  0%, 100% { transform: rotate(calc(var(--k, 1) * 24deg)); }
-  50% { transform: rotate(calc(var(--k, 1) * -26deg)); }
+@keyframes wxb-step {
+  0%, 50%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-2px); }
 }
-@keyframes wxw-fore {
-  0%, 100% { transform: rotate(calc(var(--k, 1) * -14deg)); }
-  50% { transform: rotate(calc(var(--k, 1) * -46deg)); }
+@keyframes wxb-idle {
+  0%, 100% { transform: rotate(-1.6deg); }
+  50% { transform: rotate(1.6deg); }
 }
-@keyframes wxw-bob {
-  0%, 100% { transform: translateY(calc(var(--k, 1) * 1.1px)); }
-  50% { transform: translateY(0); }
+@keyframes wxb-tuft {
+  0%, 100% { transform: rotate(-9deg); }
+  50% { transform: rotate(9deg); }
+}
+/* A slow droop, a jerk awake, a settle. */
+@keyframes wxb-nod {
+  0% { transform: rotate(0deg); animation-timing-function: ease-in; }
+  54% { transform: rotate(17deg); }
+  60% { transform: rotate(19deg); animation-timing-function: ease-out; }
+  66% { transform: rotate(-3deg); }
+  76% { transform: rotate(1deg); }
+  100% { transform: rotate(0deg); }
+}
+/* The sleeper's nose bubble swells, hangs there, pops. */
+@keyframes wxb-bubble {
+  0%, 100% { transform: scale(0.2); opacity: 0; }
+  10% { opacity: 1; }
+  58% { transform: scale(1.15); opacity: 1; }
+  66% { transform: scale(1.15); opacity: 1; }
+  72% { transform: scale(1.5); opacity: 0; }
+}
+@keyframes wxb-hello {
+  0%, 100% { transform: rotate(var(--r, 0deg)); }
+  20% { transform: rotate(calc(var(--s, 1) * -150deg)); }
+  32% { transform: rotate(calc(var(--s, 1) * -132deg)); }
+  44% { transform: rotate(calc(var(--s, 1) * -154deg)); }
+  56% { transform: rotate(calc(var(--s, 1) * -132deg)); }
+  68% { transform: rotate(calc(var(--s, 1) * -154deg)); }
+  80% { transform: rotate(calc(var(--s, 1) * -144deg)); }
 }
 
-/* Generic swing around --r (waves, scarf tails, umbrella shake) and shiver. */
+/* Generic swing around --r (scarf tails, umbrella shake) and shiver. */
 .wxc-osc { animation: wxc-osc 1s ease-in-out infinite; }
 .wxc-shiver { animation: wxc-shiver 0.12s linear infinite alternate; }
 
@@ -1608,12 +1587,9 @@
   to { transform: translateX(0.6px); }
 }
 
-/* Acting. nod: a slow droop, a jerk awake. gust and pull share the storm's
-   3.4s loop with the bolt and its glow, so the wind shoves as the lightning
-   strikes. */
-.wxs-idle { animation: wxs-idle 1.8s ease-in-out infinite; }
+/* Acting. gust and pull share the storm's 3.4s loop with the bolt and its
+   glow, so the wind shoves as the lightning strikes. */
 .wxs-breathe { animation: wxs-breathe 2.6s ease-in-out infinite; }
-.wxs-nod { animation: wxs-nod var(--T, 3.6s) infinite; }
 .wxs-blink { animation: wxs-blink 3.8s infinite; }
 .wxs-glint { animation: wxs-glint 3.4s ease-out infinite; }
 .wxs-gust { animation: wxs-gust 3.4s ease-in-out infinite; }
@@ -1622,21 +1598,9 @@
 .wxs-ripple { animation: wxs-ripple 1.6s ease-out infinite; }
 .wxs-breath { animation: wxs-breath 1.8s ease-out infinite; }
 
-@keyframes wxs-idle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-0.5px); }
-}
 @keyframes wxs-breathe {
   0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.018); }
-}
-@keyframes wxs-nod {
-  0% { transform: rotate(0deg); animation-timing-function: ease-in; }
-  54% { transform: rotate(20deg); }
-  60% { transform: rotate(22deg); animation-timing-function: ease-out; }
-  66% { transform: rotate(-4deg); }
-  76% { transform: rotate(1.5deg); }
-  100% { transform: rotate(0deg); }
+  50% { transform: scaleY(1.02); }
 }
 @keyframes wxs-blink {
   0%, 92%, 100% { transform: scaleY(1); }
@@ -1676,7 +1640,6 @@
 .wxs-fog { animation: wxs-fog 5s ease-in-out infinite; }
 .wxs-zzz { animation: wxs-zzz 2.6s ease-out infinite; }
 .wxs-flutter { animation: wxs-flutter 0.32s ease-in-out infinite; }
-.wxs-ground { animation: wxs-ground 0.9s linear infinite; }
 .wxs-glow { opacity: 0; animation: wxs-glow 3.4s linear infinite; }
 
 @keyframes wxs-rain {
@@ -1707,11 +1670,6 @@
   0%, 100% { transform: scale(1, 1); }
   50% { transform: scale(0.88, 1.1); }
 }
-/* --gs (set per scene in weather.js) is two dash periods: the ground
-   travels exactly that far per stride cycle, so the loop is seamless. */
-@keyframes wxs-ground {
-  to { stroke-dashoffset: var(--gs, 22px); }
-}
 /* Same double stutter as wx-flash, as a warm bloom behind the bolt. */
 @keyframes wxs-glow {
   0%, 50%, 100% { opacity: 0; }
@@ -1736,15 +1694,203 @@
   stroke-width: 1.45;
 }
 
+/* Shared by the three tiles. On a phone the chips are the compact pills
+   above and the value and sub-label sit inline; from tablet width up each
+   chip is a tile (a scene or character on the left, a big value over a
+   small label on the right). .hero-pop is the popover each tile opens on
+   hover (or on tap, hero.js adds .is-open where there is no hover); it is
+   absolutely positioned, so opening one never moves anything else.
+   A hovered or open tile is raised above its later siblings, or a tile in
+   the next row would paint over its popover. The popover is nearly opaque
+   white rather than blurred glass: a chip with backdrop-filter is a
+   backdrop root, so a blur on a child would only see the chip. */
+.hero-tile-sub {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.hero-clock-date {
+  display: none;
+}
+
+.hero-distance-chip .hero-tile-sub::before {
+  content: "\00b7\00a0";
+}
+
+.hero-sub-long {
+  display: none;
+}
+
+.hero-status-chip:hover,
+.hero-status-chip.is-open {
+  z-index: 3;
+}
+
+.hero-pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 5;
+  display: block;
+  width: 17.5rem;
+  max-width: calc(100vw - 2 * var(--space-3));
+  padding: 0.9rem 1rem 0.95rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(29, 78, 216, 0.16);
+  box-shadow: 0 16px 36px rgba(20, 23, 28, 0.17);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
+  white-space: normal;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-4px) scale(0.98);
+  transform-origin: 24px 0;
+  transition:
+    opacity 0.2s ease,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    visibility 0s linear 0.2s;
+}
+
+/* Keeps the pointer inside the chip's hover area while it crosses the gap. */
+.hero-pop::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -10px;
+  height: 10px;
+}
+
+.hero-status-chip:hover .hero-pop,
+.hero-status-chip.is-open .hero-pop {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  transition-delay: 0s;
+}
+
+.hero-pop-k {
+  display: block;
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.hero-pop-big + .hero-pop-k {
+  margin-top: 0.8rem;
+}
+
+.hero-pop-big {
+  display: block;
+  margin: 0.15rem 0 0.15rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-pop-small {
+  display: block;
+  margin-bottom: 0.7rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-pop-line {
+  display: block;
+  margin-top: 0.35rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(29, 78, 216, 0.12);
+  font-weight: 600;
+}
+
+.hero-pop-fine {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 400;
+}
+
+.hero-pop-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.14rem 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-pop-row > span:first-child {
+  color: var(--muted);
+}
+
+@media (hover: none) {
+  .hero-status-chip::after {
+    content: "";
+    position: absolute;
+    inset: -4px 0;
+  }
+}
+
 @media (min-width: 768px) {
-  .hero-weather-chip {
+  .hero-status-chip {
     display: inline-grid;
-    grid-template-columns: 90px auto;
+    grid-template-columns: auto auto;
     column-gap: 0.7rem;
     row-gap: 0.2rem;
     align-items: center;
-    padding: 0.3rem 1.2rem 0.3rem 0.4rem;
+    min-height: 88px;
+    padding: 0.3rem 1.2rem 0.3rem 0.5rem;
     border-radius: 22px;
+  }
+
+  .hero-status-chip > svg {
+    grid-row: 1 / span 2;
+  }
+
+  .hero-tile-val {
+    align-self: end;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .hero-tile-sub {
+    align-self: start;
+    max-width: 150px;
+    /* The chip's own line-height:1 plus this overflow clip would shave the
+       descenders off "Partly cloudy". Tile only: on a phone it would make
+       the pills taller than their siblings. */
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .hero-clock-date {
+    display: block;
+  }
+
+  .hero-distance-chip .hero-tile-sub::before {
+    content: none;
+  }
+
+  .hero-sub-short {
+    display: none;
+  }
+
+  .hero-sub-long {
+    display: inline;
   }
 
   .hero-weather-icon {
@@ -1753,40 +1899,10 @@
 
   .hero-weather-scene {
     display: block;
-    grid-row: 1 / span 2;
     width: 90px;
     height: 76px;
   }
 
-  .hero-weather-temp {
-    align-self: end;
-    font-size: 1.4rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
-
-  .hero-weather-chip .hero-status-detail {
-    align-self: start;
-    max-width: 150px;
-    opacity: 1;
-    text-overflow: ellipsis;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-
-  .hero-weather-chip .hero-status-detail::before {
-    content: none;
-  }
-}
-
-/* The distance pill now carries a 60px route map, so the cluster is wider
-   than it was. At narrow tablet widths trim the weather tile's condition
-   line a little earlier, so the worst case (a long city name beside a long
-   distance label) still clears the Getting bored? button at 768px. */
-@media (min-width: 768px) and (max-width: 899px) {
-  .hero-weather-chip .hero-status-detail {
-    max-width: 120px;
-  }
 }
 
 /* Reduced motion: every icon and scene animation off. Limbs hold their
@@ -1799,35 +1915,35 @@
   }
 }
 
-/* .hero-status-detail: the hover-reveal line each chip appends (see
-   hero.js/weather.js/distance.js) — collapsed to nothing at rest,
-   revealed on hover/focus. A real interaction, not just a hover color
-   change: the clock reveals the full weekday and date, weather reveals
-   the condition and city, distance reveals visitor-city-to-Bengaluru —
-   genuinely more info, not decoration. Touch visitors simply never
-   trigger :hover, so they always see the compact resting state; nothing
-   here needs a separate touch fallback.
-   Only `opacity` animates — `max-width` toggles instantly instead of
-   transitioning (a single one-time reflow on hover/unhover, not a
-   per-frame one across the transition's duration), since width/
-   max-width are layout properties and animating them frame-by-frame
-   causes real layout thrash; there's no `width:auto`-transitionable or
-   transform-only equivalent for "reveal more text," so this is the
-   narrowest fix rather than a `transform`/`opacity`-only rewrite. */
-.hero-status-detail {
-  display: inline-block;
-  max-width: 0;
-  overflow: hidden;
-  opacity: 0;
-  white-space: nowrap;
-  color: var(--muted);
-  font-weight: 400;
-  transition: opacity 0.25s ease;
-}
+/* .hero-status-detail: the weather pill's hover-reveal line on a phone
+   (the condition and city), collapsed to nothing at rest and revealed on
+   hover. From tablet width up the weather chip is a tile whose sub-label
+   (.hero-tile-sub) is always visible instead, and the clock and distance
+   tiles open popovers (.hero-pop), so none of this applies there. Only
+   `opacity` animates: `max-width` toggles instantly (one reflow on hover,
+   not one per frame), since there is no transform-only way to reveal more
+   text. */
+@media (max-width: 767px) {
+  .hero-status-detail {
+    display: inline-block;
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    white-space: nowrap;
+    color: var(--muted);
+    font-weight: 400;
+    transition: opacity 0.25s ease;
+  }
 
-.hero-status-chip:hover .hero-status-detail {
-  max-width: 220px;
-  opacity: 1;
+  .hero-status-chip:hover .hero-status-detail {
+    max-width: 220px;
+    opacity: 1;
+  }
+
+  .hero-weather-chip .hero-status-detail::before {
+    content: " \00b7 ";
+    white-space: pre;
+  }
 }
 
 /* Fixed visual order (clock, weather, distance) regardless of which
@@ -1848,85 +1964,119 @@
   order: 3;
 }
 
-/* Clock buddy (_includes/clock-mascot.svg, driven by hero.js): the time
-   chip's old pulsing dot and line icon, replaced per "for time use... Miss
-   Minutes, something like that" with a small cartoon alarm clock. Sized to
-   sit inside the same 36px (mobile) and 40px (bento) pills as before: the
-   negative block margins hand its extra height back, as the weather icon
-   does, and overflow stays visible so a hop or a waving hand isn't clipped.
-   Everything that moves carries .wx (pivots on its own box) except the
-   hands, orbit dot and waving arm, which are .wxc joints (rotate about
-   their local origin, set in the SVG). The hands' --r comes from hero.js
-   (the real time); the eyes' --ex/--ey come from hero.js too (the cursor).
-   The hands ease with a springy transition, dropped under reduced motion. */
+/* Clock character (_includes/clock-mascot.svg, driven by hero.js): an
+   orange rubber-hose cartoon clock, calm on the surface and a little bit
+   scheming underneath. Everything here is slow on purpose: a pendulum
+   sway, a blink every six seconds, a glance to the side now and then. The
+   eyes follow the cursor (hero.js sets --ex/--ey), and when the cursor
+   stays close hero.js adds .is-watching: the lids settle a notch, the
+   calm smile gives way to a smirk, and the gloved fingers start to tap.
+   .is-hello (a polite wave, once) and .is-ding (a hop on each new minute)
+   are also added by hero.js. Pivots are in the SVG's own coordinates
+   (viewBox 0 0 64 76), since there is no wrapper transform in this file.
+   Compact (phone) size overhangs the pill through negative block margins,
+   the way the weather icon does, so the pill keeps its 36px height. */
 .hero-clock-mascot {
   width: 34px;
-  height: 31px;
+  height: 40px;
   flex-shrink: 0;
-  margin: -7.5px -3px -7.5px -6px;
+  margin: -12px -2px -12px -5px;
   overflow: visible;
   --ex: 0px;
   --ey: 0px;
 }
 
-.hero-clock-mascot .wx {
-  transform-box: fill-box;
-  transform-origin: center;
+@media (min-width: 768px) {
+  .hero-clock-mascot {
+    width: 64px;
+    height: 76px;
+    margin: 0;
+  }
 }
 
-.wxk-sway { transform-origin: 50% 92%; animation: wxk-sway 2s ease-in-out infinite; }
-.wxk-tap { transform-origin: 50% 100%; animation: wxk-tap 1.6s ease-in-out infinite; }
-.wxk-blink { animation: wxs-blink 4.2s infinite; }
-.wxk-eyes { transform: translate(var(--ex), var(--ey)); transition: transform 0.14s ease-out; }
-.wxk-hand { transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.wxk-orbit { animation: wxk-orbit 60s linear infinite; }
-.wxk-wave { animation: wxk-wave 9s ease-in-out infinite; }
-.wxk-spark { opacity: 0; }
+.wxk-sway { transform-origin: 32px 70px; animation: wxk-sway 5s ease-in-out infinite; }
+.wxk-hand { transform-origin: 32px 30px; transform: rotate(var(--r, 0deg)); transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.wxk-orbit { transform-origin: 32px 30px; animation: wxk-orbit 60s steps(60) infinite; }
+.wxk-eyes { transform: translate(var(--ex), var(--ey)); transition: transform 0.16s ease-out; }
+.wxk-glance { animation: wxk-glance 13s ease-in-out infinite; }
+.wxk-lidrest { transition: transform 0.6s ease; }
+.wxk-lid { animation: wxk-lid 6.4s infinite; }
+.wxk-glint { opacity: 0; transform-origin: 28.4px 26.3px; animation: wxs-glint 7s ease-out infinite; }
+.wxk-brow { transform-origin: 40px 17px; animation: wxk-brow 13s ease-in-out infinite; }
+.wxk-smile, .wxk-smirk { transition: opacity 0.45s ease; }
+.wxk-smirk { opacity: 0; }
+.wxk-tap { transform-origin: 37.6px 66px; animation: wxk-tap 5.2s ease-in-out infinite; }
+.wxk-armR { transform-origin: 53.4px 36px; }
+.wxk-fingers { transform-origin: 38.6px 52px; }
+.wxk-spark { opacity: 0; transform-origin: 55px 7px; }
+
+.hero-clock-mascot.is-watching .wxk-lidrest { transform: translateY(1.3px); }
+.hero-clock-mascot.is-watching .wxk-smile { opacity: 0; }
+.hero-clock-mascot.is-watching .wxk-smirk { opacity: 1; }
+.hero-clock-mascot.is-watching .wxk-fingers { animation: wxk-scheme 1.4s ease-in-out infinite; }
+.hero-clock-mascot.is-hello .wxk-armR { animation: wxk-hello 2s ease-in-out both; }
+.hero-clock-mascot.is-hello .wxk-armR .wxk-fingers { animation: wxk-waggle 0.5s ease-in-out 0.4s 3; }
+.hero-clock-mascot.is-ding .wxk-sway { animation: wxk-hop 0.9s cubic-bezier(0.3, 0, 0.3, 1); }
+.hero-clock-mascot.is-ding .wxk-spark { animation: wxk-spark 0.9s ease-out; }
 
 @keyframes wxk-sway {
-  0%, 100% { transform: rotate(-2.4deg); }
-  50% { transform: rotate(2.4deg); }
+  0%, 100% { transform: rotate(-1.4deg); }
+  50% { transform: rotate(1.4deg); }
 }
-@keyframes wxk-tap {
-  0%, 66%, 100% { transform: translateY(0) rotate(0deg); }
-  74% { transform: translateY(-1.8px) rotate(-8deg); }
-  82% { transform: translateY(0) rotate(0deg); }
-  90% { transform: translateY(-1.4px) rotate(-6deg); }
-}
+/* One step per second; hero.js starts it at the current second. */
 @keyframes wxk-orbit {
   to { transform: rotate(360deg); }
 }
-/* Mostly hanging at its side; every 9s it raises the arm and waves. */
-@keyframes wxk-wave {
-  0%, 72%, 94%, 100% { transform: rotate(0deg); }
-  76% { transform: rotate(-150deg); }
-  79% { transform: rotate(-135deg); }
-  82% { transform: rotate(-162deg); }
-  85% { transform: rotate(-135deg); }
-  88% { transform: rotate(-162deg); }
-  91% { transform: rotate(-148deg); }
+/* A slow, deliberate blink. */
+@keyframes wxk-lid {
+  0%, 92%, 100% { transform: translateY(0); }
+  95% { transform: translateY(10.5px); }
 }
-
-/* hero.js adds .is-ding for ~1s on each new minute. */
-.hero-clock-mascot.is-ding .wxk-sway { animation: wxk-hop 0.9s cubic-bezier(0.3, 0, 0.3, 1); }
-.hero-clock-mascot.is-ding .wxk-bell { animation: wxk-bell 0.9s ease-in-out; }
-.hero-clock-mascot.is-ding .wxk-spark { animation: wxk-spark 0.9s ease-out; }
-
+/* A sly glance away and back, with the right brow lifting as it goes. */
+@keyframes wxk-glance {
+  0%, 40%, 60%, 100% { transform: translate(0, 0); }
+  46%, 54% { transform: translate(-2.2px, 0.4px); }
+}
+@keyframes wxk-brow {
+  0%, 40%, 60%, 100% { transform: translateY(0) rotate(0deg); }
+  46%, 54% { transform: translateY(-1.6px) rotate(-5deg); }
+}
+/* The foot taps twice, then waits. */
+@keyframes wxk-tap {
+  0%, 70%, 100% { transform: rotate(0deg); }
+  76% { transform: rotate(-9deg); }
+  82% { transform: rotate(0deg); }
+  88% { transform: rotate(-7deg); }
+  94% { transform: rotate(0deg); }
+}
+/* Gloved fingertips tapping together. */
+@keyframes wxk-scheme {
+  0%, 40%, 100% { transform: rotate(0deg); }
+  10%, 30% { transform: rotate(-7deg); }
+  20% { transform: rotate(0deg); }
+}
+/* Arm swings out and up (anticlockwise, the long way round the outside),
+   holds there while the glove waggles at the wrist, and comes back. */
+@keyframes wxk-hello {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-192deg); }
+  36% { transform: rotate(-186deg); }
+  52% { transform: rotate(-192deg); }
+  68% { transform: rotate(-186deg); }
+  80% { transform: rotate(-190deg); }
+}
+@keyframes wxk-waggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-26deg); }
+  75% { transform: rotate(26deg); }
+}
 @keyframes wxk-hop {
   0% { transform: translateY(0) scale(1, 1); }
-  18% { transform: translateY(1px) scale(1.06, 0.92); }
-  42% { transform: translateY(-5px) scale(0.96, 1.06); }
-  66% { transform: translateY(0) scale(1.05, 0.94); }
-  82% { transform: translateY(-1.2px) scale(1, 1); }
+  18% { transform: translateY(1px) scale(1.05, 0.93); }
+  42% { transform: translateY(-5px) scale(0.97, 1.05); }
+  66% { transform: translateY(0) scale(1.04, 0.95); }
+  82% { transform: translateY(-1px) scale(1, 1); }
   100% { transform: translateY(0) scale(1, 1); }
-}
-@keyframes wxk-bell {
-  0%, 100% { transform: rotate(0deg); }
-  15% { transform: rotate(-14deg); }
-  30% { transform: rotate(12deg); }
-  45% { transform: rotate(-9deg); }
-  60% { transform: rotate(6deg); }
-  75% { transform: rotate(-3deg); }
 }
 @keyframes wxk-spark {
   0% { transform: scale(0.2); opacity: 0; }
@@ -1942,21 +2092,24 @@
   }
 }
 
-/* Distance route (assets/js/distance.js): a little map that replaces the
-   pin icon, per "for distance use animations similar to" a few map-and-
-   route Lottie animations. The visitor's blue dot pings, a dashed route
-   draws itself across to an amber pin (the globe marker's amber, "me"),
-   a dot rides the head of the line, and the pin drops in with a squash
-   when it arrives. Every part shares one 4.6s loop except the ping.
-   The base styles are the finished picture (route fully drawn, rider and
-   ripples hidden), so reduced motion shows a still map, not a blank one.
-   The ride keyframes are sampled at equal arc lengths along the curve in
-   distance.js, so the dot stays at the head of the drawn line; the
-   drawing and the riding are both linear for the same reason. */
+/* Distance scene (assets/js/distance.js): "how far apart are you and me",
+   drawn as a tiny map. A blue cursor arrow is YOU (the visitor, so it is
+   your own pointer, in a way), an amber pin with a face is ME; a dashed
+   route draws itself from one to the other, a dot rides its head, and the
+   pin hops and ripples when the dot lands. The labels under the two
+   markers say which is which (the first version had no labels, and
+   visitors could not tell what the number measured). One 4.8s loop for
+   everything except the ping on YOU. Base styles are the finished picture
+   (route drawn, rider and ripples hidden), so reduced motion shows a
+   still map, not a blank one. The ride keyframes are sampled at equal arc
+   lengths along the exact curve in distance.js (M28 41 Q60 2 89 31), so
+   the dot stays at the head of the drawn line; drawing and riding are
+   both linear for the same reason. Compact (phone) pills show the map
+   small, without the labels. */
 .hero-distance-scene {
-  width: 60px;
-  height: 32px;
-  margin: -8px -2px -8px -6px;
+  width: 52px;
+  height: 34px;
+  margin: -9px -2px -9px -6px;
   overflow: visible;
 }
 
@@ -1965,16 +2118,30 @@
   transform-origin: center;
 }
 
+.wxd-lbl { display: none; }
+
+@media (min-width: 768px) {
+  .hero-distance-scene {
+    width: 116px;
+    height: 76px;
+    margin: 0;
+  }
+
+  .wxd-lbl {
+    display: inline;
+  }
+}
 .wxd-route {
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
-  animation: wxd-draw 4.6s linear infinite;
+  animation: wxd-draw 4.8s linear infinite;
 }
-.wxd-ride { opacity: 0; animation: wxd-ride 4.6s linear infinite; }
-.wxd-pin { transform-origin: 50% 100%; animation: wxd-pin 4.6s ease-in-out infinite; }
-.wxd-shadow { animation: wxd-shadow 4.6s ease-in-out infinite; }
-.wxd-land { opacity: 0; animation: wxd-land 4.6s ease-out infinite; }
-.wxd-ping { opacity: 0; animation: wxd-ping 2.3s ease-out infinite; }
+.wxd-ride { opacity: 0; animation: wxd-ride 4.8s linear infinite; }
+.wxd-you { transform-origin: 23px 43px; animation: wxd-you 4.8s ease-in-out infinite; }
+.wxd-pin { transform-origin: 92px 52px; animation: wxd-pin 4.8s ease-in-out infinite; }
+.wxd-shadow { animation: wxd-shadow 4.8s ease-in-out infinite; }
+.wxd-land { opacity: 0; animation: wxd-land 4.8s ease-out infinite; }
+.wxd-ping { opacity: 0; animation: wxd-ping 2.4s ease-out infinite; }
 
 @keyframes wxd-draw {
   0%, 8% { stroke-dashoffset: 1; opacity: 1; }
@@ -1986,21 +2153,27 @@
 @keyframes wxd-ride {
   0%, 7.9% { transform: translate(0, 0); opacity: 0; }
   8% { transform: translate(0, 0); opacity: 1; }
-  13.5% { transform: translate(4.02px, -4.7px); }
-  19% { transform: translate(8.62px, -8.79px); }
-  24.5% { transform: translate(13.98px, -11.82px); }
-  30% { transform: translate(20.01px, -13px); }
-  35.5% { transform: translate(26.03px, -11.82px); }
-  41% { transform: translate(31.39px, -8.78px); }
-  46.5% { transform: translate(35.99px, -4.69px); }
-  52% { transform: translate(40px, 0); opacity: 1; }
-  55%, 100% { transform: translate(40px, 0); opacity: 0; }
+  13.5% { transform: translate(6.02px, -6.76px); }
+  19% { transform: translate(12.68px, -12.88px); }
+  24.5% { transform: translate(20.16px, -17.99px); }
+  30% { transform: translate(28.5px, -21.41px); }
+  35.5% { transform: translate(37.47px, -22.31px); }
+  41% { transform: translate(46.25px, -20.27px); }
+  46.5% { transform: translate(54.14px, -15.88px); }
+  52% { transform: translate(61px, -10px); opacity: 1; }
+  55%, 100% { transform: translate(61px, -10px); opacity: 0; }
+}
+/* YOU gets a small click as the signal leaves. */
+@keyframes wxd-you {
+  0%, 3%, 12%, 100% { transform: scale(1); }
+  6% { transform: scale(0.82); }
+  9% { transform: scale(1.1); }
 }
 @keyframes wxd-pin {
   0%, 51% { transform: translateY(0) scale(1, 1); }
-  55% { transform: translateY(-4px) scale(0.94, 1.08); }
+  55% { transform: translateY(-5px) scale(0.94, 1.08); }
   61% { transform: translateY(0) scale(1.14, 0.8); }
-  67% { transform: translateY(-1.3px) scale(0.98, 1.05); }
+  67% { transform: translateY(-1.5px) scale(0.98, 1.05); }
   73%, 100% { transform: translateY(0) scale(1, 1); }
 }
 @keyframes wxd-shadow {
