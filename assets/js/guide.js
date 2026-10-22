@@ -68,10 +68,24 @@ var panel = $("div", "site-guide-panel", wrap);
 panel.id = "site-guide-panel"; panel.hidden = true;
 var msg = $("p", "", panel);
 var nav = $("nav", "", panel); nav.setAttribute("aria-label", "Suggested pages");
-tip[1].forEach(function (l) {
-  if (l[1] === path) return;
-  var a = $("a", "", nav); a.href = l[1]; a.textContent = l[0];
-});
+var shown = tip[1].filter(function (l) { return l[1] !== path; });
+function renderNav(list) {
+  nav.textContent = "";
+  list.forEach(function (l, i) {
+    var a = $("a", "", nav); a.href = l[1]; a.textContent = l[0]; a.style.setProperty("--i", i);
+  });
+}
+// "Know more" also reshuffles the options, so repeat clicks surface other pages.
+function shuffleNav() {
+  var pool = Object.keys(L).map(function (k) { return L[k]; }).filter(function (l) { return l[1] !== path; }), pick;
+  for (var tries = 0; tries < 5; tries++) {
+    pool.sort(function () { return Math.random() - 0.5; });
+    pick = pool.slice(0, 3);
+    if (pick.map(function (l) { return l[1]; }).join() !== shown.map(function (l) { return l[1]; }).join()) break;
+  }
+  shown = pick; renderNav(shown);
+}
+renderNav(shown);
 $("span", "site-guide-tail", panel).setAttribute("aria-hidden", "true");
 var more = $("button", "site-guide-more", panel); more.type = "button"; $("span", "", more).textContent = "Wanna know more about me?";
 $("small", "", more).textContent = "Click to find out";
@@ -132,7 +146,7 @@ function setOpen(open) {
 }
 nav.addEventListener("mouseover", function (e) { if (e.target.closest("a")) flash("excited", 900); });
 var fact = Math.floor(Math.random() * FACTS.length);
-more.addEventListener("click", function () { fact = (fact + 1) % FACTS.length; speak(FACTS[fact]); flash("wink", 1200); hop(); });
+more.addEventListener("click", function () { fact = (fact + 1) % FACTS.length; speak(FACTS[fact]); shuffleNav(); flash("wink", 1200); hop(); });
 var pokes = [];
 btn.addEventListener("click", function () {
   wake(); freeze(); hop();

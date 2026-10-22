@@ -1651,6 +1651,8 @@ p {
 .site-guide-panel { background: color-mix(in srgb, var(--kiddo, #ccd0ff) 16%, color-mix(in srgb, var(--surface, #fff) 30%, transparent)); transition: background 0.4s ease; transform-origin: 30px 100%; }
 .site-guide-tail { position: absolute; left: 22px; bottom: -10px; z-index: 1; width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-top: 11px solid color-mix(in srgb, var(--kiddo, #ccd0ff) 30%, color-mix(in srgb, var(--surface, #fff) 55%, transparent)); pointer-events: none; }
 .site-guide-panel.is-open p { min-height: 2.8em; }
+.site-guide-panel nav a { animation: guide-opt 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; animation-delay: calc(var(--i, 0) * 60ms); }
+@keyframes guide-opt { from { opacity: 0; transform: translateY(6px) scale(0.96); } }
 .is-talking .site-guide-btn svg { animation: guide-talk 0.22s ease-in-out infinite; }
 @keyframes guide-talk { 50% { transform: scale(1.04, 0.96) translateY(1px); } }
-@media (prefers-reduced-motion: reduce) { .site-guide-panel::before, .site-guide-panel::after, .is-talking .site-guide-btn svg { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .site-guide-panel::before, .site-guide-panel::after, .is-talking .site-guide-btn svg, .site-guide-panel nav a { animation: none; } }
