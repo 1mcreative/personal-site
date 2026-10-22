@@ -31,7 +31,8 @@ var tip = TIPS[path] || ["Need a hand finding something?", [L.home, L.grind, L.c
 var FACTS = [
   "Press J on the homepage. Something silly happens.",
   "The Component Lab has every effect on this site, with copyable code.",
-  "The footer has a small game. Swipe through the letters.",
+  // The homepage has no footer; its game button is the "Getting bored?" pill up top.
+  path === "/" ? "There's a small game up top. Tap \"Getting bored?\"." : "The footer has a small game. Give it a try.",
   "The Chaos page has Bhavesh's Instagram and YouTube work.",
   "The Hot Seat has real interview questions with worked examples.",
   "Psst. Try hovering over me."
@@ -123,7 +124,7 @@ btn.addEventListener("click", function () {
 document.addEventListener("keydown", function (e) { wake(); if (e.key === "Escape" && panel.classList.contains("is-open")) { setOpen(false); btn.focus(); } });
 document.addEventListener("click", function (e) {
   if (panel.classList.contains("is-open") && !wrap.contains(e.target)) setOpen(false);
-  if (e.target.closest("[data-slice-blade-open]")) { setOpen(false); flash("curious", 3000); say("Good luck! Swipe through the letters, avoid the bombs.", 4000); hop(); }
+  if (e.target.closest("[data-slice-blade-open]")) { setOpen(false); flash("curious", 3000); say("Good luck! Have fun.", 4000); hop(); }
 });
 
 // Idle -> sleepy; any activity wakes it with a startled hop.
