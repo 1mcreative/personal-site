@@ -78,7 +78,12 @@ var z = $("span", "site-guide-z", wrap); z.textContent = "z z"; z.setAttribute("
 document.body.appendChild(wrap);
 
 var mood = "", lockUntil = 0;
-function setMood(m) { if (m === mood) return; mood = m; wrap.dataset.mood = m; }
+// Body colour follows the mood (pastels, so the dark eyes stay readable).
+var MOOD_COLOR = { joy: "#ffe08a", excited: "#ffc27a", love: "#ffb3c7", shy: "#ffc9dc", angry: "#ff9a9a", sad: "#a9c7ff", sleepy: "#cdbfff", surprised: "#ffd9a0", curious: "#a8f0d0", wink: "#ffd0b0", dizzy: "#c8e8a0", bored: "#cfd3da", scared: "#e4ecf5" };
+function setMood(m) {
+  if (m === mood) return; mood = m; wrap.dataset.mood = m;
+  svg.style.setProperty("--mo-head", MOOD_COLOR[m] || head);
+}
 // A short-lived emotion that pointer movement can't override, then back to happy.
 function flash(m, ms) {
   setMood(m); lockUntil = Date.now() + ms;
@@ -112,6 +117,7 @@ function setOpen(open) {
   panel.style.width = "";
   if (open) { msg.textContent = tip[0]; if (Date.now() >= lockUntil) setMood("happy"); fit(); }
 }
+nav.addEventListener("mouseover", function (e) { if (e.target.closest("a")) flash("excited", 900); });
 var fact = Math.floor(Math.random() * FACTS.length);
 more.addEventListener("click", function () { fact = (fact + 1) % FACTS.length; msg.textContent = FACTS[fact]; flash("wink", 1200); hop(); });
 var pokes = [];
@@ -130,15 +136,19 @@ document.addEventListener("click", function (e) {
 
 // Idle -> sleepy; any activity wakes it with a startled hop.
 var idleT;
+var boredT;
 function wake() {
   clearTimeout(idleT);
-  if (mood === "sleepy") { flash("surprised", 700); hop(); }
+  if (mood === "sleepy") { flash("surprised", 700); hop(); } else if (mood === "bored") setMood("happy");
+  clearTimeout(boredT);
+  boredT = setTimeout(function () { if (mood === "happy" && !panel.classList.contains("is-open")) setMood("bored"); }, 12000);
   idleT = setTimeout(function () { if (!panel.classList.contains("is-open")) { setMood("sleepy"); panel.hidden = true; } }, 25000);
 }
 wake();
 
 if (!reduce) {
   // Eyes follow the mouse; near it Kiddo gets curious, on it Kiddo is happy to be petted.
+  var lastP, petT = 0;
   document.addEventListener("pointermove", function (e) {
     if (e.pointerType !== "mouse") return;
     wake();
@@ -146,8 +156,15 @@ if (!reduce) {
     var d = Math.hypot(dx, dy) || 1, k = Math.min(1, d / 200) * 3.5;
     eyes.style.transform = "translate(" + (dx / d * k) + "px," + (dy / d * k) + "px)";
     if (walking && d < 150) freeze();
-    if (Date.now() < lockUntil) return;
-    setMood(d < r.width * 0.7 ? "love" : d < 220 ? "curious" : "happy");
+    // A fast swipe at it startles it; lingering on it makes it shy.
+    var now = Date.now(), speed = lastP ? Math.hypot(e.clientX - lastP.x, e.clientY - lastP.y) / Math.max(1, now - lastP.t) : 0;
+    lastP = { x: e.clientX, y: e.clientY, t: now };
+    if (speed > 2.5 && d < 160 && now > lockUntil) { quip("Eek!", "scared", 1300); return; }
+    if (now < lockUntil) return;
+    var near = d < r.width * 0.7;
+    if (near && !petT) petT = setTimeout(function () { petT = 0; if (mood === "love") quip("Okay, that's enough!", "shy", 2000); }, 3000);
+    if (!near && petT) { clearTimeout(petT); petT = 0; }
+    setMood(near ? "love" : d < 220 ? "curious" : "happy");
   });
   // Scrolling makes it float with a lag; a fast scroll startles it.
   var lastY = {}, lagT, lastWarn = 0;
@@ -207,5 +224,5 @@ function roam() {
 }
 addEventListener("resize", function () { if (curX > maxX()) walkTo(maxX(), 0.3); });
 
-setTimeout(function () { quip("Hi! I'm " + NAME + ". Click me for a tour.", "love"); setTimeout(function () { setMood("happy"); }, 2500); }, 4000);
+setTimeout(function () { quip("Hi! I'm " + NAME + ". Click me for a tour.", "excited"); setTimeout(function () { setMood("happy"); }, 2500); }, 4000);
 setTimeout(function () { quip(FACTS[fact], "curious"); }, 40000);

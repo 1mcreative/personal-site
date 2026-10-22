@@ -1575,6 +1575,7 @@ p {
 @keyframes guide-waddle { 0%, 100% { transform: rotate(-6deg) translateY(0); } 50% { transform: rotate(6deg) translateY(-4px); } }
 .site-guide-btn .mo-eyes { transition: transform 0.12s ease-out; }
 /* Emotions are eyes only: the shared group scales, each eye tilts on its own. */
+.mo-bob > g:not(.mo-eyes) { transition: fill 0.4s ease; }
 .guide-eyes, .guide-eye { transform-box: fill-box; transform-origin: center; transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
 [data-mood="curious"] .guide-eyes { transform: scale(1.12); }
 [data-mood="surprised"] .guide-eyes { transform: scale(1.3); }
@@ -1596,6 +1597,14 @@ p {
 @keyframes guide-spin { to { transform: rotate(360deg); } }
 [data-mood="dizzy"] .site-guide-btn svg { animation: guide-wobble 0.6s ease-in-out infinite; }
 @keyframes guide-wobble { 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
+[data-mood="excited"] .guide-eyes { transform: scale(1.22); }
+[data-mood="excited"] .site-guide-btn svg { animation: guide-bounce 0.35s ease-in-out infinite; }
+@keyframes guide-bounce { 50% { transform: translateY(-6px) scale(0.97, 1.05); } }
+[data-mood="shy"] .guide-eyes { transform: translate(-2px, 3px) scaleY(0.8); }
+[data-mood="shy"] .site-guide-btn svg { transform: rotate(-7deg); }
+[data-mood="bored"] .guide-eyes { transform: scaleY(0.5); }
+[data-mood="scared"] .guide-eyes { transform: scale(0.82); }
+[data-mood="scared"] .site-guide-btn svg { animation: guide-shake 0.07s linear infinite; }
 [data-mood="sleepy"] .site-guide-btn svg { animation: guide-snooze 3.6s ease-in-out infinite; }
 @keyframes guide-snooze { 50% { transform: scale(1.04, 0.96) translateY(1px); } }
 .site-guide-z { position: absolute; left: 62px; bottom: 54px; font-weight: 700; font-size: 0.9rem; color: var(--muted); opacity: 0; pointer-events: none; }
