@@ -73,6 +73,7 @@ var more = $("button", "site-guide-more", panel); more.type = "button"; more.tex
 var btn = $("button", "site-guide-btn", wrap);
 btn.type = "button"; btn.setAttribute("aria-label", "Site guide"); btn.setAttribute("aria-expanded", "false"); btn.setAttribute("aria-controls", panel.id);
 btn.appendChild(svg);
+$("span", "site-guide-shadow", wrap).setAttribute("aria-hidden", "true");
 var z = $("span", "site-guide-z", wrap); z.textContent = "z z"; z.setAttribute("aria-hidden", "true");
 document.body.appendChild(wrap);
 
