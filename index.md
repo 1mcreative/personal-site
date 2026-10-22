@@ -46,11 +46,10 @@ permalink: /
     </span>
   </div>
 
-  <button type="button" class="bored-trigger hero-bored-trigger" data-slice-blade-open aria-label="Getting bored? Play a quick slicing game">
+  <button type="button" class="bored-trigger hero-bored-trigger" data-game-picker-open aria-haspopup="dialog" aria-label="Getting bored? Pick a quick game">
     <span class="bored-trigger-icon" aria-hidden="true">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <path d="M5 19L19 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
-        <path d="M13 5h6v6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M7 8h10a4 4 0 0 1 3.9 4.9l-.7 3a2.4 2.4 0 0 1-4 1.2L14 15h-4l-2.2 2.1a2.4 2.4 0 0 1-4-1.2l-.7-3A4 4 0 0 1 7 8zM8 10.5v3M6.5 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </span>
     Getting bored?

@@ -939,6 +939,8 @@
   function open(event) {
     if (event) event.preventDefault();
     lastFocused = document.activeElement;
+    // Opened via the picker: its card is about to hide, so return focus to the real trigger.
+    if (lastFocused.closest && lastFocused.closest("[data-game-picker]") && window.gamePickerOrigin) lastFocused = window.gamePickerOrigin;
     clearTimeout(closeTimer);
     modal.hidden = false;
     void modal.offsetWidth;
