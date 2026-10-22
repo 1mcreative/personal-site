@@ -1003,11 +1003,17 @@ html:has(body.theme-personal) {
    sizing to the panel. Caption/metadata below are plain block elements, so
    they automatically fill whatever width the image ends up settling the
    panel at — no flex/JS needed for that part. */
+/* .contact-modal-panel's own box-shadow (tokens.css) is a heavy drop
+   shadow plus a blue outer glow — reads as muddy against a photo rather
+   than the clean glass look, and was explicitly not wanted here. Keep
+   the glass itself (background/backdrop-filter/border, all inherited
+   from the base rule) — only the shadow is cut. */
 .photo-modal-panel {
   width: fit-content;
   max-width: min(94vw, 1100px);
   min-width: min(340px, 100%);
   max-height: min(92vh, 920px);
+  box-shadow: none;
 }
 
 .photo-modal-figure {
@@ -1027,7 +1033,13 @@ html:has(body.theme-personal) {
   width: auto;
   height: auto;
   max-width: calc(min(94vw, 1100px) - 2 * var(--space-4));
-  max-height: min(68vh, 640px);
+  /* Shrunk from 68vh — that left no real room for the caption/metadata
+     below it, so the panel's own max-height overflowed and showed a
+     scroll bar (confirmed directly: 786px of content in a 705px box) at
+     an ordinary desktop window height. This leaves enough headroom for
+     a few lines of story text without the panel ever needing to scroll
+     in the common case. */
+  max-height: min(52vh, 480px);
   min-height: 160px;
   object-fit: contain;
   border-radius: var(--radius);
