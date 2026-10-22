@@ -1045,6 +1045,16 @@ html:has(body.theme-personal) {
    (photo-modal.js). Positioned against the image's own box via
    .photo-modal-figure, not the wider panel, so they sit at the vertical
    center of whatever aspect ratio the current photo actually rendered at. */
+/* .photo-modal-nav[hidden] (class+attribute) is needed to actually win:
+   a bare [hidden] selector loses to this file's own .photo-modal-nav rule
+   on specificity regardless of source order — the same trap this project
+   already hit on .lab-modal/.ig-feed-loading. Confirmed directly: without
+   this, photo-modal.js's hidden=true was set correctly but the button
+   still computed display:grid. */
+.photo-modal-nav[hidden] {
+  display: none;
+}
+
 .photo-modal-nav {
   position: absolute;
   top: 50%;
