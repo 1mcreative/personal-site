@@ -320,13 +320,16 @@ html:has(body.theme-personal) {
   position: relative;
   z-index: 1;
   scroll-snap-align: start;
-  border-top: 1px solid var(--border);
-  color: var(--muted);
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
 }
 
-.theme-personal .site-footer a {
-  color: var(--muted);
+/* The fixed left section nav (16px in, 44px wide) sits over the footer's own
+   left edge whenever the 780px footer box is wider than the space around
+   it; clear it with the same token the section rows use. */
+@media (max-width: 940px) {
+  .theme-personal .site-footer {
+    padding-left: var(--nav-clearance);
+  }
 }
 
 /* Hero — WebGPU Black Hole background (assets/js/black-hole-lite.js), fixed

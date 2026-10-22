@@ -39,15 +39,6 @@
   color: var(--text);
 }
 
-.theme-professional .site-footer {
-  border-top: 1px solid var(--border);
-  color: var(--muted);
-}
-
-.theme-professional .site-footer a {
-  color: var(--muted);
-}
-
 /* Galaxy button — moved here from the homepage hero, in the nav bar instead
    of the plain "The Chaos" keycap-btn it replaces. Structurally identical to
    the hero version (see git history for the full port writeup): one
