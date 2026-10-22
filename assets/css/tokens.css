@@ -1612,10 +1612,10 @@ p {
 @keyframes guide-z { 0% { opacity: 0; transform: translate(0, 6px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(10px, -22px); } }
 /* The speech bubble: a quip is one small line; opening the guide adds the
    option buttons. */
-/* Liquid glass: heavy blur + saturation, a diagonal sheen, a bright specular
-   rim (inset highlights) and a soft drop shadow. Same translucent --surface
-   language as the footer cards, pushed further. */
-.site-guide-panel { position: relative; max-width: min(300px, calc(100vw - 2 * var(--space-3))); padding: 10px 14px; border-radius: 20px 20px 20px 6px; border: 1px solid rgba(255,255,255,0.35); background: linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.04) 45%, rgba(255,255,255,0.14) 100%), color-mix(in srgb, var(--surface, #fff) 38%, transparent); -webkit-backdrop-filter: blur(22px) saturate(190%) brightness(1.05); backdrop-filter: blur(22px) saturate(190%) brightness(1.05); color: var(--text); box-shadow: inset 0 1px 1px rgba(255,255,255,0.7), inset 0 -1px 1px rgba(255,255,255,0.15), inset 0 0 14px rgba(255,255,255,0.12), 0 10px 30px rgba(0,0,0,0.22); font-size: 0.88rem; line-height: 1.4; transform-origin: 0 100%; animation: guide-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+/* Liquid glass, taken from the nav bar: near-clear pane, a thin bright ring and
+   no drop shadow. A light blur and --surface tint stay so the text over page
+   content is still readable. */
+.site-guide-panel { position: relative; max-width: min(300px, calc(100vw - 2 * var(--space-3))); padding: 10px 14px; border-radius: 22px 22px 22px 8px; border: 1px solid color-mix(in srgb, white 14%, transparent); background: color-mix(in srgb, var(--surface, #fff) 30%, transparent); -webkit-backdrop-filter: blur(10px) saturate(115%); backdrop-filter: blur(10px) saturate(115%); color: var(--text); box-shadow: inset 0 0 0 1px color-mix(in srgb, white 14%, transparent); font-size: 0.88rem; line-height: 1.4; transform-origin: 0 100%; animation: guide-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
 @keyframes guide-pop { from { opacity: 0; transform: scale(0.7); } }
 .site-guide-panel[hidden] { display: none; }
 .site-guide-panel p { margin: 0; }
@@ -1626,12 +1626,52 @@ p {
 .site-guide-panel.is-open .site-guide-more { display: flex; }
 .site-guide-panel:not(.is-open) { pointer-events: none; }
 /* Options are buttons (pill, tint, arrow), not text links: no underline. */
-.site-guide-panel a, .site-guide-more { display: flex; align-items: center; justify-content: space-between; gap: 8px; box-sizing: border-box; width: 100%; min-height: 44px; padding: 0 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 14px; background: linear-gradient(160deg, rgba(255,255,255,0.22), rgba(255,255,255,0.04)), color-mix(in srgb, var(--accent) 8%, transparent); box-shadow: inset 0 1px 1px rgba(255,255,255,0.55), inset 0 -1px 1px rgba(255,255,255,0.1); color: var(--text) !important; font: inherit; font-weight: 600; text-align: left; text-decoration: none !important; cursor: pointer; transition: background 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.site-guide-panel a, .site-guide-more { display: flex; align-items: center; justify-content: space-between; gap: 8px; box-sizing: border-box; width: 100%; min-height: 44px; padding: 0 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 14px; background: color-mix(in srgb, var(--accent) 8%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, white 14%, transparent); color: var(--text) !important; font: inherit; font-weight: 600; text-align: left; text-decoration: none !important; cursor: pointer; transition: background 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .site-guide-panel a::after { content: "\2192"; color: var(--accent); }
-.site-guide-panel a:hover, .site-guide-more:hover { background: linear-gradient(160deg, rgba(255,255,255,0.3), rgba(255,255,255,0.06)), color-mix(in srgb, var(--accent) 20%, transparent); border-color: var(--accent); transform: translateX(3px); text-decoration: none !important; }
+.site-guide-panel a:hover, .site-guide-more:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); border-color: var(--accent); transform: translateX(3px); text-decoration: none !important; }
 .site-guide-more { margin-top: 8px; }
 .site-guide-panel a:focus-visible, .site-guide-more:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (max-width: 640px) { .site-guide-btn { width: 60px; height: 60px; } .site-guide-z { left: 52px; bottom: 44px; } .site-guide-shadow { left: 8px; width: 44px; } }
 @media (prefers-reduced-motion: reduce) { .site-guide, .guide-eyes, .guide-eye, .site-guide-panel { transition: none; animation: none; } }
 /* Homepage: lift above the © line that owns the bottom-left corner. */
 .theme-home .site-guide { bottom: calc(var(--space-2) + 28px); }
+
+/* Kiddo ask mode: an "AI"-style input with a rotating gradient border and glow.
+   The multi-hue gradient is a deliberate exception to the single-accent palette,
+   like the Instagram and YouTube brand colours: it is the recognisable look of
+   an AI prompt box. */
+@property --ga { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes guide-glow { to { --ga: 360deg; } }
+.site-guide-chat { display: none; }
+.site-guide-panel.is-open.is-chat { width: 300px; }
+.site-guide-panel.is-open.is-chat nav, .site-guide-panel.is-open.is-chat .site-guide-more { display: none; }
+.site-guide-panel.is-open.is-chat .site-guide-chat { display: flex; flex-direction: column; gap: 8px; }
+.site-guide-log { display: flex; flex-direction: column; gap: 8px; max-height: 190px; overflow-y: auto; overscroll-behavior: contain; padding: 2px 2px 4px; }
+.guide-msg { max-width: 88%; padding: 8px 12px; border-radius: 14px; font-size: 0.86rem; line-height: 1.4; animation: guide-in-l 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.guide-msg.is-kiddo { align-self: flex-start; border-bottom-left-radius: 4px; background: color-mix(in srgb, var(--accent) 12%, var(--surface, #fff)); }
+.guide-msg.is-user { align-self: flex-end; border-bottom-right-radius: 4px; background: var(--accent); color: var(--bg); animation-name: guide-in-r; }
+@keyframes guide-in-l { from { opacity: 0; transform: translate(-14px, 6px) scale(0.92); } }
+@keyframes guide-in-r { from { opacity: 0; transform: translate(14px, 6px) scale(0.92); } }
+.guide-dots { display: inline-flex; align-items: center; gap: 4px; height: 1.2em; }
+.guide-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: guide-dot 1s ease-in-out infinite; }
+.guide-dots i:nth-child(2) { animation-delay: 0.15s; }
+.guide-dots i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes guide-dot { 0%, 80%, 100% { transform: translateY(0); opacity: 0.45; } 40% { transform: translateY(-4px); opacity: 1; } }
+.guide-msg-link { display: flex; align-items: center; min-height: 44px; margin-top: 4px; color: var(--accent) !important; font-weight: 600; text-decoration: none !important; }
+.site-guide-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.site-guide-chips::-webkit-scrollbar { display: none; }
+.site-guide-chips button { flex: none; min-height: 44px; padding: 0 12px; border: 1px solid var(--border, rgba(0,0,0,0.15)); border-radius: 999px; background: transparent; color: var(--text); font: inherit; font-size: 0.82rem; cursor: pointer; white-space: nowrap; }
+.site-guide-chips button:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.site-guide-ask { position: relative; display: flex; padding: 2px; border-radius: 16px; background: conic-gradient(from var(--ga), #6ec1ff, #a78bfa, #f472b6, #fbbf24, #6ec1ff); animation: guide-glow 4s linear infinite; }
+.site-guide-ask::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: inherit; filter: blur(10px); opacity: 0.55; z-index: -1; }
+.site-guide-ask input { flex: 1; min-width: 0; min-height: 44px; padding: 0 12px; border: 0; border-radius: 14px 0 0 14px; background: var(--surface, #fff); color: var(--text); font: inherit; font-size: 0.9rem; }
+.site-guide-ask input:focus { outline: none; }
+.site-guide-ask button { min-width: 44px; min-height: 44px; border: 0; border-radius: 0 14px 14px 0; background: var(--surface, #fff); color: var(--accent); font-size: 1.1rem; cursor: pointer; }
+.site-guide-ask:focus-within::before { opacity: 0.9; }
+.site-guide-back { align-self: flex-start; min-height: 44px; padding: 0 4px; border: 0; background: none; color: var(--muted); font: inherit; font-size: 0.82rem; cursor: pointer; }
+.site-guide-back:hover { color: var(--text); }
+/* The menu's "Wanna know something?" button wears the same glowing border. */
+.site-guide-more { flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 14px; border: 2px solid transparent; background: linear-gradient(var(--surface, #fff), var(--surface, #fff)) padding-box, conic-gradient(from var(--ga), #6ec1ff, #a78bfa, #f472b6, #fbbf24, #6ec1ff) border-box; animation: guide-glow 4s linear infinite; }
+.site-guide-more small { color: var(--muted); font-weight: 400; font-size: 0.78rem; }
+.site-guide-more:hover { background: linear-gradient(var(--surface, #fff), var(--surface, #fff)) padding-box, conic-gradient(from var(--ga), #6ec1ff, #a78bfa, #f472b6, #fbbf24, #6ec1ff) border-box; }
+@media (prefers-reduced-motion: reduce) { .site-guide-ask, .site-guide-more, .guide-msg, .guide-dots i { animation: none; } }

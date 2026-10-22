@@ -69,7 +69,18 @@ tip[1].forEach(function (l) {
   if (l[1] === path) return;
   var a = $("a", "", nav); a.href = l[1]; a.textContent = l[0];
 });
-var more = $("button", "site-guide-more", panel); more.type = "button"; more.textContent = "Tell me something";
+var more = $("button", "site-guide-more", panel); more.type = "button";
+$("span", "", more).textContent = "Wanna know something?";
+$("small", "", more).textContent = "Click to know more";
+// Chat mode: a log of bubbles, suggested questions and a glowing input box.
+var chat = $("div", "site-guide-chat", panel);
+var log = $("div", "site-guide-log", chat); log.setAttribute("role", "log"); log.setAttribute("aria-live", "polite");
+var chips = $("div", "site-guide-chips", chat);
+var form = $("form", "site-guide-ask", chat);
+var input = $("input", "", form); input.type = "text"; input.maxLength = 120; input.autocomplete = "off";
+input.placeholder = "Ask Kiddo about this site"; input.setAttribute("aria-label", "Ask Kiddo about this site");
+var send = $("button", "", form); send.type = "submit"; send.setAttribute("aria-label", "Send"); send.textContent = "\u2192";
+var back = $("button", "site-guide-back", chat); back.type = "button"; back.textContent = "\u2190 Back to menu";
 var btn = $("button", "site-guide-btn", wrap);
 btn.type = "button"; btn.setAttribute("aria-label", "Site guide"); btn.setAttribute("aria-expanded", "false"); btn.setAttribute("aria-controls", panel.id);
 btn.appendChild(svg);
@@ -112,14 +123,82 @@ function hop() {
 function setOpen(open) {
   clearInterval(typing); clearTimeout(hideT);
   panel.classList.toggle("is-open", open);
+  panel.classList.remove("is-chat");
   panel.hidden = !open;
   btn.setAttribute("aria-expanded", String(open));
   panel.style.width = "";
   if (open) { msg.textContent = tip[0]; if (Date.now() >= lockUntil) setMood("happy"); fit(); }
 }
 nav.addEventListener("mouseover", function (e) { if (e.target.closest("a")) flash("excited", 900); });
-var fact = Math.floor(Math.random() * FACTS.length);
-more.addEventListener("click", function () { fact = (fact + 1) % FACTS.length; msg.textContent = FACTS[fact]; flash("wink", 1200); hop(); });
+// What Kiddo "knows": hand-written answers matched by keyword. It is not an AI,
+// and says so; anything it can't match gets an honest "I don't know".
+var KB = [
+  { k: ["who is bhavesh", "bhavesh", "about", "owner", "who made"], t: "Bhavesh Nakum is a senior software engineer in Bengaluru who works on backend systems, distributed systems, big data and cloud. The full story is in his r\u00e9sum\u00e9.", l: L.grind },
+  { k: ["resume", "cv", "experience", "skill set", "work", "job", "career", "download", "hire"], t: "The r\u00e9sum\u00e9 lives on The Grind page, with a button to download the PDF.", l: L.grind },
+  { k: ["contact", "email", "reach", "touch", "message", "talk", "connect", "linkedin"], t: "Open any inner page, like the r\u00e9sum\u00e9, and press the Let's talk button in the footer. It opens a short form. LinkedIn is in the footer links too.", m: "happy" },
+  { k: ["instagram", "youtube", "photo", "video", "social", "chaos", "album", "reel", "channel"], t: "The Chaos page is the personal side: Instagram, YouTube videos and a photo album.", l: L.chaos },
+  { k: ["interview", "question", "hot seat", "goldman", "prepare", "leetcode"], t: "The Hot Seat has real interview questions with worked examples, and filters to narrow them down.", l: L.hot },
+  { k: ["lab", "component", "effect", "animation", "code", "built", "build", "tech", "stack", "framework", "how is this", "made with", "source"], t: "The site is plain Jekyll with hand-written CSS and JavaScript, no framework. The Component Lab shows every effect live, with code you can copy.", l: L.lab },
+  { k: ["skill", "claude", "tailor"], t: "Claude Skills is a small catalog of the Claude Skills used to build and run this site. You can copy or download them.", l: L.skills },
+  { k: ["game", "play", "bored", "slice", "glide", "fun"], t: "Look for the Getting bored? button: footer on inner pages, top right on the homepage. It opens a game picker with Slice Blade and Glide.", m: "excited" },
+  { k: ["joke", "funny", "easter egg", "secret"], t: "On the homepage, press the J key. Something silly happens. I won't spoil it.", m: "wink" },
+  { k: ["weather", "clock", "time", "distance", "far", "temperature"], t: "On the homepage, the top-left bar shows your local time, the weather and how far apart you and Bhavesh are. It uses your approximate location from your network, looked up in your browser. This site doesn't store it.", m: "curious" },
+  { k: ["who are you", "your name", "are you real", "are you ai", "are you a bot", "what are you", "kiddo", "chatgpt"], t: "I'm Kiddo, a little Blobatar made from the text \"bhavesh\". I'm not a real AI. I just know this site by heart.", m: "joy" },
+  { k: ["site", "page", "everything", "explore", "menu", "whats"], t: "Four main places: The Grind (r\u00e9sum\u00e9), The Chaos (Instagram, YouTube, photos), The Hot Seat (interview questions) and the Component Lab. Plus a Claude Skills page and a couple of games.", m: "excited" },
+  { k: ["hello", "hi", "hey", "yo"], t: "Hey! Ask me about the r\u00e9sum\u00e9, The Chaos, the games or how the site is built.", m: "joy" },
+  { k: ["thank", "cool", "nice", "great"], t: "Anytime!", m: "love" }
+];
+var NOPE = { t: "Hmm, I don't know that one. I only know this site. Try the r\u00e9sum\u00e9, The Chaos, interview questions, the games or how it's built.", m: "sad" };
+var SUGGEST = ["What's on this site?", "Who is Bhavesh?", "How do I get in touch?", "Is there a game?"];
+function norm(x) { return x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim(); }
+function stem(w) { return w.replace(/s$/, ""); }
+function answer(q) {
+  var n = " " + norm(q) + " ", ws = n.trim().split(" ").map(stem), best = NOPE, top = 0;
+  KB.forEach(function (e) {
+    var sc = 0;
+    e.k.forEach(function (k) {
+      if (k.indexOf(" ") > -1) { if (n.indexOf(" " + k + " ") > -1) sc += k.length * 2; }
+      else if (ws.indexOf(stem(k)) > -1) sc += k.length;
+    });
+    if (sc > top) { top = sc; best = e; }
+  });
+  return best;
+}
+var busy = false;
+function addMsg(cls) { var d = $("div", "guide-msg " + cls, log); log.scrollTop = log.scrollHeight; return d; }
+function typeInto(el, text, done) {
+  if (reduce) { el.textContent = text; done(); return; }
+  var i = 0, t = setInterval(function () {
+    el.textContent = text.slice(0, ++i); log.scrollTop = log.scrollHeight;
+    if (i >= text.length) { clearInterval(t); done(); }
+  }, 14);
+}
+function ask(q) {
+  q = q.trim(); if (!q || busy) return;
+  busy = true; wake();
+  addMsg("is-user").textContent = q; input.value = "";
+  var b = addMsg("is-kiddo"); $("span", "guide-dots", b).innerHTML = "<i></i><i></i><i></i>";
+  log.setAttribute("aria-busy", "true");
+  setMood("curious"); eyes.style.transform = "translate(2px,-3px)";
+  var a = answer(q);
+  setTimeout(function () {
+    b.textContent = ""; hop(); flash(a.m || "excited", 1500);
+    typeInto(b, a.t, function () {
+      if (a.l) { var l = $("a", "guide-msg-link", b); l.href = a.l[1]; l.textContent = a.l[0]; }
+      log.setAttribute("aria-busy", "false"); log.scrollTop = log.scrollHeight; busy = false;
+    });
+  }, reduce ? 0 : 700 + Math.random() * 500);
+}
+SUGGEST.forEach(function (q) { var c = $("button", "", chips); c.type = "button"; c.textContent = q; c.addEventListener("click", function () { ask(q); }); });
+form.addEventListener("submit", function (e) { e.preventDefault(); ask(input.value); });
+input.addEventListener("focus", function () { flash("curious", 1200); });
+input.addEventListener("input", function () { eyes.style.transform = "translate(3px,-3px)"; });
+more.addEventListener("click", function () {
+  panel.classList.add("is-chat"); msg.textContent = "Ask me anything about this site.";
+  if (!log.children.length) { var h = addMsg("is-kiddo"); h.textContent = "I'm not a real AI, but I know this site by heart. Ask away!"; }
+  flash("excited", 1200); hop(); fit(); input.focus();
+});
+back.addEventListener("click", function () { panel.classList.remove("is-chat"); msg.textContent = tip[0]; flash("joy", 700); hop(); });
 var pokes = [];
 btn.addEventListener("click", function () {
   wake(); freeze(); hop();
@@ -225,4 +304,4 @@ function roam() {
 addEventListener("resize", function () { if (curX > maxX()) walkTo(maxX(), 0.3); });
 
 setTimeout(function () { quip("Hi! I'm " + NAME + ". Click me for a tour.", "excited"); setTimeout(function () { setMood("happy"); }, 2500); }, 4000);
-setTimeout(function () { quip(FACTS[fact], "curious"); }, 40000);
+setTimeout(function () { quip(FACTS[Math.floor(Math.random() * FACTS.length)], "curious"); }, 40000);
