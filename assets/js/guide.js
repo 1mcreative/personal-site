@@ -4,7 +4,7 @@
 // up startled. No backend or AI: moods and quips are scripted, links are a menu.
 import { blobatar } from "../third-party/blobatar/blob.js";
 
-var NAME = "Navi"; // the guide's name, used in its greeting
+var NAME = "Kiddo"; // the guide's name, used in its greeting
 var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 var NS = "http://www.w3.org/2000/svg";
 var path = location.pathname.replace(/index\.html$/, "");
@@ -138,7 +138,7 @@ function wake() {
 wake();
 
 if (!reduce) {
-  // Eyes follow the mouse; near it Navi gets curious, on it Navi is happy to be petted.
+  // Eyes follow the mouse; near it Kiddo gets curious, on it Kiddo is happy to be petted.
   document.addEventListener("pointermove", function (e) {
     if (e.pointerType !== "mouse") return;
     wake();
