@@ -32,3 +32,15 @@
   caption: "Lovely sunset view at Gudibanda lake, just outside Bengaluru."
   location: "Gudibanda Lake, near Bengaluru"
   date: "6:22 PM"
+
+- src: /assets/img/life/02.jpg
+  alt: "Sunset over the waves at Mandrem beach, Goa"
+  caption: "Sunset at Mandrem beach, Goa."
+  location: "Mandrem Beach, Goa"
+  date: ""
+
+- src: /assets/img/life/03.jpg
+  alt: "The Eiffel Tower lit up at dusk, seen from the Seine"
+  caption: "The Eiffel Tower, lit up for the evening."
+  location: "Paris, France"
+  date: ""

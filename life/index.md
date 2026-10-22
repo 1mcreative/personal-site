@@ -237,11 +237,12 @@ permalink: /life/
 
 <section class="life-section" id="album">
   {% assign photos = site.data.album %}
-  <div class="album-intro">
-    <span class="album-placeholder-icon" aria-hidden="true">{% include album-glyph.svg %}</span>
-    <h2>Photo album</h2>
-    <p class="coming-later">{% if photos.size > 0 %}Drag, or scroll sideways, to look through. Tap one for the story.{% else %}Empty for now, drag to preview how it'll feel once real photos land.{% endif %}</p>
-  </div>
+  <!-- Direct feedback: the icon/heading/subtext intro read as redundant
+       once the section is already identifiable (the left-nav icon already
+       labels it "Photo album") — kept only a visually-hidden heading so
+       the page's real heading outline/screen-reader structure is
+       unaffected. -->
+  <h2 class="sr-only">Photo album</h2>
 
   <div class="photo-slider" id="photo-slider">
     <!-- No loading="lazy" here deliberately: this page makes `body`, not
@@ -258,9 +259,6 @@ permalink: /life/
       <button type="button" class="photo-slide" data-photo-open data-full="{{ photo.src }}" data-caption="{{ photo.caption | default: '' | escape }}" data-location="{{ photo.location | default: '' | escape }}" data-date="{{ photo.date | default: '' | escape }}">
         <img src="{{ photo.src }}" alt="{{ photo.alt | default: '' }}" decoding="async" width="170" height="170" draggable="false" onerror="this.closest('.photo-slide').classList.add('photo-slide-broken')"{% if photo.offsetY %} style="--offset-y: {{ photo.offsetY }}px"{% endif %}>
         <span class="photo-slide-scrim" aria-hidden="true"></span>
-        <span class="photo-slide-expand" aria-hidden="true">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 5V1h4M13 9v4H9M13 5V1H9M1 9v4h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </span>
       </button>
       {% endfor %}
     {% else %}
@@ -271,32 +269,42 @@ permalink: /life/
   </div>
 </section>
 
-<!-- Photo info modal — reuses .contact-modal's own shell/transitions
-     (tokens.css), same convention slice-blade-modal.html already
-     established for a second modal on this site. Scoped to /life/ only
-     (not a shared footer include) since the Album section is the only
-     place that needs it. Content is populated per-click from whichever
-     .photo-slide button was pressed (assets/js/photo-modal.js) rather
-     than one modal per photo. -->
+<!-- Photo lightbox — photo only, no surrounding card (direct feedback:
+     "remove whole card concept... show only photo with rounded corners").
+     Reuses .contact-modal's own fixed-overlay fade shell (tokens.css), but
+     NOT .contact-modal-panel — that's the glass "card" being removed here.
+     .photo-modal-figure is the flex-centered child instead, and every
+     control (close/info/download/dots) floats directly on the image.
+     Content is populated per-click from whichever .photo-slide button was
+     pressed (assets/js/photo-modal.js) rather than one modal per photo.
+     Prev/Next are gone as visible buttons — see assets/js/photo-modal.js
+     for the edge-hover-cursor + click-the-edge replacement and the
+     keyboard-arrow fallback this hint describes. -->
 <div class="contact-modal" data-photo-modal hidden>
   <div class="contact-modal-backdrop" data-photo-close></div>
-  <div class="contact-modal-panel photo-modal-panel" role="dialog" aria-modal="true" aria-labelledby="photo-modal-caption">
-    <button type="button" class="contact-modal-close" data-photo-close aria-label="Close">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <p class="sr-only" id="photo-modal-hint">Use the left and right arrow keys, or click near either edge of the photo, to browse.</p>
+  <div class="photo-modal-figure" role="dialog" aria-modal="true" aria-label="Photo" aria-describedby="photo-modal-hint">
+    <button type="button" class="photo-modal-close" data-photo-close aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
     </button>
-    <div class="photo-modal-figure">
-      <img class="photo-modal-image" data-photo-modal-image alt="" onerror="this.classList.add('photo-modal-image-broken')">
-      <button type="button" class="photo-modal-nav photo-modal-prev" data-photo-prev aria-label="Previous photo">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <img class="photo-modal-image" data-photo-modal-image alt="" onerror="this.classList.add('photo-modal-image-broken')">
+    <div class="photo-modal-cursor" data-photo-cursor aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="photo-modal-info-panel" data-photo-info-panel hidden>
+      <p class="photo-modal-caption" data-photo-modal-caption></p>
+      <dl class="photo-modal-meta" data-photo-modal-meta></dl>
+    </div>
+    <div class="photo-modal-toolbar">
+      <button type="button" class="photo-modal-tool-btn" data-photo-info aria-expanded="false" aria-label="Photo details">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5.5M12 7.5v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
-      <button type="button" class="photo-modal-nav photo-modal-next" data-photo-next aria-label="Next photo">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="photo-modal-dots" data-photo-dots aria-hidden="true"></div>
+      <button type="button" class="photo-modal-tool-btn" data-photo-download aria-label="Request the full-resolution photo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v11M8 11l4 4 4-4M5 19h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
-    <p class="photo-modal-caption" id="photo-modal-caption" data-photo-modal-caption></p>
-    <dl class="photo-modal-meta" data-photo-modal-meta></dl>
-    <p class="photo-modal-request">Want this one in full resolution? <a href="mailto:{{ site.email }}" data-photo-modal-request>Email me</a> and I'll send it over.</p>
   </div>
 </div>
