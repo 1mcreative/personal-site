@@ -870,6 +870,13 @@ html:has(body.theme-personal) {
   background: var(--surface);
   border: 1px solid var(--border);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  transition: transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
+}
+
+.theme-personal button.photo-slide:hover,
+.theme-personal button.photo-slide:focus-visible {
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: 0 14px 32px -6px rgba(0, 0, 0, 0.55), 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 /* Real photos render as a <button> (clicking one opens the info modal);
@@ -901,6 +908,17 @@ html:has(body.theme-personal) {
   /* Soft deterrent only (see photo-modal.js's own contextmenu guard) —
      removes iOS's long-press "Save/Copy Image" callout menu. */
   -webkit-touch-callout: none;
+}
+
+/* A soft scrim at the tile's bottom edge — gives the expand badge below
+   reliable contrast against any photo's own colors, and gives the tile a
+   bit more depth than a flat crop. */
+.theme-personal .photo-slide-scrim {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 45%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+  pointer-events: none;
 }
 
 /* Always visible, not hover-only — hover has no equivalent on touch, so a
@@ -974,11 +992,26 @@ html:has(body.theme-personal) {
 /* Photo info modal — reuses .contact-modal's own shell (tokens.css), only
    the content area is specific to this one. Sized as a real lightbox, not
    a small form-sized popup (direct feedback: "make it big... not like in
-   small window") — the photo is the dominant element, caption/metadata
-   secondary underneath. */
+   small window"). width:fit-content, not a fixed vw-based width: the panel
+   should hug the photo's own real aspect ratio (direct feedback: "show in
+   exact original aspect ratio and metadata should adjust based on that"),
+   not stretch a portrait photo into a wide box with empty space either
+   side. The image's own max-width is computed independently (viewport
+   minus the panel's own horizontal padding) rather than inherited from the
+   panel's resolved width, specifically to avoid a circular dependency —
+   the panel can't size to the image's content while the image is also
+   sizing to the panel. Caption/metadata below are plain block elements, so
+   they automatically fill whatever width the image ends up settling the
+   panel at — no flex/JS needed for that part. */
 .photo-modal-panel {
-  width: min(94vw, 1100px);
+  width: fit-content;
+  max-width: min(94vw, 1100px);
+  min-width: min(340px, 100%);
   max-height: min(92vh, 920px);
+}
+
+.photo-modal-figure {
+  position: relative;
 }
 
 /* .contact-modal-close is absolutely positioned at top:8px, 44px tall, so
@@ -991,8 +1024,11 @@ html:has(body.theme-personal) {
    margin still clears it at this much wider panel size. */
 .photo-modal-image {
   display: block;
-  width: 100%;
+  width: auto;
+  height: auto;
+  max-width: calc(min(94vw, 1100px) - 2 * var(--space-4));
   max-height: min(68vh, 640px);
+  min-height: 160px;
   object-fit: contain;
   border-radius: var(--radius);
   margin-top: 1.25rem;
@@ -1003,6 +1039,51 @@ html:has(body.theme-personal) {
 
 .photo-modal-image.photo-modal-image-broken {
   display: none;
+}
+
+/* Prev/Next — hidden entirely when there's only one real photo
+   (photo-modal.js). Positioned against the image's own box via
+   .photo-modal-figure, not the wider panel, so they sit at the vertical
+   center of whatever aspect ratio the current photo actually rendered at. */
+.photo-modal-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color var(--speed) var(--ease), transform var(--speed) var(--ease);
+}
+
+.photo-modal-nav:hover,
+.photo-modal-nav:focus-visible {
+  background: color-mix(in srgb, var(--accent) 70%, var(--bg));
+}
+
+.photo-modal-prev {
+  left: 8px;
+}
+
+.photo-modal-next {
+  right: 8px;
+}
+
+.photo-modal-prev:hover,
+.photo-modal-prev:focus-visible {
+  transform: translateY(-50%) translateX(-2px);
+}
+
+.photo-modal-next:hover,
+.photo-modal-next:focus-visible {
+  transform: translateY(-50%) translateX(2px);
 }
 
 .photo-modal-caption {

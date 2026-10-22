@@ -1,7 +1,10 @@
 // Photo info modal for the /life/ Album section — tapping a photo shows
-// its story and metadata (location/date). Same open/close/focus-trap shell
-// as contact-modal.js and slice-blade.js (see .contact-modal in
-// tokens.css), just populated per-click instead of being static content.
+// its story and metadata (location/date), sized to its real aspect ratio
+// (see .photo-modal-panel's own comment in personal.css). Same open/close/
+// focus-trap shell as contact-modal.js and slice-blade.js (see
+// .contact-modal in tokens.css), just populated per-click instead of being
+// static content. Prev/Next step through every real photo on the page,
+// wrapping at the ends — hidden entirely when there's only one.
 (function () {
   var modal = document.querySelector("[data-photo-modal]");
   if (!modal) return;
@@ -15,10 +18,13 @@
   var metaEl = modal.querySelector("[data-photo-modal-meta]");
   var requestLink = modal.querySelector("[data-photo-modal-request]");
   var requestHrefBase = requestLink ? requestLink.getAttribute("href") : "";
-  var openers = document.querySelectorAll("[data-photo-open]");
+  var openers = Array.prototype.slice.call(document.querySelectorAll("[data-photo-open]"));
   var closers = modal.querySelectorAll("[data-photo-close]");
+  var prevBtn = modal.querySelector("[data-photo-prev]");
+  var nextBtn = modal.querySelector("[data-photo-next]");
 
   var lastFocused = null;
+  var currentIndex = -1;
 
   function focusable() {
     return Array.prototype.slice.call(
@@ -30,8 +36,7 @@
     return "<dt>" + label + "</dt><dd>" + value + "</dd>";
   }
 
-  function open(event) {
-    var btn = event.currentTarget;
+  function populate(btn) {
     var caption = btn.getAttribute("data-caption") || "";
     var location = btn.getAttribute("data-location") || "";
     var date = btn.getAttribute("data-date") || "";
@@ -52,6 +57,16 @@
       var subject = "Full-res photo" + (location ? " — " + location : "") + (date ? " (" + date + ")" : "");
       requestLink.setAttribute("href", requestHrefBase + "?subject=" + encodeURIComponent(subject));
     }
+  }
+
+  function showIndex(i) {
+    currentIndex = (i + openers.length) % openers.length;
+    populate(openers[currentIndex]);
+  }
+
+  function open(event) {
+    currentIndex = openers.indexOf(event.currentTarget);
+    populate(event.currentTarget);
 
     lastFocused = document.activeElement;
     modal.hidden = false;
@@ -79,6 +94,14 @@
       close();
       return;
     }
+    if (openers.length > 1 && event.key === "ArrowLeft") {
+      showIndex(currentIndex - 1);
+      return;
+    }
+    if (openers.length > 1 && event.key === "ArrowRight") {
+      showIndex(currentIndex + 1);
+      return;
+    }
     if (event.key !== "Tab") return;
     var items = focusable();
     if (!items.length) return;
@@ -93,7 +116,7 @@
     }
   }
 
-  Array.prototype.forEach.call(openers, function (el) {
+  openers.forEach(function (el) {
     el.addEventListener("click", open);
     // Soft deterrent only — any image a browser renders can still be
     // screenshotted, so this just removes the convenient "Save image as"
@@ -108,4 +131,14 @@
   Array.prototype.forEach.call(closers, function (el) {
     el.addEventListener("click", close);
   });
+
+  // Only one real photo: nothing to step to, so the buttons would just
+  // reopen the same one — hide them rather than show a dead control.
+  if (openers.length > 1) {
+    if (prevBtn) prevBtn.addEventListener("click", function () { showIndex(currentIndex - 1); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { showIndex(currentIndex + 1); });
+  } else {
+    if (prevBtn) prevBtn.hidden = true;
+    if (nextBtn) nextBtn.hidden = true;
+  }
 })();
