@@ -44,6 +44,10 @@
       hint: "What happened, on which page, and on what device?",
       starters: ["Broken page: ", "On my phone, ", "Broken link: "]
     },
+    "Photo request": {
+      hint: "Say which photo (the caption or location works) and I'll email the full-resolution file.",
+      starters: ["Could I get the full-res version of ", "Love this one from ", "Any chance you still have "]
+    },
     "Hello": {
       hint: "Say anything. I read everything.",
       starters: ["Hi! ", "Found you via ", "Your work made me think of "]
@@ -192,6 +196,27 @@
     window.location.href = url;
     return true;
   }
+
+  // Lets another script (assets/js/photo-modal.js's download button) open
+  // this modal pre-filled, instead of only ever being click-triggered from
+  // its own markup — same cross-script handoff pattern this site already
+  // uses elsewhere (e.g. window.globeFocusMarker). prefill.topic must
+  // match one of the radio values above/a PROMPTS key.
+  window.openContactModal = function (prefill) {
+    if (prefill && prefill.topic) {
+      var radio = form.querySelector('input[name="topic"][value="' + prefill.topic + '"]');
+      if (radio) {
+        radio.checked = true;
+        showStarters(prefill.topic);
+        fieldError("topic", false);
+      }
+    }
+    if (prefill && prefill.message) {
+      message.value = prefill.message;
+      updateCount();
+    }
+    open();
+  };
 
   Array.prototype.forEach.call(openers, function (el) {
     el.addEventListener("click", open);

@@ -77,12 +77,30 @@
     return ((value % m) + m) % m;
   }
 
+  // Direct feedback: "album must be animated... when hover stop moving,
+  // when not hover move" — idle auto-drift by default, pauses the moment a
+  // visitor hovers in to actually look/click, using the same target/
+  // current easing a drag or wheel gesture already drives, so it blends
+  // into real input instead of fighting it. pointerenter/pointerleave
+  // don't fire for a touch visitor (no hover there), so this never
+  // auto-plays on touch — fine, touch already has its own native
+  // drag-scroll and isn't a case where something could scroll out from
+  // under a stationary cursor anyway.
+  var AUTOPLAY_PX_PER_SEC = 36;
+  var hovering = false;
+  root.addEventListener("pointerenter", function () { hovering = true; });
+  root.addEventListener("pointerleave", function () { hovering = false; });
+
   var last = 0;
   function tick(now) {
     requestAnimationFrame(tick);
     var delta = last ? Math.min((now - last) / 1000, 0.1) : 1 / 60;
     last = now;
     if (width <= 0) return;
+
+    if (!hovering && pointerId === null) {
+      target += AUTOPLAY_PX_PER_SEC * delta;
+    }
 
     if (current > span || current < -span) {
       var shift = Math.trunc(current / span) * span;
