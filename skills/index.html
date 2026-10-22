@@ -76,7 +76,7 @@ mv resume-tailor ~/.claude/skills/</code></pre></div>
     </div>
 
     <div class="question-card-meta question-card-stack">
-      {% for tag in skill.tags %}<span class="skill-pill">{{ tag }}</span>{% endfor %}
+      {% if skill.version %}<span class="skill-pill">{{ skill.version }}</span>{% endif %}{% for tag in skill.tags %}<span class="skill-pill">{{ tag }}</span>{% endfor %}
     </div>
 
     <p class="skill-card-desc">{{ skill.description }}</p>

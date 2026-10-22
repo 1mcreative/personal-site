@@ -7,12 +7,14 @@
 #    file, so nothing else needs to change.
 - id: resume-tailor
   name: "Resume Tailor"
+  version: "v2"
   tagline: "Tailors a real resume to a job description without inventing a single fact."
-  description: "Fans out into parallel agents that extract the JD's must-have keywords, audit the resume into a verified facts inventory, ask only for the gaps that can't be confirmed, write and ATS-score the bullets, then render a real PDF and Word file. Every line traces back to something the candidate actually confirmed."
+  description: "Fans out into parallel agents that extract the JD's must-have keywords, audit the resume into a verified facts inventory, ask only for the gaps that can't be confirmed, write and ATS-score the bullets, run a humanize pass so the text reads like a person wrote it, then render a real PDF and Word file. Every line traces back to something the candidate actually confirmed."
   highlights:
     - "Parallel agents for JD analysis, resume audit, and gap mapping"
     - "Fact-checks every bullet — zero invented metrics or placeholders"
     - "Scores against a real ATS rubric and fixes anything under 75"
+    - "Humanize pass strips AI-sounding phrasing without touching a fact"
     - "Delivers an actual PDF and Word file, not just text in chat"
   tags: ["career", "resume", "job-search", "ats"]
   include: "skills/resume-tailor/SKILL.md"
