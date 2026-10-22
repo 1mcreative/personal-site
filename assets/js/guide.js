@@ -72,14 +72,10 @@ tip[1].forEach(function (l) {
 var more = $("button", "site-guide-more", panel); more.type = "button";
 $("span", "", more).textContent = "Wanna know something?";
 $("small", "", more).textContent = "Click to know more";
-// Chat mode: a log of bubbles, suggested questions and a glowing input box.
+// Chat mode: a log of bubbles and tappable questions. No free-text input.
 var chat = $("div", "site-guide-chat", panel);
 var log = $("div", "site-guide-log", chat); log.setAttribute("role", "log"); log.setAttribute("aria-live", "polite");
 var chips = $("div", "site-guide-chips", chat);
-var form = $("form", "site-guide-ask", chat);
-var input = $("input", "", form); input.type = "text"; input.maxLength = 120; input.autocomplete = "off";
-input.placeholder = "Ask Kiddo about this site"; input.setAttribute("aria-label", "Ask Kiddo about this site");
-var send = $("button", "", form); send.type = "submit"; send.setAttribute("aria-label", "Send"); send.textContent = "\u2192";
 var back = $("button", "site-guide-back", chat); back.type = "button"; back.textContent = "\u2190 Back to menu";
 var btn = $("button", "site-guide-btn", wrap);
 btn.type = "button"; btn.setAttribute("aria-label", "Site guide"); btn.setAttribute("aria-expanded", "false"); btn.setAttribute("aria-controls", panel.id);
@@ -149,7 +145,7 @@ var KB = [
   { k: ["thank", "cool", "nice", "great"], t: "Anytime!", m: "love" }
 ];
 var NOPE = { t: "Hmm, I don't know that one. I only know this site. Try the r\u00e9sum\u00e9, The Chaos, interview questions, the games or how it's built.", m: "sad" };
-var SUGGEST = ["What's on this site?", "Who is Bhavesh?", "How do I get in touch?", "Is there a game?"];
+var SUGGEST = ["What's on this site?", "Who is Bhavesh?", "How do I get in touch?", "Is there a game?", "How is this site built?", "Where are the interview questions?"];
 function norm(x) { return x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim(); }
 function stem(w) { return w.replace(/s$/, ""); }
 function answer(q) {
@@ -176,7 +172,7 @@ function typeInto(el, text, done) {
 function ask(q) {
   q = q.trim(); if (!q || busy) return;
   busy = true; wake();
-  addMsg("is-user").textContent = q; input.value = "";
+  addMsg("is-user").textContent = q;
   var b = addMsg("is-kiddo"); $("span", "guide-dots", b).innerHTML = "<i></i><i></i><i></i>";
   log.setAttribute("aria-busy", "true");
   setMood("curious"); eyes.style.transform = "translate(2px,-3px)";
@@ -190,13 +186,10 @@ function ask(q) {
   }, reduce ? 0 : 700 + Math.random() * 500);
 }
 SUGGEST.forEach(function (q) { var c = $("button", "", chips); c.type = "button"; c.textContent = q; c.addEventListener("click", function () { ask(q); }); });
-form.addEventListener("submit", function (e) { e.preventDefault(); ask(input.value); });
-input.addEventListener("focus", function () { flash("curious", 1200); });
-input.addEventListener("input", function () { eyes.style.transform = "translate(3px,-3px)"; });
 more.addEventListener("click", function () {
-  panel.classList.add("is-chat"); msg.textContent = "Ask me anything about this site.";
-  if (!log.children.length) { var h = addMsg("is-kiddo"); h.textContent = "I'm not a real AI, but I know this site by heart. Ask away!"; }
-  flash("excited", 1200); hop(); fit(); input.focus();
+  panel.classList.add("is-chat"); msg.textContent = "Pick something to ask me.";
+  if (!log.children.length) { var h = addMsg("is-kiddo"); h.textContent = "I'm not a real AI, but I know this site by heart. Tap a question below."; }
+  flash("excited", 1200); hop(); fit();
 });
 back.addEventListener("click", function () { panel.classList.remove("is-chat"); msg.textContent = tip[0]; flash("joy", 700); hop(); });
 var pokes = [];
