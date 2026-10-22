@@ -1562,7 +1562,7 @@ p {
    above it. */
 .site-guide { position: fixed; left: var(--space-3); bottom: var(--space-3); z-index: 120; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; translate: var(--x, 0px) 0; transform: translateY(var(--lag, 0px)); transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), translate var(--walk, 0s) ease-in-out; }
 .site-guide-btn { position: relative; width: 72px; height: 72px; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-/* Ground shadow under Navi (not a glow behind it); shrinks while it hops. */
+/* Ground shadow under Kiddo (not a glow behind it); shrinks while it hops. */
 .site-guide-shadow { position: absolute; left: 10px; bottom: -7px; width: 52px; height: 10px; border-radius: 50%; background: rgba(0,0,0,0.3); filter: blur(4px); pointer-events: none; transition: left 0s; }
 .site-guide-btn.is-hop ~ .site-guide-shadow { animation: guide-shadow 0.55s cubic-bezier(0.34, 1.56, 0.64, 1); }
 @keyframes guide-shadow { 30% { transform: scale(0.55); opacity: 0.5; } 60% { transform: scale(1.1); } }
