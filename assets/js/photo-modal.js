@@ -5,6 +5,9 @@
 (function () {
   var modal = document.querySelector("[data-photo-modal]");
   if (!modal) return;
+  // Authored inside <main>, whose z-index:1 stacking context ties with the
+  // footer's and loses on DOM order, so the footer painted over the lightbox.
+  document.body.appendChild(modal);
 
   var panel = modal.querySelector(".contact-modal-panel");
   var img = modal.querySelector("[data-photo-modal-image]");

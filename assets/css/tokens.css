@@ -282,6 +282,290 @@ main#main {
   padding-top: var(--space-3);
   padding-bottom: var(--space-4);
   font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.site-footer a {
+  color: var(--muted);
+}
+
+/* One footer on every page except the landing page: one big "Say hello"
+   line, one row of quiet links, one fine-print line. The only link-shaped
+   things are links; the only button is the game toggle in the fine print. */
+.site-footer {
+  padding-top: var(--space-5);
+}
+
+.site-footer p {
+  margin: 0;
+  max-width: none;
+}
+
+.site-footer .footer-cta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+/* Quiet glass: translucent surface, hairline border, no shadow. Hover only
+   brightens the border, so the footer never competes with page content. */
+.site-footer .footer-glass {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 72px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface) 45%, transparent);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color var(--speed) var(--ease), background var(--speed) var(--ease);
+}
+
+.site-footer .footer-glass:hover,
+.site-footer .footer-glass:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+
+.site-footer .footer-glass-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.site-footer .footer-glass-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.site-footer .footer-hello .footer-glass-title span {
+  display: inline-block;
+  color: var(--accent);
+  transition: transform var(--speed) var(--ease);
+}
+
+.site-footer .footer-hello:hover .footer-glass-title span {
+  transform: translateX(0.2em);
+}
+
+.site-footer .footer-play {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.site-footer .footer-play-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
+}
+
+/* A tiny live demo of the game: every few seconds a slash crosses the word
+   and the "C" splits in two. Quiet, no shadow, tells you what the tile does. */
+.site-footer .footer-play-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: none;
+  overflow: hidden;
+  padding: 0.35rem 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.site-footer .fp-l {
+  display: inline-block;
+  width: 0.8em;
+  text-align: center;
+}
+
+.site-footer .fp-cut {
+  position: relative;
+  height: 1em;
+}
+
+.site-footer .fp-cut::before,
+.site-footer .fp-cut::after {
+  content: attr(data-l);
+  position: absolute;
+  inset: 0;
+  color: var(--accent);
+  animation: fp-split 4.8s var(--ease) infinite;
+}
+
+.site-footer .fp-cut::before {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.site-footer .fp-cut::after {
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  --dx: 1;
+}
+
+.site-footer .fp-slash {
+  position: absolute;
+  top: -20%;
+  left: 0;
+  width: 2px;
+  height: 140%;
+  background: var(--accent);
+  opacity: 0;
+  transform: translateX(-10px) rotate(40deg);
+  animation: fp-slash 4.8s ease-in infinite;
+}
+
+@keyframes fp-slash {
+  0%, 60% { opacity: 0; transform: translateX(-10px) rotate(40deg); }
+  62% { opacity: 1; }
+  72% { opacity: 1; transform: translateX(120px) rotate(40deg); }
+  74%, 100% { opacity: 0; transform: translateX(120px) rotate(40deg); }
+}
+
+@keyframes fp-split {
+  0%, 68% { transform: none; opacity: 1; }
+  80% { transform: translate(calc(var(--dx, -1) * 0.14em), calc(var(--dx, -1) * -0.18em)) rotate(calc(var(--dx, -1) * 12deg)); opacity: 1; }
+  92% { transform: translate(calc(var(--dx, -1) * 0.3em), calc(var(--dx, -1) * -0.4em)) rotate(calc(var(--dx, -1) * 22deg)); opacity: 0; }
+  100% { transform: none; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-footer .footer-glass { transition: none; }
+  .site-footer .fp-cut::before,
+  .site-footer .fp-cut::after,
+  .site-footer .fp-slash { animation: none; }
+  .site-footer .fp-slash { display: none; }
+}
+
+@media (max-width: 700px) {
+  .site-footer .footer-cta {
+    grid-template-columns: 1fr;
+  }
+}
+
+.site-footer .footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.25rem;
+  margin-top: var(--space-2);
+}
+
+/* Icon links: the name appears in a small label on hover/focus. Touch has no
+   hover, so there the label is always shown under the icon. */
+.site-footer .footer-links a {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color var(--speed) var(--ease);
+}
+
+.site-footer .footer-links a:hover,
+.site-footer .footer-links a:focus-visible {
+  color: var(--accent);
+}
+
+/* Hover devices read the label from the pointer-following .footer-tip
+   (footer-tip.js); this in-icon copy is only for touch, below. */
+.site-footer .footer-link-text {
+  display: none;
+}
+
+.footer-tip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 400;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--speed) var(--ease);
+}
+
+/* The pill stands in for the system pointer while it is over an icon. */
+@media (hover: hover) {
+  .site-footer .footer-links a {
+    cursor: none;
+  }
+}
+
+.footer-tip.is-on {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .site-footer .footer-links {
+    gap: var(--space-1) 0;
+  }
+  .site-footer .footer-links a {
+    width: 64px;
+    height: auto;
+    min-height: 44px;
+    padding: 0.4rem 0;
+    border-radius: var(--radius);
+    gap: 0.2rem;
+  }
+  .site-footer .footer-link-text {
+    display: block;
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.2;
+  }
+}
+
+.site-footer .footer-sep {
+  width: 1px;
+  height: 1em;
+  background: var(--border);
+}
+
+.site-footer .footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0 var(--space-2);
+  margin-top: var(--space-2);
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 520px) {
+  .site-footer .footer-sep {
+    display: none;
+  }
 }
 
 h1, h2, h3 {
@@ -1229,7 +1513,6 @@ p {
     justify-content: center;
   }
 
-  .site-footer .footer-dev-note a,
   .ig-feed-links a,
   .video-row-label {
     display: inline-block;
