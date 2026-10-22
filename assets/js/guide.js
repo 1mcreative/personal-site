@@ -196,6 +196,7 @@ if (!reduce) {
   // Scrolling makes it float with a lag; a fast scroll startles it.
   var lastY = {}, lagT, lastWarn = 0;
   document.addEventListener("scroll", function (e) {
+    recheck();
     var t = e.target === document ? document.scrollingElement : e.target;
     var y = t.scrollTop, dy = y - (lastY[t.tagName] || y); lastY[t.tagName] = y;
     wake();
@@ -218,38 +219,76 @@ if (!reduce) {
   document.addEventListener("visibilitychange", function () { if (!document.hidden) quip("You're back!", "joy", 1500); });
 }
 
-var walking = false, curX = 0, walkT;
-function maxX() {
-  var w = btn.offsetWidth, m = Math.min(innerWidth * 0.4, innerWidth - w - 2 * 24);
-  var cue = document.querySelector(".scroll-cue");
-  if (cue && cue.offsetParent) m = Math.min(m, cue.getBoundingClientRect().left - 36 - w - curX + curX);
-  return Math.max(0, m);
+// Free roaming: Kiddo may wander anywhere on screen, but only onto spots where it
+// would not cover anything functional (links, buttons, inputs, headings, text,
+// images, the nav, the homepage globe). Candidate spots are hit-tested first.
+var walking = false, curX = 0, curY = 0, walkT, recheckT;
+var BLOCK = 'a,button,input,textarea,select,summary,label,[role="button"],[tabindex]:not([tabindex="-1"]),h1,h2,h3,h4,h5,h6,p,li,dt,dd,blockquote,pre,img,video,iframe,.hero-globe,.site-header,.hero-status,.section-nav,.life-pull-btn';
+var TOP_CLEAR = 84; // keep clear of the fixed nav bars
+function baseLeft() { return parseFloat(getComputedStyle(wrap).left); }
+function baseTop() { return innerHeight - parseFloat(getComputedStyle(wrap).bottom) - btn.offsetHeight; }
+function bounds() { return { maxX: Math.max(0, innerWidth - btn.offsetWidth - 2 * baseLeft()), minY: -Math.max(0, baseTop() - TOP_CLEAR) }; }
+function blockedAt(left, top, size) {
+  var pad = 6;
+  for (var i = 0; i < 4; i++) for (var j = 0; j < 4; j++) {
+    var els = document.elementsFromPoint(left + pad + (size - 2 * pad) * i / 3, top + pad + (size - 2 * pad) * j / 3);
+    for (var k = 0; k < els.length; k++) if (!wrap.contains(els[k]) && els[k].closest(BLOCK)) return true;
+  }
+  return false;
 }
-function walkTo(x, dur) {
-  curX = x; wrap.style.setProperty("--walk", dur + "s"); wrap.style.setProperty("--x", x + "px");
+function pickSpot(minDist) {
+  var bd = bounds(), size = btn.offsetWidth;
+  for (var t = 0; t < 30; t++) {
+    var x = Math.random() * bd.maxX, y = Math.random() * bd.minY;
+    if (Math.hypot(x - curX, y - curY) < minDist) continue;
+    if (!blockedAt(baseLeft() + x, baseTop() + y, size)) return { x: x, y: y };
+  }
+  return null;
 }
+function walkTo(x, y, dur) {
+  curX = x; curY = y;
+  wrap.style.setProperty("--walk", dur + "s"); wrap.style.setProperty("--x", x + "px"); wrap.style.setProperty("--y", y + "px");
+}
+function goTo(spot, speed) {
+  var dist = Math.hypot(spot.x - curX, spot.y - curY), dur = Math.min(9, dist / speed);
+  eyes.style.transform = "translate(" + (spot.x > curX ? 3 : -3) + "px," + (spot.y > curY ? 2 : -2) + "px)";
+  walking = true; btn.classList.add("is-walking"); walkTo(spot.x, spot.y, dur);
+  walkT = setTimeout(function () { walking = false; btn.classList.remove("is-walking"); hop(); }, dur * 1000);
+}
+// Keep an open bubble on screen: nudge Kiddo left/down if the bubble would overflow.
 function fit() {
-  var over = wrap.getBoundingClientRect().left + panel.offsetWidth - (innerWidth - 12) + 0;
-  var base = parseFloat(wrap.style.getPropertyValue("--x")) || 0;
-  if (over > 0 && !walking) walkTo(Math.max(0, base - over - 0), 0.3);
+  if (walking) return;
+  // Measured from the button and the panel's layout size: the panel's own rect is
+  // scaled down while its pop-in animation starts.
+  var b = btn.getBoundingClientRect(), right = b.left + panel.offsetWidth, top = b.top - 10 - panel.offsetHeight, x = curX, y = curY;
+  if (right > innerWidth - 12) x = Math.max(0, curX - (right - (innerWidth - 12)));
+  if (top < TOP_CLEAR) y = Math.min(0, curY + (TOP_CLEAR - top));
+  if (x !== curX || y !== curY) walkTo(x, y, 0.3);
 }
 function freeze() {
   if (!walking) return;
   walking = false; clearTimeout(walkT); btn.classList.remove("is-walking");
-  var x = btn.getBoundingClientRect().left - parseFloat(getComputedStyle(wrap).left);
-  walkTo(Math.max(0, x), 0);
+  var r = btn.getBoundingClientRect();
+  walkTo(Math.max(0, r.left - baseLeft()), Math.min(0, r.top - baseTop()), 0);
+}
+function idle() {
+  return !(reduce || document.hidden || walking || panel.classList.contains("is-open") || !panel.hidden || wrap.matches(":hover, :focus-within") || document.querySelector("[data-slice-blade-modal]:not([hidden])"));
 }
 function roam() {
-  if (reduce || document.hidden || mood === "sleepy" || walking || panel.classList.contains("is-open") || !panel.hidden || wrap.matches(":hover, :focus-within") || document.querySelector("[data-slice-blade-modal]:not([hidden])")) return;
-  var m = maxX(); if (m < 40) return;
-  var x = Math.random() * m;
-  if (Math.abs(x - curX) < 60) x = curX > m / 2 ? 0 : m;
-  var dur = Math.abs(x - curX) / 45;
-  eyes.style.transform = "translate(" + (x > curX ? 3 : -3) + "px,0)";
-  walking = true; btn.classList.add("is-walking"); walkTo(x, dur);
-  walkT = setTimeout(function () { walking = false; btn.classList.remove("is-walking"); hop(); }, dur * 1000);
+  if (!idle() || mood === "sleepy") return;
+  var r = btn.getBoundingClientRect(), stuck = blockedAt(r.left, r.top, r.width);
+  var spot = pickSpot(stuck ? 0 : 90); if (spot) goTo(spot, stuck ? 220 : 55);
 }
-addEventListener("resize", function () { if (curX > maxX()) walkTo(maxX(), 0.3); });
+// If scrolling or resizing slides content under Kiddo, move it to a free spot.
+function recheck() {
+  clearTimeout(recheckT);
+  recheckT = setTimeout(function () {
+    if (!idle()) return;
+    var bd = bounds(), r = btn.getBoundingClientRect();
+    if (curX > bd.maxX || curY < bd.minY || blockedAt(r.left, r.top, r.width)) { var spot = pickSpot(0); if (spot) goTo(spot, 220); }
+  }, 450);
+}
+addEventListener("resize", recheck);
 
 setTimeout(function () { quip("Hi! I'm " + NAME + ". Click me for a tour.", "excited"); setTimeout(function () { setMood("happy"); }, 2500); }, 4000);
 setTimeout(function () { quip(FACTS[fact], "curious"); }, 40000);
