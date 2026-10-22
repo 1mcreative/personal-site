@@ -1014,6 +1014,19 @@ html:has(body.theme-personal) {
   min-width: min(340px, 100%);
   max-height: min(92vh, 920px);
   box-shadow: none;
+  /* More see-through than the base .contact-modal-panel's 45% — a photo
+     behind the glass reads better with more of it showing through than a
+     form does. */
+  background: color-mix(in srgb, var(--surface) 25%, transparent);
+  /* Stays scrollable (overflow-y:auto, base rule) when a long caption
+     pushes past max-height — the ask was to lose the visible scroll bar,
+     not the ability to scroll. Same hide-but-keep-functional technique
+     .photo-slider already uses. */
+  scrollbar-width: none;
+}
+
+.photo-modal-panel::-webkit-scrollbar {
+  display: none;
 }
 
 .photo-modal-figure {
