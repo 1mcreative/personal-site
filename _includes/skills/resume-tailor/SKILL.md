@@ -1,6 +1,6 @@
 ---
-name: resume-tailor
-description: Turn a candidate's real resume plus a job description (JD) into a resume that passes ATS filters and convinces a skeptical recruiter, without inventing a single fact. Use when the user wants to tailor, update, or build a resume/CV against a specific job posting or JD.
+name: "resume-tailor"
+description: "Tailor an ATS-optimized resume to a job description from the user's real resume, asking gap questions, using parallel agents, and delivering PDF and/or Word. Use for any resume, CV, or JD tailoring request."
 ---
 
 # Resume Tailor
@@ -16,23 +16,25 @@ Turn a candidate's real resume plus a job description (JD) into a resume that pa
 - Keep honesty calibration exact: "hands-on" vs "some exposure" vs "familiar" are different claims. Use the user's own level. If an answer is vague ("some exposure"), ask one follow-up for concrete detail before writing a bullet.
 - Leadership is stated exactly as confirmed (e.g. "led a team of 6 for 1 year"). Never upgrade technical leadership into formal people management (direct reports, reviews, hiring authority) unless the user confirmed it.
 - Compute total experience from the dated timeline. Never claim more years than the dates support.
+- Humanizing (section 4) changes wording only. It never adds, strengthens, or removes a fact.
 
 ## 1. Intake
 
 1. Look for the resume first: uploaded files, project knowledge, project memory. If found, confirm it with the user in one line instead of asking again.
-2. Get the JD (pasted text, file, or URL). If the user sends only a JD with no instruction, treat it as "tailor my resume to this".
-3. Ask output format once, if not already known or stored: **PDF**, **Word (.docx)**, or **both**. Default to both if the user does not care.
-4. Confirm standing details once and reuse them: name, email, phone, city, LinkedIn, website. Never re-ask for something already stored. Use the contact details the user last confirmed.
-5. If building from scratch (no resume), interview section by section (work history, then skills, then education), one section per message.
-6. Build a **Facts Inventory**: a structured list of every verified fact (roles, exact dates, bullets, metrics, tools, education, certifications, confirmed leadership). This is the single source of truth. Every bullet written later must trace back to it.
+2. Get the JD (pasted text, file, or URL). If given a URL, fetch it. If the user sends only a JD with no instruction, treat it as "tailor my resume to this".
+3. If the JD is truncated or boilerplate only (no title, no requirements, no tech stack), do not build. Ask for the job title and the full posting, or fetch the link.
+4. Ask output format once, if not already known or stored: **PDF**, **Word (.docx)**, or **both**. Default to both if the user does not care.
+5. Confirm standing details once and reuse them: name, email, phone, city, LinkedIn, website. Never re-ask for something already stored. Use the contact details the user last confirmed.
+6. If building from scratch (no resume), interview section by section (work history, then skills, then education), one section per message.
+7. Build a **Facts Inventory**: a structured list of every verified fact (roles, exact dates, bullets, metrics, tools, education, certifications, confirmed leadership). This is the single source of truth. Every bullet written later must trace back to it.
 
 ## 2. Fit triage (before spending effort)
 
 Classify the match honestly:
 
 - **Soft gaps** (a few missing tools or keywords): proceed, report gaps afterwards.
-- **Leveling mismatch** (JD wants far fewer or far more years or seniority than the candidate has, e.g. 10+ yrs vs 8, or a junior/II role for a lead): say so in two lines and recommend.
-- **Hard blockers** (core required language or domain the candidate has none of, such as Go/C++/ERP/Windows internals, or formal people management they never did): STOP and ask once whether to proceed, skip, or tailor anyway. Do not build until answered.
+- **Leveling mismatch** (JD wants far fewer or far more years or seniority than the candidate has, e.g. 10+ yrs vs 8, a junior/II role for a lead, or a Staff role for a Senior): say so in two lines and recommend.
+- **Hard blockers** (core required language or domain the candidate has none of, such as Go/C++/ERP/Windows internals/mandatory Angular, or formal people management they never did): STOP and ask once whether to proceed, skip, or tailor anyway. Do not build until answered.
 - **Duplicate JD** (same company and role already tailored in this conversation): say so, note only what changed in the JD, and ask whether to reuse or rebuild.
 
 If the user has said "don't ask, just build", skip questions for soft gaps and flag gaps after the build. Hard blockers still get one question.
@@ -80,6 +82,12 @@ Spawn independent reviewers (they did not write the draft, so they are not gradi
 - Batch any "needs new info" fixes into one question to the user, and wait.
 - If ATS score is below 75, fix and re-score before presenting. Do not show a low score and move on without trying. If it stays low because of real gaps, say so honestly.
 
+### Wave 3.5: Humanize pass (mandatory, after fixes, before render)
+
+Run the humanize-ai-writing skill (and stop-slop if available) over the final content file: summary, every bullet, skills labels. Then run the checks in section 4. The goal is to remove the patterns that make resume text read as machine-written. Be honest with the user: no one can guarantee detectors will not flag text, so describe this as reducing AI patterns, never as undetectable.
+
+After the humanize pass, re-run the Fact Checker on the changed text. Wording may change; facts, numbers, dates, tools and claim strength may not. Re-check that every ATS keyword still appears.
+
 ### Wave 4: Render (parallel)
 
 Render from the same content file so formats match. Spawn one agent per requested format:
@@ -99,6 +107,17 @@ Both agents verify their own output: PDF with `pdfinfo` (page count and size) an
 - Quantify only with confirmed numbers; otherwise write a precise, concrete bullet without a number.
 - Adapt to the role variant when the JD lists several teams: choose the best-fitting team and say which and why.
 - Never paste the JD's sentences wholesale.
+- Never list a methodology or keyword (Agile, Scrum, etc.) the user has not confirmed, even if the JD asks for it.
+
+### Human-sounding checks (apply to every resume)
+
+- No em dashes, no curly quotes, no emoji.
+- Cut stacked adjectives and filler: "high-performance, scalable, robust, seamless, cutting-edge, leveraged, spearheaded, passionate, results-driven".
+- Use plain verbs (built, led, wrote, cut, ran) and say what actually happened in concrete terms.
+- Vary bullet openings and length. Do not start three bullets in a row with the same word or shape. Avoid forced groups of three.
+- Do not reuse the same signature sentence word for word across resumes sent to the same company or recruiter. Reword the headline achievement per resume, keeping the same facts.
+- Keep the summary short, specific, and different in rhythm from the bullets.
+- Specifics must come from the Facts Inventory. If a bullet is vague, ask the user for the real detail instead of inventing one.
 
 ## 5. ATS score rubric (0-100)
 
