@@ -1636,34 +1636,14 @@ p {
 /* Homepage: lift above the © line that owns the bottom-left corner. */
 .theme-home .site-guide { bottom: calc(var(--space-2) + 28px); }
 
-/* Kiddo ask mode: tappable questions and chat bubbles (no free-text input).
-   The multi-hue rotating border on the menu button is a deliberate exception
-   to the single-accent palette, like the Instagram and YouTube brand colours. */
+/* Kiddo's dialog box wears a rotating multi-hue "AI" border and glow, and so
+   does its "know more" button. The gradient is a deliberate exception to the
+   single-accent palette, like the Instagram and YouTube brand colours. */
 @property --ga { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 @keyframes guide-glow { to { --ga: 360deg; } }
-.site-guide-chat { display: none; }
-.site-guide-panel.is-open.is-chat { width: 300px; max-height: calc(100svh - 150px); overflow-y: auto; overscroll-behavior: contain; }
-.site-guide-panel.is-open.is-chat nav, .site-guide-panel.is-open.is-chat .site-guide-more { display: none; }
-.site-guide-panel.is-open.is-chat .site-guide-chat { display: flex; flex-direction: column; gap: 8px; }
-.site-guide-log { display: flex; flex-direction: column; gap: 8px; max-height: 170px; overflow-y: auto; overscroll-behavior: contain; padding: 2px 2px 4px; }
-.guide-msg { max-width: 88%; padding: 8px 12px; border-radius: 14px; font-size: 0.86rem; line-height: 1.4; animation: guide-in-l 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.guide-msg.is-kiddo { align-self: flex-start; border-bottom-left-radius: 4px; background: color-mix(in srgb, var(--accent) 12%, var(--surface, #fff)); }
-.guide-msg.is-user { align-self: flex-end; border-bottom-right-radius: 4px; background: var(--accent); color: var(--bg); animation-name: guide-in-r; }
-@keyframes guide-in-l { from { opacity: 0; transform: translate(-14px, 6px) scale(0.92); } }
-@keyframes guide-in-r { from { opacity: 0; transform: translate(14px, 6px) scale(0.92); } }
-.guide-dots { display: inline-flex; align-items: center; gap: 4px; height: 1.2em; }
-.guide-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: guide-dot 1s ease-in-out infinite; }
-.guide-dots i:nth-child(2) { animation-delay: 0.15s; }
-.guide-dots i:nth-child(3) { animation-delay: 0.3s; }
-@keyframes guide-dot { 0%, 80%, 100% { transform: translateY(0); opacity: 0.45; } 40% { transform: translateY(-4px); opacity: 1; } }
-.guide-msg-link { display: flex; align-items: center; min-height: 44px; margin-top: 4px; color: var(--accent) !important; font-weight: 600; text-decoration: none !important; }
-.site-guide-chips { display: flex; flex-direction: column; gap: 6px; }
-.site-guide-chips button { min-height: 44px; padding: 0 14px; border: 1px solid var(--border, rgba(0,0,0,0.15)); border-radius: 12px; background: color-mix(in srgb, var(--accent) 8%, transparent); color: var(--text); font: inherit; font-size: 0.86rem; font-weight: 600; text-align: left; cursor: pointer; transition: background 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.site-guide-chips button:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, transparent); transform: translateX(3px); }
-.site-guide-back { align-self: flex-start; min-height: 44px; padding: 0 4px; border: 0; background: none; color: var(--muted); font: inherit; font-size: 0.82rem; cursor: pointer; }
-.site-guide-back:hover { color: var(--text); }
-/* The menu's "Wanna know something?" button wears the same glowing border. */
+.site-guide-panel::before, .site-guide-panel::after { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px; background: conic-gradient(from var(--ga), #6ec1ff, #a78bfa, #f472b6, #fbbf24, #6ec1ff); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude; pointer-events: none; animation: guide-glow 4s linear infinite; }
+.site-guide-panel::after { filter: blur(8px); opacity: 0.7; }
 .site-guide-more { flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 14px; border: 2px solid transparent; background: linear-gradient(var(--surface, #fff), var(--surface, #fff)) padding-box, conic-gradient(from var(--ga), #6ec1ff, #a78bfa, #f472b6, #fbbf24, #6ec1ff) border-box; animation: guide-glow 4s linear infinite; }
 .site-guide-more small { color: var(--muted); font-weight: 400; font-size: 0.78rem; }
 .site-guide-more:hover { background: linear-gradient(var(--surface, #fff), var(--surface, #fff)) padding-box, conic-gradient(from var(--ga), #6ec1ff, #a78bfa, #f472b6, #fbbf24, #6ec1ff) border-box; }
-@media (prefers-reduced-motion: reduce) { .site-guide-more, .guide-msg, .guide-dots i { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .site-guide-panel::before, .site-guide-panel::after, .site-guide-more { animation: none; } }
