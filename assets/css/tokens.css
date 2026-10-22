@@ -1556,7 +1556,7 @@ p {
 .game-card-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.4; }
 @media (prefers-reduced-motion: reduce) { .game-card { transition: none; } .game-card:hover, .game-card:focus-visible { transform: none; } }
 
-/* Site guide (assets/js/guide.js): "Navi", a Blobatar character that lives
+/* Site guide (assets/js/guide.js): "Kiddo", a Blobatar character that lives
    bottom-left on every page, walks along the bottom edge, and shows moods with
    its eyes only. Under 300 so modals (300) and the cursor trail (9999) sit
    above it. */
