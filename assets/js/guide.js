@@ -72,6 +72,7 @@ tip[1].forEach(function (l) {
   if (l[1] === path) return;
   var a = $("a", "", nav); a.href = l[1]; a.textContent = l[0];
 });
+$("span", "site-guide-tail", panel).setAttribute("aria-hidden", "true");
 var more = $("button", "site-guide-more", panel); more.type = "button"; $("span", "", more).textContent = "Wanna know more about me?";
 $("small", "", more).textContent = "Click to find out";
 var btn = $("button", "site-guide-btn", wrap);
@@ -87,6 +88,7 @@ var MOOD_COLOR = { joy: "#ffe08a", excited: "#ffc27a", love: "#ffb3c7", shy: "#f
 function setMood(m) {
   if (m === mood) return; mood = m; wrap.dataset.mood = m;
   svg.style.setProperty("--mo-head", MOOD_COLOR[m] || head);
+  wrap.style.setProperty("--kiddo", MOOD_COLOR[m] || head);
 }
 // A short-lived emotion that pointer movement can't override, then back to happy.
 function flash(m, ms) {
@@ -105,6 +107,13 @@ function say(text, ms) {
   else typing = setInterval(function () { msg.textContent = text.slice(0, ++i); if (i >= text.length) clearInterval(typing); }, 18);
   if (ms) hideT = setTimeout(function () { if (!panel.classList.contains("is-open")) { panel.hidden = true; panel.style.width = ""; } }, ms + text.length * 18);
 }
+// Kiddo "talks" inside the open bubble: eyes up at it, a little bob while typing.
+function speak(text) {
+  clearInterval(typing); eyes.style.transform = "translate(0,-3px)";
+  if (reduce) { msg.textContent = text; return; }
+  wrap.classList.add("is-talking"); var i = 0;
+  typing = setInterval(function () { msg.textContent = text.slice(0, ++i); if (i >= text.length) { clearInterval(typing); wrap.classList.remove("is-talking"); } }, 16);
+}
 function quip(text, m, ms) {
   if (panel.classList.contains("is-open") || quips >= 8 || document.querySelector("[data-slice-blade-modal]:not([hidden])")) return;
   quips++; flash(m || "happy", ms || 2200); hop(); say(text, 4500);
@@ -114,22 +123,22 @@ function hop() {
   btn.classList.remove("is-hop"); void btn.offsetWidth; btn.classList.add("is-hop");
 }
 function setOpen(open) {
-  clearInterval(typing); clearTimeout(hideT);
+  clearInterval(typing); clearTimeout(hideT); wrap.classList.remove("is-talking");
   panel.classList.toggle("is-open", open);
   panel.hidden = !open;
   btn.setAttribute("aria-expanded", String(open));
   panel.style.width = "";
-  if (open) { msg.textContent = tip[0]; if (Date.now() >= lockUntil) setMood("happy"); fit(); }
+  if (open) { if (Date.now() >= lockUntil) setMood("happy"); msg.textContent = tip[0]; fit(); speak(tip[0]); }
 }
 nav.addEventListener("mouseover", function (e) { if (e.target.closest("a")) flash("excited", 900); });
 var fact = Math.floor(Math.random() * FACTS.length);
-more.addEventListener("click", function () { fact = (fact + 1) % FACTS.length; msg.textContent = FACTS[fact]; flash("wink", 1200); hop(); });
+more.addEventListener("click", function () { fact = (fact + 1) % FACTS.length; speak(FACTS[fact]); flash("wink", 1200); hop(); });
 var pokes = [];
 btn.addEventListener("click", function () {
   wake(); freeze(); hop();
   var now = Date.now(); pokes = pokes.filter(function (t) { return now - t < 2500; }); pokes.push(now);
-  if (pokes.length >= 8) { flash("dizzy", 2500); setOpen(true); msg.textContent = "Too... many... pokes..."; }
-  else if (pokes.length >= 4) { flash("angry", 1800); setOpen(true); msg.textContent = "Okay okay, stop poking!"; }
+  if (pokes.length >= 8) { flash("dizzy", 2500); setOpen(true); speak("Too... many... pokes..."); }
+  else if (pokes.length >= 4) { flash("angry", 1800); setOpen(true); speak("Okay okay, stop poking!"); }
   else { flash("joy", 700); setOpen(!panel.classList.contains("is-open")); }
 });
 document.addEventListener("keydown", function (e) { wake(); if (e.key === "Escape" && panel.classList.contains("is-open")) { setOpen(false); btn.focus(); } });

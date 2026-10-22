@@ -1641,9 +1641,16 @@ p {
    single-accent palette, like the Instagram and YouTube brand colours. */
 @property --ga { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 @keyframes guide-glow { to { --ga: 360deg; } }
-.site-guide-panel::before, .site-guide-panel::after { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px; background: conic-gradient(from var(--ga), #6ec1ff, #a78bfa, #f472b6, #fbbf24, #6ec1ff); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude; pointer-events: none; animation: guide-glow 4s linear infinite; }
-.site-guide-panel::after { filter: blur(8px); opacity: 0.7; }
-.site-guide-more { flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 14px; border: 2px solid transparent; background: linear-gradient(var(--surface, #fff), var(--surface, #fff)) padding-box, conic-gradient(from var(--ga), #6ec1ff, #a78bfa, #f472b6, #fbbf24, #6ec1ff) border-box; animation: guide-glow 4s linear infinite; }
+.site-guide-panel::before, .site-guide-panel::after { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; background: conic-gradient(from var(--ga), #6ec1ff, #a78bfa, #f472b6, #fbbf24, #6ec1ff); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude; pointer-events: none; animation: guide-glow 4s linear infinite; }
+.site-guide-panel::after { filter: blur(4px); opacity: 0.25; }
+.site-guide-more { flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 14px; border-style: dashed; background: transparent; }
 .site-guide-more small { color: var(--muted); font-weight: 400; font-size: 0.78rem; }
-.site-guide-more:hover { background: linear-gradient(var(--surface, #fff), var(--surface, #fff)) padding-box, conic-gradient(from var(--ga), #6ec1ff, #a78bfa, #f472b6, #fbbf24, #6ec1ff) border-box; }
-@media (prefers-reduced-motion: reduce) { .site-guide-panel::before, .site-guide-panel::after, .site-guide-more { animation: none; } }
+/* The box is Kiddo's speech bubble: a tail points at it, the fill picks up its
+   mood colour, and it bobs while Kiddo talks. */
+.site-guide { gap: 10px; }
+.site-guide-panel { background: color-mix(in srgb, var(--kiddo, #ccd0ff) 16%, color-mix(in srgb, var(--surface, #fff) 30%, transparent)); transition: background 0.4s ease; transform-origin: 30px 100%; }
+.site-guide-tail { position: absolute; left: 22px; bottom: -10px; z-index: 1; width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-top: 11px solid color-mix(in srgb, var(--kiddo, #ccd0ff) 30%, color-mix(in srgb, var(--surface, #fff) 55%, transparent)); pointer-events: none; }
+.site-guide-panel.is-open p { min-height: 2.8em; }
+.is-talking .site-guide-btn svg { animation: guide-talk 0.22s ease-in-out infinite; }
+@keyframes guide-talk { 50% { transform: scale(1.04, 0.96) translateY(1px); } }
+@media (prefers-reduced-motion: reduce) { .site-guide-panel::before, .site-guide-panel::after, .is-talking .site-guide-btn svg { animation: none; } }
