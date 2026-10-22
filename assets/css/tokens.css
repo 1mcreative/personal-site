@@ -1534,6 +1534,17 @@ p {
   summary {
     min-height: 44px;
   }
+
+  /* min-width/min-height, not width/height: personal.css's own 36px
+     explicit size (loaded after this file) ties on specificity and would
+     otherwise win the cascade regardless of this media query — a plain
+     min-height always clamps the used height up regardless of which
+     `height` declaration wins, so it doesn't need to win that tie at all. */
+  .photo-modal-close,
+  .photo-modal-tool-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
 }
 
 /* Game picker: two cards side by side (stacked on very narrow phones). */

@@ -256,15 +256,52 @@
 
   // Edge-zone navigation: a click within EDGE_ZONE of either side of the
   // image steps that way; the middle does nothing. Works regardless of
-  // hover support, so a tap near the edge on touch navigates too.
+  // hover support, so a tap near the edge on touch navigates too — but a
+  // touch visitor has no hover to ever discover that zone exists, so a
+  // real swipe (the actual expected mobile gesture, same as Photos/
+  // Instagram) is the primary touch path, added right below.
   if (openers.length > 1) {
+    var didSwipe = false;
+
     img.addEventListener("click", function (event) {
+      if (didSwipe) {
+        didSwipe = false;
+        return;
+      }
       var rect = img.getBoundingClientRect();
       var relX = event.clientX - rect.left;
       var edge = rect.width * EDGE_ZONE;
       if (relX < edge) navigate(currentIndex - 1, -1);
       else if (relX > rect.width - edge) navigate(currentIndex + 1, 1);
     });
+
+    // Touch-only swipe, works from anywhere on the image (not just the
+    // edge zones above) — there's no pointer/hover on touch to discover
+    // those with. Mouse is untouched: desktop already has hover + click.
+    (function () {
+      var SWIPE_PX = 40;
+      var startX = 0;
+      var startY = 0;
+      var trackingId = null;
+
+      img.addEventListener("pointerdown", function (event) {
+        if (event.pointerType !== "touch") return;
+        trackingId = event.pointerId;
+        startX = event.clientX;
+        startY = event.clientY;
+      });
+
+      img.addEventListener("pointerup", function (event) {
+        if (trackingId === null || event.pointerId !== trackingId) return;
+        trackingId = null;
+        var dx = event.clientX - startX;
+        var dy = event.clientY - startY;
+        if (Math.abs(dx) < SWIPE_PX || Math.abs(dx) < Math.abs(dy)) return;
+        didSwipe = true;
+        if (dx < 0) navigate(currentIndex + 1, 1);
+        else navigate(currentIndex - 1, -1);
+      });
+    })();
 
     // Pointer-follow chevron, adapted from a pasted "Cursor Image Gallery"
     // reference — hover-only, since there's no pointer position to follow

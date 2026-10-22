@@ -973,6 +973,13 @@ html:has(body.theme-personal) {
   object-fit: contain;
   background: color-mix(in srgb, var(--bg) 40%, transparent);
   -webkit-touch-callout: none;
+  /* Without this, a browser can claim a horizontal swipe as its own pan
+     gesture before pointermove/pointerup ever reach the swipe-to-navigate
+     listener below (assets/js/photo-modal.js) — the same real gap this
+     project already hit once for the globe's own drag. Safe here since
+     nothing inside the lightbox needs native touch scrolling while it's
+     open (body scroll is disabled for the duration). */
+  touch-action: none;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
