@@ -1,4 +1,4 @@
-// Site guide: "Navi", a Blobatar (blobatar.dev, MIT, vendored in
+// Site guide: "Kiddo", a Blobatar (blobatar.dev, MIT, vendored in
 // assets/third-party/blobatar) that lives bottom-left on every page. It follows the
 // pointer with its eyes, reacts to scrolling, falls asleep when idle and wakes
 // up startled. No backend or AI: moods and quips are scripted, links are a menu.
