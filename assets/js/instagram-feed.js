@@ -7,7 +7,7 @@
 // touches the browser, no per-source limit.
 (function () {
   var DATA_URL = "/assets/data/instagram-feed.json";
-  var POST_COUNT = 6; // 2 full rows at 3-column desktop width
+  var POST_COUNT = 10; // one Netflix-style "Top 10" row
 
   var loadingEl = document.getElementById("ig-feed-loading");
   var gridEl = document.getElementById("ig-feed-grid");

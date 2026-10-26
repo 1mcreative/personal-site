@@ -28,13 +28,20 @@
     .filter(Boolean);
   if (!sections.length) return;
 
+  // threshold: 0 (any pixel at all) looked right on paper but a snapped
+  // section's neighbor can sit a sub-pixel (confirmed directly: 0.047px)
+  // past the viewport edge from ordinary layout rounding — invisible, but
+  // IntersectionObserver still counts it, so the previous section's icon
+  // never actually turned off (direct report: "when I'm in album, youtube
+  // icon also shows its color"). A small real threshold filters that noise
+  // out while still catching genuine multi-section visibility mid-scroll.
   var observer = new IntersectionObserver(
     function (entries) {
       entries.forEach(function (entry) {
         linksBySection[entry.target.id].classList.toggle("is-active", entry.isIntersecting);
       });
     },
-    { threshold: 0 }
+    { threshold: 0.02 }
   );
 
   sections.forEach(function (section) { observer.observe(section); });
