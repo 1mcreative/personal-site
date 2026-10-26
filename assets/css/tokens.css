@@ -1584,7 +1584,7 @@ p {
 @keyframes guide-hop { 0% { transform: translateY(0) scale(1); } 30% { transform: translateY(-16px) scale(0.92, 1.1); } 60% { transform: translateY(0) scale(1.12, 0.88); } 100% { transform: translateY(0) scale(1); } }
 /* While walking it can pass over content, so it must not catch clicks. */
 .site-guide-btn.is-walking { pointer-events: none; }
-.site-guide-btn.is-walking svg { animation: guide-waddle 0.5s ease-in-out infinite; }
+.site-guide-btn.is-walking svg { animation: guide-waddle 0.9s ease-in-out infinite; }
 @keyframes guide-waddle { 0%, 100% { transform: rotate(-6deg) translateY(0); } 50% { transform: rotate(6deg) translateY(-4px); } }
 .site-guide-btn .mo-eyes { transition: transform 0.12s ease-out; }
 /* Emotions are eyes only: the shared group scales, each eye tilts on its own. */

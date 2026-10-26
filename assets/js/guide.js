@@ -129,8 +129,8 @@ function speak(text) {
   typing = setInterval(function () { msg.textContent = text.slice(0, ++i); if (i >= text.length) { clearInterval(typing); wrap.classList.remove("is-talking"); } }, 16);
 }
 function quip(text, m, ms) {
-  if (panel.classList.contains("is-open") || quips >= 8 || document.querySelector("[data-slice-blade-modal]:not([hidden])")) return;
-  quips++; flash(m || "happy", ms || 2200); hop(); say(text, 4500);
+  if (panel.classList.contains("is-open") || quips >= 3 || document.querySelector("[data-slice-blade-modal]:not([hidden])")) return;
+  quips++; flash(m || "happy", ms || 2200); say(text, 6500);
 }
 function hop() {
   if (reduce) return;
@@ -158,66 +158,98 @@ btn.addEventListener("click", function () {
 document.addEventListener("keydown", function (e) { wake(); if (e.key === "Escape" && panel.classList.contains("is-open")) { setOpen(false); btn.focus(); } });
 document.addEventListener("click", function (e) {
   if (panel.classList.contains("is-open") && !wrap.contains(e.target)) setOpen(false);
-  if (e.target.closest("[data-slice-blade-open]")) { setOpen(false); flash("curious", 3000); say("Good luck! Have fun.", 4000); hop(); }
+  if (e.target.closest("[data-slice-blade-open]")) setOpen(false);
 });
 
-// Idle -> sleepy; any activity wakes it with a startled hop.
+// Kiddo has a life of its own. Its mood drifts on a random timer, it naps when left
+// alone, wanders now and then and mutters a line once in a while. It reacts only to
+// being poked or hovered, not to everything the visitor does.
 var idleT;
-var boredT;
 function wake() {
   clearTimeout(idleT);
-  if (mood === "sleepy") { flash("surprised", 700); hop(); } else if (mood === "bored") setMood("happy");
-  clearTimeout(boredT);
-  boredT = setTimeout(function () { if (mood === "happy" && !panel.classList.contains("is-open")) setMood("bored"); }, 12000);
-  idleT = setTimeout(function () { if (!panel.classList.contains("is-open")) { setMood("sleepy"); panel.hidden = true; } }, 25000);
+  if (mood === "sleepy") { flash("surprised", 700); hop(); }
+  idleT = setTimeout(function () { if (!panel.classList.contains("is-open")) { setMood("sleepy"); panel.hidden = true; } }, 70000);
 }
 wake();
+function rand(a, b) { return a + Math.random() * (b - a); }
+function later(fn, a, b) { setTimeout(fn, rand(a, b)); }
+function choose(list) { return list[Math.floor(Math.random() * list.length)]; }
 
 if (!reduce) {
-  // Eyes follow the mouse; near it Kiddo gets curious, on it Kiddo is happy to be petted.
-  var lastP, petT = 0;
+  // The eyes only follow the cursor when it is close; otherwise it minds its own business.
   document.addEventListener("pointermove", function (e) {
     if (e.pointerType !== "mouse") return;
     wake();
     var r = btn.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
-    var d = Math.hypot(dx, dy) || 1, k = Math.min(1, d / 200) * 3.5;
-    eyes.style.transform = "translate(" + (dx / d * k) + "px," + (dy / d * k) + "px)";
+    var d = Math.hypot(dx, dy) || 1;
     if (walking && d < 150) freeze();
-    // A fast swipe at it startles it; lingering on it makes it shy.
-    var now = Date.now(), speed = lastP ? Math.hypot(e.clientX - lastP.x, e.clientY - lastP.y) / Math.max(1, now - lastP.t) : 0;
-    lastP = { x: e.clientX, y: e.clientY, t: now };
-    if (speed > 2.5 && d < 160 && now > lockUntil) { quip("Eek!", "scared", 1300); return; }
-    if (now < lockUntil) return;
-    var near = d < r.width * 0.7;
-    if (near && !petT) petT = setTimeout(function () { petT = 0; if (mood === "love") quip("Okay, that's enough!", "shy", 2000); }, 3000);
-    if (!near && petT) { clearTimeout(petT); petT = 0; }
-    setMood(near ? "love" : d < 220 ? "curious" : "happy");
+    if (d < 260) { var k = Math.min(1, d / 200) * 3.5; eyes.style.transform = "translate(" + (dx / d * k) + "px," + (dy / d * k) + "px)"; }
   });
-  // Scrolling makes it float with a lag; a fast scroll startles it.
-  var lastY = {}, lagT, lastWarn = 0;
-  document.addEventListener("scroll", function (e) {
-    recheck();
-    var t = e.target === document ? document.scrollingElement : e.target;
-    var y = t.scrollTop, dy = y - (lastY[t.tagName] || y); lastY[t.tagName] = y;
-    wake();
-    wrap.style.setProperty("--lag", Math.max(-26, Math.min(26, dy * 0.25)) + "px");
-    clearTimeout(lagT); lagT = setTimeout(function () { wrap.style.setProperty("--lag", "0px"); }, 90);
-    var now = Date.now();
-    if (Math.abs(dy) > 140 && now - lastWarn > 30000) { lastWarn = now; quip("Whoa, slow down!", "dizzy", 1400); }
-    if (y + t.clientHeight >= t.scrollHeight - 4 && !wrap.dataset.end) { wrap.dataset.end = "1"; quip("That's the end. Say hello?", "love", 2500); }
-  }, { capture: true, passive: true });
-  // Now and then it glances around, winks or hops on its own.
-  setInterval(function () {
-    if (mood !== "happy" || panel.classList.contains("is-open") || walking) return;
-    var r = Math.random();
-    if (r < 0.2) flash("wink", 900);
-    else { eyes.style.transform = "translate(" + (Math.random() * 6 - 3) + "px," + (Math.random() * 4 - 2) + "px)"; if (r < 0.4) hop(); }
-  }, 6000);
-  // Walks slowly along the bottom edge when nobody is interacting with it.
-  setInterval(roam, 9000);
-  document.addEventListener("mouseout", function (e) { if (!e.relatedTarget && e.clientY <= 0) quip("Leaving already?", "sad", 2200); });
-  document.addEventListener("visibilitychange", function () { if (!document.hidden) quip("You're back!", "joy", 1500); });
+  // Being hovered sometimes makes it happy, sometimes it doesn't care.
+  var lastLove = 0;
+  btn.addEventListener("pointerenter", function (e) {
+    if (e.pointerType !== "mouse" || Date.now() < lockUntil || Date.now() - lastLove < 20000) return;
+    lastLove = Date.now();
+    if (Math.random() < 0.4) flash("love", 1400);
+  });
+  document.addEventListener("scroll", recheck, { capture: true, passive: true });
+
+  // Its mood drifts by itself. Weighted, so mostly content, sometimes anything else.
+  var DRIFT = [["happy", 34], ["curious", 14], ["joy", 10], ["bored", 12], ["wink", 8], ["shy", 8], ["excited", 6]];
+  var driftTotal = DRIFT.reduce(function (n, m) { return n + m[1]; }, 0);
+  var drift = function () {
+    if (idle() && Date.now() >= lockUntil) {
+      var r = Math.random() * driftTotal, m = "happy";
+      for (var i = 0; i < DRIFT.length; i++) { r -= DRIFT[i][1]; if (r <= 0) { m = DRIFT[i][0]; break; } }
+      flash(m, rand(4000, 9000));
+    }
+    later(drift, 12000, 35000);
+  };
+  later(drift, 8000, 20000);
+  // It glances around or winks at nothing in particular.
+  var glance = function () {
+    if (mood === "happy" && idle()) {
+      if (Math.random() < 0.15) flash("wink", 900);
+      else eyes.style.transform = "translate(" + (Math.random() * 6 - 3) + "px," + (Math.random() * 4 - 2) + "px)";
+    }
+    later(glance, 7000, 20000);
+  };
+  later(glance, 6000, 12000);
+  // It wanders off now and then, not on a schedule.
+  var wander = function () { if (Math.random() < 0.55) roam(); later(wander, 20000, 50000); };
+  later(wander, 15000, 30000);
 }
+
+// Things it says to itself, a few times per visit at most. Relatable, a little dry.
+var MUSINGS = [
+  "Is it snack time yet? I don't even have a mouth.",
+  "I was thinking about nothing. It was great.",
+  "Do pixels get tired? Asking for a friend.",
+  "Some days you scroll, some days you stare. Both count.",
+  "I walked all the way over here. Worth it.",
+  "Don't mind me. Just a blob, doing blob things.",
+  "Somewhere there's a tab you forgot about. Just saying.",
+  "I could really use a nap.",
+  "No legs, still get around.",
+  "Drink some water. I can't, but you can."
+];
+var PAGE_MUSINGS = {
+  "/": "Nice view. That globe never gets dizzy.",
+  "/resume/": "Bhavesh wrote all this. I mostly supervise.",
+  "/life/": "That black hole is my favourite neighbour.",
+  "/lab/": "Everything in here actually works. Rare, I know.",
+  "/questions/": "Interview nerves are normal. Even blobs get them.",
+  "/skills/": "I'm not a skill. I'm more of a vibe."
+};
+var said = {};
+function chatter() {
+  if (quips < 3 && idle() && mood !== "sleepy" && Math.random() < 0.6) {
+    var pool = MUSINGS.concat(PAGE_MUSINGS[path] ? [PAGE_MUSINGS[path], PAGE_MUSINGS[path]] : []).filter(function (t) { return !said[t]; });
+    if (pool.length) { var t = choose(pool); said[t] = 1; quip(t, choose(["happy", "curious", "joy", "wink", "bored", "shy"]), 2800); }
+  }
+  later(chatter, 50000, 110000);
+}
+later(chatter, 30000, 60000);
 
 // Free roaming: Kiddo may wander anywhere on screen, but only onto spots where it
 // would not cover anything functional (links, buttons, inputs, headings, text,
@@ -250,7 +282,7 @@ function walkTo(x, y, dur) {
   wrap.style.setProperty("--walk", dur + "s"); wrap.style.setProperty("--x", x + "px"); wrap.style.setProperty("--y", y + "px");
 }
 function goTo(spot, speed) {
-  var dist = Math.hypot(spot.x - curX, spot.y - curY), dur = Math.min(9, dist / speed);
+  var dist = Math.hypot(spot.x - curX, spot.y - curY), dur = Math.min(24, dist / speed);
   eyes.style.transform = "translate(" + (spot.x > curX ? 3 : -3) + "px," + (spot.y > curY ? 2 : -2) + "px)";
   walking = true; btn.classList.add("is-walking"); walkTo(spot.x, spot.y, dur);
   walkT = setTimeout(function () { walking = false; btn.classList.remove("is-walking"); hop(); }, dur * 1000);
@@ -277,7 +309,7 @@ function idle() {
 function roam() {
   if (!idle() || mood === "sleepy") return;
   var r = btn.getBoundingClientRect(), stuck = blockedAt(r.left, r.top, r.width);
-  var spot = pickSpot(stuck ? 0 : 90); if (spot) goTo(spot, stuck ? 220 : 55);
+  var spot = pickSpot(stuck ? 0 : 120); if (spot) goTo(spot, stuck ? 90 : 30);
 }
 // If scrolling or resizing slides content under Kiddo, move it to a free spot.
 function recheck() {
@@ -285,10 +317,7 @@ function recheck() {
   recheckT = setTimeout(function () {
     if (!idle()) return;
     var bd = bounds(), r = btn.getBoundingClientRect();
-    if (curX > bd.maxX || curY < bd.minY || blockedAt(r.left, r.top, r.width)) { var spot = pickSpot(0); if (spot) goTo(spot, 220); }
+    if (curX > bd.maxX || curY < bd.minY || blockedAt(r.left, r.top, r.width)) { var spot = pickSpot(0); if (spot) goTo(spot, 90); }
   }, 450);
 }
 addEventListener("resize", recheck);
-
-setTimeout(function () { quip("Hi! I'm " + NAME + ". Click me for a tour.", "excited"); setTimeout(function () { setMood("happy"); }, 2500); }, 4000);
-setTimeout(function () { quip(FACTS[fact], "curious"); }, 40000);
