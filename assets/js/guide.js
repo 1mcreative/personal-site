@@ -128,9 +128,9 @@ function speak(text) {
   wrap.classList.add("is-talking"); var i = 0;
   typing = setInterval(function () { msg.textContent = text.slice(0, ++i); if (i >= text.length) { clearInterval(typing); wrap.classList.remove("is-talking"); } }, 16);
 }
-function quip(text, m, ms) {
-  if (panel.classList.contains("is-open") || quips >= 3 || document.querySelector("[data-slice-blade-modal]:not([hidden])")) return;
-  quips++; flash(m || "happy", ms || 2200); say(text, 6500);
+function quip(text, m, ms, force) {
+  if (panel.classList.contains("is-open") || (!force && quips >= 3) || document.querySelector("[data-slice-blade-modal]:not([hidden])")) return;
+  if (!force) quips++; flash(m || "happy", ms || 2200); say(text, 6500);
 }
 function hop() {
   if (reduce) return;
@@ -321,3 +321,18 @@ function recheck() {
   }, 450);
 }
 addEventListener("resize", recheck);
+
+// The one thing it always does: say hello and invite a click, since otherwise
+// nobody would know it is interactive. Full greeting once per session, then a
+// single gentle nudge per page until the visitor has opened it at least once.
+function store(k, v) { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch (e) {} }
+btn.addEventListener("click", function () { store("kiddo-clicked", "1"); });
+setTimeout(function () {
+  if (store("kiddo-greeted")) return;
+  store("kiddo-greeted", "1");
+  quip("Hi, I'm " + NAME + ", Bhavesh's site guide. Click me and I'll show you around.", "excited", 5000, true); hop();
+}, 3500);
+setTimeout(function () {
+  if (store("kiddo-clicked")) return;
+  quip(choose(["Psst. Click me, I'm friendlier than I look.", "Still here. Click me if you want a tour.", "I know where everything is. Just click me."]), "wink", 3000, true);
+}, 40000);
