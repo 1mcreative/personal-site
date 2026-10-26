@@ -28,6 +28,14 @@ html:has(body.theme-personal) {
      media query; confirmed via a real overlap at 1024px desktop width, not
      just assumed from the CSS. */
   --nav-clearance: calc(var(--space-2) + 44px + var(--space-3));
+  /* One shared card width, driving the Instagram/Youtube/Album rows alike
+     — direct feedback: "I want all things to be blended, same card design
+     for all sections... take netflix as base." Each row used its own
+     one-off size before this (.video-card 160px, .photo-slider's own
+     --tile-size 170/240px, .ig-feed-item sized by a 3-column grid instead
+     of a card width at all) — one token now, bigger from tablet up same
+     as the old --tile-size already did. */
+  --card-w: 170px;
 
   background: var(--bg);
   color: var(--text);
@@ -620,24 +628,38 @@ html:has(body.theme-personal) {
   transform: translateX(2px);
 }
 
-/* Live Instagram feed (assets/js/instagram-feed.js, via Behold.so) — replaces
-   the two static handle cards above (.social-card, kept for /lab/'s own
-   demo, not deleted) with real photo content, per direct feedback that the
-   old cards "marketed the ID, not the content." Merges both accounts'
-   posts into one grid sorted by real timestamp rather than two separately
-   labeled rows, matching the same consistency preference the YouTube
-   section's own redesign already established. */
+/* Live Instagram feed (assets/js/instagram-feed.js, self-hosted — see its
+   own header comment) — replaces the two static handle cards above
+   (.social-card, kept for /lab/'s own demo, not deleted) with real photo
+   content. Same horizontal Netflix-row pattern as .video-grid/.photo-slider
+   now (direct feedback: "take netflix as base... same card design for all
+   sections" — this used to be its own 3-column grid, the one layout on
+   the page that matched neither of the other two). Merges both accounts'
+   posts into one row sorted by real timestamp. */
 .theme-personal .ig-feed-grid,
 .theme-personal .ig-feed-loading {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: var(--space-2);
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: var(--space-1) var(--space-3) var(--space-2) var(--nav-clearance);
+  scroll-padding-left: var(--nav-clearance);
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.theme-personal .ig-feed-grid::-webkit-scrollbar,
+.theme-personal .ig-feed-loading::-webkit-scrollbar {
+  display: none;
 }
 
 /* This project has hit this exact bug once already on .lab-modal: a bare
    [hidden] attribute selector loses to any class selector on specificity,
    so instagram-feed.js's "loadingEl.hidden = true" was correctly setting
-   the attribute while this file's own "display: grid" above just kept
+   the attribute while this file's own "display: flex" above just kept
    winning — confirmed directly, not assumed, via a real screenshot still
    showing the skeleton after the JS reported it hidden. Class+attribute
    forces this to actually win. */
@@ -646,23 +668,10 @@ html:has(body.theme-personal) {
   display: none;
 }
 
-@media (max-width: 900px) {
-  .theme-personal .ig-feed-grid,
-  .theme-personal .ig-feed-loading {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .theme-personal .ig-feed-grid,
-  .theme-personal .ig-feed-loading {
-    grid-template-columns: 1fr;
-  }
-}
-
 .theme-personal .ig-feed-loading span {
-  display: block;
-  aspect-ratio: 1;
+  flex: 0 0 auto;
+  width: var(--card-w);
+  aspect-ratio: 2 / 3;
   border-radius: var(--radius);
   background: var(--surface);
   animation: ig-feed-pulse 1.4s ease-in-out infinite;
@@ -686,12 +695,28 @@ html:has(body.theme-personal) {
 }
 
 .theme-personal .ig-feed-item {
+  flex: 0 0 auto;
+  width: var(--card-w);
   display: block;
-  aspect-ratio: 1;
+  aspect-ratio: 2 / 3;
   border-radius: var(--radius);
   overflow: hidden;
+  scroll-snap-align: start;
   border: 1px solid var(--border);
   background: var(--surface);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  transition: transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
+}
+
+/* Card-level lift, not just an inner-image zoom — the same hover language
+   .photo-slide/.video-card both use, Instagram's own brand pink standing
+   in for the glow color the same way Youtube's red and Album's accent
+   blue already do (an established exception to the single-accent rule —
+   a real external platform's card gets its own brand color). */
+.theme-personal .ig-feed-item:hover,
+.theme-personal .ig-feed-item:focus-visible {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 14px 32px -6px rgba(0, 0, 0, 0.55), 0 0 0 1px color-mix(in srgb, #e1306c 45%, transparent);
 }
 
 .theme-personal .ig-feed-item img {
@@ -699,12 +724,6 @@ html:has(body.theme-personal) {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.35s var(--ease);
-}
-
-.theme-personal .ig-feed-item:hover img,
-.theme-personal .ig-feed-item:focus-visible img {
-  transform: scale(1.06);
 }
 
 .theme-personal .ig-feed-error {
@@ -758,26 +777,28 @@ html:has(body.theme-personal) {
   border-radius: 50%;
 }
 
-/* Each story gets the full screen to itself and its own content vertically
-   centered within it — replaces the old "just enough height for its own
-   content, margin-top for spacing" layout, which is what let sections read
-   as one continuous, overlapping wall (confirmed directly: scrolled past
-   Instagram, its own card text was still passing behind the fixed nav bar
-   with no clean section boundary to rest on). No margin-top now — sections
-   sit flush against each other; the height itself is the separation. */
+/* Direct feedback: forcing every story to a full 100svh regardless of its
+   own content ("Each story gets the full screen to itself", the previous
+   version of this comment) read as "too much empty space" once the actual
+   content was measured — Instagram's real content is ~21px tall right
+   now, Youtube's ~184px, Album's ~320px, each sitting in an 800px section.
+   Sized to content instead, with generous but fixed (not viewport-locked)
+   padding for breathing room between "chapters." The clean-boundary fix
+   this comment used to credit to full-screen height was actually the
+   padding-top clearance below, not the height — scroll-snap-align plus
+   that clearance is what stops a section's own content from passing
+   behind the fixed nav bar after a snap, and both are untouched here. */
 .theme-personal .life-section {
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  min-height: 100vh;
-  min-height: 100svh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   /* Own top clearance so a section's heading never sits directly under the
      fixed nav pill right after a snap — nav is ~64-80px tall depending on
      width, this comfortably clears it at every size tested. */
-  padding-top: max(var(--space-4), 12vh);
-  padding-bottom: var(--space-4);
+  padding-top: max(var(--space-4), 10vh);
+  padding-bottom: var(--space-5);
 }
 
 .theme-personal .life-section h2 {
@@ -785,22 +806,25 @@ html:has(body.theme-personal) {
   margin: 0 0 var(--space-1);
 }
 
-/* Smooth Scroll Slider — ported from a pasted Originkit React component
-   into plain JS/CSS (photo-slider.js). This is the real, no-JS/
-   reduced-motion markup: a plain horizontally-scrollable row, same
-   full-bleed + scroll-snap recipe as .social-grid/.video-grid above. When
-   motion is allowed, photo-slider.js adds .is-enhanced and takes over
-   layout with its own absolute-positioned, auto-looping, drag/wheel-driven
-   transform loop — this rule set is what that state falls back from, not
-   just a loading skeleton. Placeholder tiles (no real photos yet) use the
-   exact gradient-hue formula the original React component falls back to
-   when it has no images either. */
+@media (min-width: 640px) {
+  .theme-personal {
+    --card-w: 220px;
+  }
+}
+
+/* Album row — a plain horizontally-scrollable flex row, same full-bleed +
+   scroll-snap recipe .video-grid/.ig-feed-grid also use (see --card-w on
+   .theme-personal above for the shared sizing). Used to be driven by a
+   custom drag/wheel-physics carousel (photo-slider.js, since removed) —
+   direct feedback that its tiles were drifting into each other with no
+   space between ("looks odd") traced to that physics math, and the same
+   message's broader ask ("take netflix as base... same card design for
+   all sections") meant the fix was to drop the one-off carousel for the
+   same plain row every other section already uses, not patch its math.
+   Placeholder tiles (no real photos yet) use the exact gradient-hue
+   formula the original ported React component fell back to when it had
+   no images either. */
 .theme-personal .photo-slider {
-  /* One token drives tile size everywhere (plain row, enhanced carousel,
-     and photo-slider.js, which reads this computed size directly instead
-     of a duplicated JS constant) — bigger from tablet up, since a 170px
-     tile read as too small on a real desktop (direct feedback). */
-  --tile-size: 170px;
   display: flex;
   gap: var(--space-2);
   width: 100vw;
@@ -812,19 +836,6 @@ html:has(body.theme-personal) {
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-}
-
-@media (min-width: 640px) {
-  .theme-personal .photo-slider {
-    --tile-size: 240px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .theme-personal .photo-slider {
-    --tile-size: 320px;
-  }
 }
 
 .theme-personal .photo-slider::-webkit-scrollbar {
@@ -834,8 +845,8 @@ html:has(body.theme-personal) {
 .theme-personal .photo-slide {
   position: relative;
   flex: 0 0 auto;
-  width: var(--tile-size);
-  height: var(--tile-size);
+  width: var(--card-w);
+  aspect-ratio: 2 / 3;
   border-radius: var(--radius);
   overflow: hidden;
   scroll-snap-align: start;
@@ -847,7 +858,7 @@ html:has(body.theme-personal) {
 
 .theme-personal button.photo-slide:hover,
 .theme-personal button.photo-slide:focus-visible {
-  transform: translateY(-4px) scale(1.015);
+  transform: translateY(-4px) scale(1.03);
   box-shadow: 0 14px 32px -6px rgba(0, 0, 0, 0.55), 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
@@ -910,27 +921,6 @@ html:has(body.theme-personal) {
 
 .theme-personal .photo-slide-placeholder {
   background: linear-gradient(150deg, hsl(var(--hue) 42% 34%), hsl(calc(var(--hue) + 45) 55% 10%));
-}
-
-.theme-personal .photo-slider.is-enhanced {
-  position: relative;
-  overflow: hidden;
-  scroll-snap-type: none;
-  padding: 0;
-  cursor: grab;
-}
-
-.theme-personal .photo-slider.is-enhanced .photo-slide {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  margin: 0;
-  will-change: transform, filter;
-  scroll-snap-align: none;
-}
-
-.theme-personal .photo-slider.is-enhanced.is-dragging {
-  cursor: grabbing;
 }
 
 /* Photo lightbox — photo only, no surrounding card (direct feedback:
@@ -1140,7 +1130,11 @@ html:has(body.theme-personal) {
 }
 
 .photo-modal-dot.is-active {
-  background: #fff;
+  /* The site's one signature accent, not plain white — ties this into the
+     same "blue means active/current" language as the section-nav icons
+     and nav current-page state, rather than reading as a generic,
+     off-brand gallery widget. */
+  background: var(--accent);
   transform: scale(1.3);
 }
 
@@ -1196,6 +1190,74 @@ html:has(body.theme-personal) {
   margin: 0;
 }
 
+/* Video lightbox (assets/js/video-modal.js) — direct request: clicking a
+   Youtube card opens the real video in an in-page player first, not an
+   immediate tab-away to youtube.com; only an explicit "Watch on Youtube"
+   click (or the embed's own native fullscreen, which stays on this page
+   regardless) actually leaves. Same .contact-modal shell and the same
+   .photo-modal-close circle as the photo lightbox — one modal language
+   across the whole page, not a second one-off. */
+.video-modal-figure {
+  position: relative;
+  width: min(90vw, 960px);
+  transform: scale(0.96);
+  transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.contact-modal.is-open .video-modal-figure {
+  transform: scale(1);
+}
+
+.video-modal-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #000;
+}
+
+/* Shorts play in their own real 9:16 frame instead of being letterboxed
+   into a 16:9 box — the thumbnail crop upstream is for browsing, not
+   playback, so this is the one place where each video keeps its real
+   shape (assets/js/video-modal.js sets this from the card's own URL). */
+.video-modal-frame.is-vertical {
+  width: min(360px, 80vh, 90vw);
+  aspect-ratio: 9 / 16;
+  margin: 0 auto;
+}
+
+.video-modal-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.video-modal-title {
+  margin: var(--space-2) 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.video-modal-external {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-top: var(--space-1);
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color var(--speed) var(--ease);
+}
+
+.video-modal-external:hover,
+.video-modal-external:focus-visible {
+  color: #ff0000;
+}
+
 /* YouTube: two channel cards plus a horizontally scrolling row of specific
    videos edited for another creator. Same visual recipe as .social-card
    (translucent dark glass, blur, brand-colored hover reveal) but kept as
@@ -1205,77 +1267,35 @@ html:has(body.theme-personal) {
    external platform gets its own brand color" exception already
    established for Instagram's pink hover glow, which the site-wide
    blue-accent pass deliberately left alone for the same reason. */
-/* Each channel/creator gets its own row: a small clickable name linking
-   straight to that channel, directly above its own horizontal strip of
-   cards — replaces the old .youtube-channels card pair that sat above all
-   24 cards as one undifferentiated pile. Kartik Bansal (whose videos these
-   are, per each card's own .video-title/href — he's not a channel the
-   site owner runs) gets a real clickable row label for the first time
-   here too, instead of only being named in a hover-only meta line. */
+/* Each channel/creator gets its own row — direct feedback that a text
+   label living above the row (the old .video-row-label) ate into the
+   hover-scale headroom and forced an asymmetric, top-anchored growth that
+   itself then looked odd ("it should size up equally from all sides").
+   The channel link is now the first card in its own row instead
+   (.video-channel-card below), so nothing sits above the grid at all —
+   every card, including this one, has identical, symmetric room to grow
+   into on hover. Kartik Bansal (whose videos these are, per each other
+   card's own .video-title/href — he's not a channel the site owner runs)
+   gets the same real clickable channel card as the other two. */
 .theme-personal .video-row {
   margin-top: var(--space-3);
-}
-
-.theme-personal .video-row-label {
-  display: inline-block;
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.3;
-  color: var(--text);
-  text-decoration: none;
-  opacity: 0.8;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
-  transition: opacity var(--speed) var(--ease), color var(--speed) var(--ease);
-}
-
-.theme-personal .video-row-label::after {
-  content: " ↗";
-  font-weight: 400;
-}
-
-.theme-personal .video-row-label:hover,
-.theme-personal .video-row-label:focus-visible {
-  opacity: 1;
-  color: #ff0000;
-}
-
-.theme-personal .video-grid-intro {
-  margin-top: var(--space-3);
-  color: var(--muted);
-  font-size: 0.9rem;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
 }
 
 /* Same full-bleed horizontal scroll-snap row as .social-grid (see its own
    comment for why the padding is paired with a matching scroll-padding —
    a scroll-snap container silently jumps scrollLeft to an unmirrored
    leading padding otherwise), kept separate so this row and the Instagram
-   one can change independently. Extra top/bottom padding (beyond what the
-   content itself needs) is deliberate headroom for the hover scale-up
-   below — .social-card hit exactly this bug once already (a hover lift
-   clipped clean off by the row's own overflow-y: hidden, since it had no
-   slack above the resting card); this row gets that slack from the start.
-   Three of these now sit inside #youtube (one per .video-row, see above) —
-   an earlier pass had collapsed them into one unified 24-card row because
-   three separate grids plus a per-card .video-meta line pushed #youtube's
-   real height to 1261px against a 768px viewport, confirmed directly via
-   getBoundingClientRect(), with no snap point inside that overflow. This
-   time the per-card .video-meta line is gone (the channel name now lives
-   once, in the row's own label, not repeated on every card under it),
-   which alone claws back enough height that three grids plus three labels
-   fits #youtube's real budget with room to spare — confirmed the same way,
-   via getBoundingClientRect() at both mobile and desktop after building,
-   not just estimated from the CSS. margin-top is small (var(--space-1))
-   since .video-row-label directly above already carries the bulk of the
-   spacing via its own row's var(--space-3) margin-top. */
+   one can change independently. Top and bottom padding match — the
+   center-origin hover scale below grows evenly in both directions, so
+   both sides need the same slack, confirmed via getBoundingClientRect()
+   that this covers it with room to spare at the largest --card-w
+   breakpoint. */
 .theme-personal .video-grid {
   display: flex;
   gap: var(--space-2);
-  margin-top: var(--space-1);
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  padding: var(--space-1) var(--space-3) var(--space-1) var(--nav-clearance);
+  padding: var(--space-4) var(--space-3) var(--space-4) var(--nav-clearance);
   scroll-padding-left: var(--nav-clearance);
   overflow-x: auto;
   overflow-y: visible;
@@ -1292,31 +1312,133 @@ html:has(body.theme-personal) {
    vertical Shorts, Kartik Bansal's dance edits) — gets the identical box.
    YouTube's own hqdefault.jpg is the same flat 480x360 raster for a Short
    as for a long-form video (confirmed directly, not assumed), so cropping
-   every thumbnail into one shared 16:9 frame via object-fit:cover isn't
-   losing anything format-specific — there was never a "true vertical"
-   source image to begin with. */
+   every thumbnail into one shared frame via object-fit:cover isn't losing
+   anything format-specific — there was never a "true vertical" source
+   image to begin with. Vertical (2:3), not the original 16:9 — direct
+   feedback: "take netflix as base... same card design for all sections,"
+   matching the vertical .ig-feed-item/.photo-slide cards either side of
+   this row. Actual playback still gets each video's own real aspect ratio
+   (assets/js/video-modal.js) — only the browsing thumbnail is cropped. */
 .theme-personal .video-card {
   flex: 0 0 auto;
-  width: 160px;
+  width: var(--card-w);
   scroll-snap-align: start;
   text-decoration: none;
   color: var(--text);
   transition: transform var(--speed) var(--ease), z-index 0s var(--speed);
 }
 
-/* Netflix-style hover pop, toned down from an earlier, larger-card version
-   of this same idea — a compact playlist row doesn't need (or have vertical
-   room for) a dramatic scale-up, and a smaller one reduces how much
-   headroom .video-grid has to reserve against clipping. */
+/* Netflix-style hover pop — center-origin (the default), so the card
+   grows equally on every side. A top-anchored version of this fixed an
+   earlier clipping report but then looked odd growing only downward
+   ("it should size up equally from all sides") — the real fix was
+   removing .video-row-label above the grid so there's symmetric headroom
+   to grow into on both sides, not keeping the asymmetric growth. */
 .theme-personal .video-card.is-hover-active {
-  transform: scale(1.08);
+  transform: scale(1.12);
   z-index: 5;
+}
+
+/* The channel link, now the first card in its own row instead of a text
+   label above it (see .video-row's own comment). Same box as a real
+   .video-thumb (identical size, radius, border) so it sits in the row as
+   "just another card," not a different-shaped intruder. Direct feedback
+   that a generic icon-badge-on-gradient version "looks fake... cheap" —
+   that's a recognizable templated pattern precisely because it's the only
+   card in the row with no real content behind it. Fixed by giving it one:
+   a blurred, darkened frame from that channel's own first video
+   (life/index.md's --channel-bg, the same hqdefault.jpg the real card
+   right after it uses), so this card is visibly built from the same
+   material as its neighbors instead of a generic placeholder standing in
+   for one. */
+.theme-personal .video-channel-card .video-channel-card-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.3em;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  color: #fff;
+  text-align: center;
+  padding: var(--space-2) var(--space-2) var(--space-3);
+  transition: border-color var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
+}
+
+.theme-personal .video-channel-card .video-channel-card-inner::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  z-index: 0;
+  background-image: var(--channel-bg);
+  background-size: cover;
+  background-position: center;
+  filter: blur(6px) brightness(0.55) saturate(1.1);
+}
+
+.theme-personal .video-channel-card .video-channel-card-inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to top, rgba(5, 2, 2, 0.92), rgba(5, 2, 2, 0.3) 55%, rgba(5, 2, 2, 0.1));
+}
+
+.theme-personal .video-card.video-channel-card:hover .video-channel-card-inner,
+.theme-personal .video-card.video-channel-card:focus-visible .video-channel-card-inner,
+.theme-personal .video-card.video-channel-card.is-hover-active .video-channel-card-inner {
+  border-color: #ff0000;
+  box-shadow: 0 16px 36px -14px rgba(255, 0, 0, 0.45);
+}
+
+.theme-personal .video-channel-card-icon {
+  position: relative;
+  z-index: 2;
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 0.15em;
+  border-radius: 50%;
+  background: #ff0000;
+  color: #fff;
+}
+
+.theme-personal .video-channel-card-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.theme-personal .video-channel-card-name {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.theme-personal .video-channel-card-cta {
+  position: relative;
+  z-index: 2;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color var(--speed) var(--ease);
+}
+
+.theme-personal .video-card.video-channel-card:hover .video-channel-card-cta,
+.theme-personal .video-card.video-channel-card:focus-visible .video-channel-card-cta {
+  color: #fff;
 }
 
 .theme-personal .video-thumb {
   position: relative;
   display: block;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 2 / 3;
   border-radius: var(--radius);
   overflow: hidden;
   border: 1px solid var(--border);
@@ -1348,49 +1470,11 @@ html:has(body.theme-personal) {
   pointer-events: none;
 }
 
-/* A small centered badge, not a full-thumbnail scrim — visible by default,
-   not gated behind :hover/:focus-visible. That gate meant touch visitors
-   never saw any "this is a video" cue at all (neither state a tap can
-   trigger), confirmed directly: computed opacity read 0 at rest with
-   nothing to reveal it on a touch device. Real platforms (YouTube, Vimeo)
-   all show a persistent play affordance on thumbnails for the same reason. */
-.theme-personal .video-play {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: rgba(0, 0, 0, 0.55);
-  transition: transform var(--speed) var(--ease), background var(--speed) var(--ease), opacity var(--speed) var(--ease);
-}
-
-.theme-personal .video-play svg {
-  width: 14px;
-  height: 14px;
-}
-
 .theme-personal .video-card:hover .video-thumb,
 .theme-personal .video-card:focus-visible .video-thumb,
 .theme-personal .video-card.is-hover-active .video-thumb {
   border-color: #ff0000;
   box-shadow: 0 16px 36px -14px rgba(255, 0, 0, 0.45);
-}
-
-.theme-personal .video-card:hover .video-play,
-.theme-personal .video-card:focus-visible .video-play {
-  transform: translate(-50%, -50%) scale(1.15);
-  background: rgba(0, 0, 0, 0.75);
-}
-
-/* Once a real preview starts playing, the static play badge would just sit
-   on top of it doing nothing useful — hide it for that state only, not
-   the plain hover state above it. */
-.theme-personal .video-card.is-hover-active .video-play {
-  opacity: 0;
 }
 
 /* Playlist-style: clamped to a fixed line count (not unbounded wrapping),
@@ -1400,16 +1484,28 @@ html:has(body.theme-personal) {
    few words ("SPARSH 2K18 Pre-Movie" vs "SPARSH 2K18 Theme Teaser"), and a
    single-line clamp truncated both down to the identical "SPARSH 2K18...",
    reading as duplicate cards at a glance. */
+/* Direct feedback: "video name should be inside card not outside" — moved
+   from a plain text line below .video-thumb (life/index.md) to an overlay
+   inside it, same gradient-scrim-for-legibility technique
+   .photo-slide-scrim already uses on the Album cards right next to this
+   row, so the two card types read as the same family, not two different
+   conventions. */
 .theme-personal .video-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  margin-top: var(--space-1);
+  margin: 0;
+  padding: 1.75rem 0.6rem 0.6rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
   font-size: 0.85rem;
   font-weight: 600;
   line-height: 1.3;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  color: #fff;
 }
 
 /* Left-edge jump nav — bare floating icons, deliberately no pill/background
@@ -1478,9 +1574,14 @@ html:has(body.theme-personal) {
 /* Blue glow on hover/focus — the site's own accent, not a new color —
    independent of grayscale/active state (drop-shadow's own color isn't
    affected by a preceding grayscale() in the same filter chain), so it
-   works the same whether the icon is currently colorful or not. */
+   works the same whether the icon is currently colorful or not. Direct
+   feedback: hovering used to only add this glow while leaving the icon
+   itself grayscale unless that section was also the active one — hover
+   now reveals the icon's real color too (same grayscale(0) .is-active
+   already uses), a natural "preview what clicking this does" affordance. */
 .theme-personal .section-nav-link:hover .section-nav-icon,
 .theme-personal .section-nav-link:focus-visible .section-nav-icon {
+  --icon-gray: grayscale(0);
   --icon-glow: drop-shadow(0 0 10px var(--accent));
 }
 
