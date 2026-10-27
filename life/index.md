@@ -253,6 +253,12 @@ permalink: /life/
       <button type="button" class="photo-slide" data-photo-open data-full="{{ photo.src }}" data-caption="{{ photo.caption | default: '' | escape }}" data-location="{{ photo.location | default: '' | escape }}" data-date="{{ photo.date | default: '' | escape }}">
         <img src="{{ photo.src }}" alt="{{ photo.alt | default: '' }}" decoding="async" width="170" height="170" draggable="false" onerror="this.closest('.photo-slide').classList.add('photo-slide-broken')"{% if photo.offsetY %} style="--offset-y: {{ photo.offsetY }}px"{% endif %}>
         <span class="photo-slide-scrim" aria-hidden="true"></span>
+        {% if photo.location or photo.date %}
+        <span class="photo-slide-meta" aria-hidden="true">
+          {% if photo.location %}<strong>{{ photo.location }}</strong>{% endif %}
+          {% if photo.date %}{{ photo.date }}{% endif %}
+        </span>
+        {% endif %}
       </button>
       {% endfor %}
     {% else %}
@@ -293,11 +299,15 @@ permalink: /life/
     </div>
     <div class="photo-modal-toolbar">
       <button type="button" class="photo-modal-tool-btn" data-photo-info aria-expanded="false" aria-label="Photo details">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5.5M12 7.5v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <!-- No outer circle on the glyph itself — the button's own round
+             glass background already frames it, so a second stroked
+             circle on top just doubled up as a cluttered ring-in-a-ring.
+             A solid dot+bar reads as a clean "i" on its own. -->
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="7.3" r="1.9" fill="currentColor"/><rect x="10.4" y="10.8" width="3.2" height="8.4" rx="1.6" fill="currentColor"/></svg>
       </button>
       <div class="photo-modal-dots" data-photo-dots aria-hidden="true"></div>
       <button type="button" class="photo-modal-tool-btn" data-photo-download aria-label="Request the full-resolution photo">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v11M8 11l4 4 4-4M5 19h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5v10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M7.3 10.2L12 15l4.7-4.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 18.8h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
       </button>
     </div>
   </div>

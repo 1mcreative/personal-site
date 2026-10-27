@@ -151,17 +151,44 @@
     }, SLIDE_MS);
   }
 
-  function setInfoOpen(isOpen) {
+  // Timed-hidden-around-a-transition, same technique entry-toggle.js
+  // already uses: the real `hidden` attribute is what actually removes the
+  // panel from hit-testing/assistive tech, but toggling it alone can't
+  // animate (display:none has no transition), so .is-visible drives a real
+  // opacity/transform fade and `hidden` only gets re-applied once that fade
+  // has actually finished closing. `instant` skips both the open-flush and
+  // the close-delay — used when a new photo loads, where the info panel
+  // should just reset to its closed state, not visibly re-animate closed.
+  var INFO_TRANSITION_MS = 220;
+  var infoHideTimer = null;
+  function setInfoOpen(isOpen, instant) {
     if (!infoBtn || !infoPanel) return;
-    infoPanel.hidden = !isOpen;
     infoBtn.setAttribute("aria-expanded", String(isOpen));
+    if (infoHideTimer) {
+      clearTimeout(infoHideTimer);
+      infoHideTimer = null;
+    }
+    if (isOpen) {
+      infoPanel.hidden = false;
+      if (!instant) void infoPanel.offsetWidth; // flush layout so the class add transitions instead of jumping straight to its end state
+      infoPanel.classList.add("is-visible");
+    } else {
+      infoPanel.classList.remove("is-visible");
+      if (instant) {
+        infoPanel.hidden = true;
+      } else {
+        infoHideTimer = setTimeout(function () {
+          infoPanel.hidden = true;
+        }, INFO_TRANSITION_MS);
+      }
+    }
   }
 
   function open(event) {
     currentIndex = indexForSrc(event.currentTarget.getAttribute("data-full"));
     populate(event.currentTarget);
     updateDots();
-    setInfoOpen(false);
+    setInfoOpen(false, true);
 
     lastFocused = document.activeElement;
     modal.hidden = false;

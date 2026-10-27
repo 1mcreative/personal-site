@@ -812,54 +812,105 @@ html:has(body.theme-personal) {
   }
 }
 
-/* Album row — a plain horizontally-scrollable flex row, same full-bleed +
-   scroll-snap recipe .video-grid/.ig-feed-grid also use (see --card-w on
-   .theme-personal above for the shared sizing). Used to be driven by a
-   custom drag/wheel-physics carousel (photo-slider.js, since removed) —
-   direct feedback that its tiles were drifting into each other with no
-   space between ("looks odd") traced to that physics math, and the same
-   message's broader ask ("take netflix as base... same card design for
-   all sections") meant the fix was to drop the one-off carousel for the
-   same plain row every other section already uses, not patch its math.
-   Placeholder tiles (no real photos yet) use the exact gradient-hue
-   formula the original ported React component fell back to when it had
-   no images either. */
+/* Album — a Coverflow carousel (assets/js/photo-coverflow.js): one centered
+   photo, the rest tilted away in perspective on either side, drifting
+   between photos on its own and pausing on any real interaction. Replaces
+   the plain horizontally-scrollable flex row this section used right after
+   the Netflix-row unification (see VERSIONING/tooling log) — picked after
+   directly comparing three live candidates side by side and choosing this
+   one, not a reversal of that unification by accident. Every card is
+   `position: absolute`, sized and placed per-frame by the JS (not by this
+   CSS — the width/height/transform values below are only the pre-JS/no-JS
+   fallback), so this container needs its own explicit height the way a
+   normal flex/grid row never did. Placeholder tiles (no real photos yet)
+   keep the exact gradient-hue formula the original ported React component
+   fell back to when it had no images either. */
 .theme-personal .photo-slider {
-  display: flex;
-  gap: var(--space-2);
+  position: relative;
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  padding: var(--space-1) var(--space-3) var(--space-2) var(--nav-clearance);
-  scroll-padding-left: var(--nav-clearance);
-  overflow-x: auto;
-  overflow-y: visible;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
+  height: calc(var(--card-w) * 1.5 + 2.5rem);
+  overflow: hidden;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  cursor: grab;
+  /* none, not pan-y: a horizontal swipe that isn't perfectly horizontal
+     can otherwise get claimed by the browser as native vertical panning
+     before any pointermove ever reaches the drag handler below — the same
+     real gap this project already hit once for the homepage globe's own
+     touch-drag, fixed the same way there. The tradeoff (can't start a
+     page-scroll swipe with a finger resting exactly on a card) is the
+     same one already accepted there. */
+  touch-action: none;
 }
 
-.theme-personal .photo-slider::-webkit-scrollbar {
-  display: none;
+.theme-personal .photo-slider.is-dragging {
+  cursor: grabbing;
 }
 
 .theme-personal .photo-slide {
-  position: relative;
-  flex: 0 0 auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
   width: var(--card-w);
   aspect-ratio: 2 / 3;
   border-radius: var(--radius);
   overflow: hidden;
-  scroll-snap-align: start;
   background: var(--surface);
   border: 1px solid var(--border);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  transition: transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
+  will-change: transform, opacity;
+  /* JS drives transform/width/height/opacity every frame once it boots;
+     this transition only covers the gap before it has (and never applies
+     once inline styles take over, since those always win over this rule
+     regardless of this transition property). */
+  transition: box-shadow var(--speed) var(--ease);
 }
 
 .theme-personal button.photo-slide:hover,
 .theme-personal button.photo-slide:focus-visible {
-  transform: translateY(-4px) scale(1.03);
+  /* No transform here on purpose — the coverflow JS sets each card's own
+     transform every frame via inline style, which always wins over a
+     stylesheet rule for the same property regardless of specificity, so a
+     CSS hover-lift transform would silently never apply. A shadow/border
+     boost doesn't have that conflict (JS never touches box-shadow). */
   box-shadow: 0 14px 32px -6px rgba(0, 0, 0, 0.55), 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* Hover metadata hook — direct request: hovering a photo should surface
+   its location/date without opening it. Deliberately short (never the full
+   caption, which belongs to the lightbox's own info panel) and decorative
+   only (aria-hidden; the real accessible text is the lightbox's info panel
+   and the image's own alt), matching this site's existing "a hook, not a
+   report" convention for hover reveals (e.g. .hero-status-detail). Gated
+   to hover-capable pointers the same way spotlight-text/video-hover.js
+   already are — a touch tap has no hover to show this in, and goes
+   straight to the lightbox instead. Layered after .photo-slide-scrim in
+   the markup so it paints above that gradient with no z-index needed. */
+@media (hover: hover) {
+  .theme-personal .photo-slide-meta {
+    position: absolute;
+    inset: auto var(--space-2) var(--space-2) var(--space-2);
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity var(--speed) var(--ease), transform var(--speed) var(--ease);
+    pointer-events: none;
+  }
+
+  .theme-personal .photo-slide-meta strong {
+    display: block;
+    font-weight: 600;
+  }
+
+  .theme-personal button.photo-slide:hover .photo-slide-meta,
+  .theme-personal button.photo-slide:focus-visible .photo-slide-meta {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Real photos render as a <button> (clicking one opens the info modal);
@@ -957,8 +1008,15 @@ html:has(body.theme-personal) {
   display: block;
   width: auto;
   height: auto;
-  max-width: min(94vw, 1100px);
-  max-height: min(92vh, 920px);
+  /* calc(100vw/100vh - the modal's own 2x var(--space-3) padding), not a
+     flat 94vw/92vh — .contact-modal (tokens.css) pads itself 24px on
+     every side while centering its content, and a flat vw-based max-width
+     ignores that padding entirely. Confirmed directly at 375px: the image
+     was rendering 353px wide inside a 327px-wide clipped figure (the
+     padding's own real 327px), cutting ~26px off one side — direct
+     report: "photos should not cut from side." */
+  max-width: min(calc(100vw - var(--space-3) * 2), 1100px);
+  max-height: min(calc(100vh - var(--space-3) * 2), 920px);
   min-height: 160px;
   object-fit: contain;
   background: color-mix(in srgb, var(--bg) 40%, transparent);
@@ -1055,23 +1113,40 @@ html:has(body.theme-personal) {
   top: 8px;
   right: 8px;
   z-index: 2;
+}
+
+/* Direct feedback that the previous treatment (a heavy multi-shadow +
+   glossy radial-sheen "liquid glass" look) "looks odd" next to the rest
+   of the page — checked, and it genuinely didn't match: every other glass
+   surface here (.footer-glass's "Let's talk"/"Getting bored" pills,
+   tokens.css) is just a 1px border + one blur/saturate backdrop-filter +
+   a tinted background, no inset highlights, no gloss layer. Rebuilt to
+   that exact recipe instead of a one-off heavier style for just these two
+   controls. */
+.photo-modal-close,
+.photo-modal-tool-btn {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  border: none;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 50%;
-  background: color-mix(in srgb, var(--bg) 55%, transparent);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: color-mix(in srgb, var(--bg) 48%, transparent);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
   color: var(--text);
   cursor: pointer;
-  transition: background-color var(--speed) var(--ease), color var(--speed) var(--ease);
+  transition: background-color var(--speed) var(--ease), color var(--speed) var(--ease),
+    border-color var(--speed) var(--ease);
 }
 
 .photo-modal-close:hover,
-.photo-modal-close:focus-visible {
-  background: color-mix(in srgb, var(--accent) 70%, var(--bg));
+.photo-modal-close:focus-visible,
+.photo-modal-tool-btn:hover,
+.photo-modal-tool-btn:focus-visible,
+.photo-modal-tool-btn[aria-expanded="true"] {
+  background: color-mix(in srgb, var(--accent) 65%, var(--bg));
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
   color: #fff;
 }
 
@@ -1087,28 +1162,6 @@ html:has(body.theme-personal) {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-}
-
-.photo-modal-tool-btn {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--bg) 55%, transparent);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  color: var(--text);
-  cursor: pointer;
-  transition: background-color var(--speed) var(--ease), color var(--speed) var(--ease);
-}
-
-.photo-modal-tool-btn:hover,
-.photo-modal-tool-btn:focus-visible,
-.photo-modal-tool-btn[aria-expanded="true"] {
-  background: color-mix(in srgb, var(--accent) 70%, var(--bg));
-  color: #fff;
 }
 
 .photo-modal-dots[hidden] {
@@ -1149,6 +1202,15 @@ html:has(body.theme-personal) {
   display: none;
 }
 
+/* Used to pop in instantly on the [hidden] toggle alone — direct feedback
+   that the info button should "look good" when opened, which a flat
+   display:none/block swap can't do. Same timed-hidden-around-a-transition
+   technique entry-toggle.js already uses elsewhere on this site: the class
+   drives a real opacity/transform animation, and the real `hidden`
+   attribute (needed so this empty space isn't still intercepting clicks
+   over the image, or lingering for assistive tech, while closed) is only
+   re-applied once that animation has actually finished closing — see
+   photo-modal.js's setInfoOpen(). */
 .photo-modal-info-panel {
   position: absolute;
   left: 10px;
@@ -1166,6 +1228,17 @@ html:has(body.theme-personal) {
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.5);
   color: #fff;
+  opacity: 0;
+  transform: translateY(8px) scale(0.97);
+  transform-origin: bottom center;
+  pointer-events: none;
+  transition: opacity 0.22s var(--ease), transform 0.22s var(--ease);
+}
+
+.photo-modal-info-panel.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
 }
 
 .photo-modal-caption {
