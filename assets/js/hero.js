@@ -286,20 +286,62 @@
   // The homepage no longer scrolls at all (.theme-home has overflow:hidden —
   // see home.css) — there's nothing below the hero to reveal. Instead, any
   // wheel/touch scroll *gesture* is read as "take me to the resume" and
-  // navigates there directly, letting the sitewide view-transition wipe
-  // (tokens.css) play exactly as it would from a normal link click. This
+  // navigates there after the globe-zoom exit animation below. This
   // replaces the deprecated sentinel/IntersectionObserver mechanic below —
   // same intent (a scroll gesture opens /resume/), but since the page
   // physically can't scroll anymore there's no sentinel to watch for.
   // Downward gestures only (deltaY > 0 / swipe-up), so a user idly rocking
   // a trackpad or trying to scroll back up doesn't get launched into a
   // navigation. The always-present .scroll-cue link is still the fallback
-  // for reduced-motion, keyboard, and no-JS visitors.
+  // for reduced-motion, keyboard, and no-JS visitors; with motion allowed
+  // a click on it (and on every other link into /life/ or /resume/) runs
+  // the same exit animation as the gestures, see the click handler below.
   if (!reduceMotion) {
     // Shared by goToResume and goToLife below — whichever gesture fires
     // first wins, the other is a no-op, since only one navigation can
     // ever actually happen.
     var navigated = false;
+
+    // Both exit animations below (the black circle into /life/, the globe
+    // zoom and white fade into /resume/) end in a plain page navigation, and
+    // the browser's sitewide cross-document wipe (tokens.css) used to play
+    // on top of it: the old page's last frame dimmed to 30% while the
+    // destination rose from the bottom edge, a second animation after the
+    // first had already covered the screen. Reported as "after the black
+    // screen the page opens bottom to top and then loads, very
+    // inconsistent". Each exit animation calls beginHandoff() first, which
+    // opts this one navigation out of that wipe, so the destination just
+    // opens on the color the animation ended on and runs its own intro. It
+    // also fades Kiddo (home.css), which would otherwise float over the
+    // wipe, its open menu included.
+    var leaving = false;
+    var beginHandoff = function () {
+      navigated = true;
+      leaving = true;
+      document.documentElement.classList.add("is-leaving");
+      var optOut = document.createElement("style");
+      optOut.textContent = "@view-transition { navigation: none; }";
+      document.head.appendChild(optOut);
+    };
+    // Fallback for a browser that has already created the transition by the
+    // time it reads the rule above: cancel it here, and swallow the
+    // "transition was skipped" rejection so it doesn't land in the console
+    // as an uncaught error.
+    window.addEventListener("pageswap", function (e) {
+      if (!leaving || !e.viewTransition) return;
+      e.viewTransition.ready.catch(function () {});
+      e.viewTransition.skipTransition();
+    });
+
+    // Coming Back to this page after either exit animation: the browser may
+    // restore it from the back/forward cache exactly as it was left, i.e.
+    // still covered by the black circle or the white fade, with every
+    // gesture dead because navigated is still true. Reloading is simpler
+    // and safer than rewinding every effect (the globe's focus-zoom
+    // included) and matches what a Back without that cache does anyway.
+    window.addEventListener("pageshow", function (e) {
+      if (e.persisted && navigated) window.location.reload();
+    });
 
     // Reported "while playing the game, an accidental swipe up opens
     // /resume/" — the wheel/touchmove listeners below are on window, so a
@@ -345,7 +387,7 @@
 
     var goToLife = function () {
       if (navigated || !lifeWipe || !pullBtn || sliceBladeOpen()) return;
-      navigated = true;
+      beginHandoff();
       syncLifeWipe();
       lifeWipe.classList.add("life-wipe-active");
       // The circle's center never moves, so growing it to cover every
@@ -367,16 +409,9 @@
       }, 700);
     };
 
-    if (pullBtn) {
-      pullBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        goToLife();
-      });
-    }
-
     var goToResume = function () {
       if (navigated || sliceBladeOpen()) return;
-      navigated = true;
+      beginHandoff();
       // "Zoom to happen to the yellow dot — if it's on the back side the
       // globe should spin and bring it to the front, then fill the screen
       // with that color before the next page." globe.js's
@@ -451,6 +486,30 @@
         finish();
       }
     };
+
+    // Every link into /life/ or /resume/ runs the same exit animation as the
+    // gestures, not just the gestures and the edge button. The hidden hint
+    // link, the "keep going" cue and Kiddo's menu links used to be plain
+    // navigations that got only the sitewide wipe-up, so the same
+    // destination opened three different ways. Delegated on document (not
+    // bound per link) because Kiddo builds and reshuffles its links at
+    // runtime. Modified clicks (new tab or window, download) and links with
+    // a hash or query are left to the browser.
+    document.addEventListener("click", function (e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var a = e.target.closest && e.target.closest("a[href]");
+      if (!a || a.origin !== window.location.origin || a.hash || a.search) return;
+      if (a.target && a.target !== "_self") return;
+      if (a.hasAttribute("download")) return;
+      var path = a.pathname.replace(/index\.html$/, "").replace(/\/?$/, "/");
+      if (path === "/life/" && lifeWipe && pullBtn) {
+        e.preventDefault();
+        goToLife();
+      } else if (path === "/resume/") {
+        e.preventDefault();
+        goToResume();
+      }
+    });
 
     // Whichever axis moves more decides the destination — a wheel
     // gesture that's mostly vertical shouldn't accidentally fire the
