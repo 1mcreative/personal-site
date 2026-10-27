@@ -2793,7 +2793,7 @@ if (matchMedia("(hover: hover)").matches) {
       <div class="lab-card-head">
         <h3>Sitewide View Transition</h3>
       </div>
-      <p class="lab-card-desc">Pure CSS, no JS. One <code>@view-transition</code> rule opts every same-origin navigation into the browser's native Cross-Document View Transitions API; the new page wipes up into view rather than a plain cross-fade. Disabled under reduced motion automatically. This exact rule is already active on the lab page you're reading right now.</p>
+      <p class="lab-card-desc">Pure CSS, no JS. One <code>@view-transition</code> rule opts every same-origin navigation into the browser's native Cross-Document View Transitions API; the new page wipes up into view rather than a plain cross-fade. Disabled under reduced motion automatically. This exact rule is already active on the lab page you're reading right now. If your page runs its own exit animation before it navigates, opt that one navigation out (the last lines of the snippet) so the two do not stack.</p>
       <div class="lab-demo" style="display:block; padding:1.5rem; text-align:center;">
         <a class="offset-btn" href="/resume/">
           See it: go to /resume/
@@ -2804,7 +2804,7 @@ if (matchMedia("(hover: hover)").matches) {
         <p style="font-size:0.82rem; color:var(--muted); margin-top:0.75rem; margin-bottom:0;">(use the back button to return)</p>
       </div>
       <div class="lab-card-actions">
-        <button class="lab-copy-btn" data-copy-target="snippet-view-transition">Copy CSS</button>
+        <button class="lab-copy-btn" data-copy-target="snippet-view-transition">Copy code</button>
       </div>
       <details class="lab-code-details">
         <summary>View code</summary>
@@ -2827,7 +2827,14 @@ if (matchMedia("(hover: hover)").matches) {
 
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
-}</code></pre>
+}
+
+// JS: your own exit animation already covered the screen? Opt this one
+// navigation out, so the wipe-up does not play on top of it.
+var optOut = document.createElement("style");
+optOut.textContent = "@view-transition { navigation: none; }";
+document.head.appendChild(optOut);
+location.href = "/wherever";</code></pre>
       </details>
     </div>
 
