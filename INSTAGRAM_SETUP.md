@@ -4,9 +4,14 @@ One-time setup for the self-hosted Instagram feed (`scripts/fetch-instagram.js`,
 `.github/workflows/instagram-feed.yml`). Built as a free, unlimited-accounts
 alternative to Behold.so, whose free tier only covers one connected account.
 
+There is no server to run or host: a scheduled GitHub Action does the
+fetching and saves the photos into this repository, and the site just reads
+that file.
+
 Every step below has to be done by you — it needs your own Meta developer
 account and your own login to both Instagram accounts, none of which
-Claude can do on your behalf.
+Claude can do on your behalf. Never paste a token into a chat; put it
+straight into GitHub (step 5).
 
 ## 1. Convert both accounts to Business or Creator
 
@@ -44,6 +49,17 @@ Still on the **API setup with Instagram business login** page:
 
 You should end up with 4 values: a token and a user ID, for each account.
 
+Two things that can trip this step up:
+
+- If Meta says an account can't be added until it has a role on the app,
+  add it as an **Instagram Tester** (app **Roles → Add People**), then accept
+  the invite from that Instagram account (**Settings → Apps and websites →
+  Tester invites**) and retry. Meta's own page doesn't mention this, but
+  other guides report it, so skip it if your dashboard doesn't ask.
+- Ignore any webhooks, callback URL, or redirect URI sections on that page.
+  They're for apps that serve other people's accounts and need a server;
+  this setup uses neither.
+
 ## 4. Create a GitHub token for secret rotation
 
 The workflow needs to update its own stored tokens every time it refreshes
@@ -58,6 +74,11 @@ old one). That needs its own GitHub token, separate from the Instagram ones:
    reminder is enough).
 4. Copy the token immediately.
 
+Create it while signed in as the repository owner (`1mcreative`). The
+workflow also uses it to push the refreshed photos file to `main`. `main`
+requires a PR review, which the built-in bot token can't skip, but the
+owner's own token can (branch protection isn't enforced on admins).
+
 ## 5. Add all 5 secrets to this repository
 
 Repository → **Settings → Secrets and variables → Actions → New repository
@@ -71,12 +92,35 @@ secret**. Add:
 | `IG_USER_ID_STRAIGHTFORKWARD` | User ID from step 3, for @straightforkward |
 | `SECRETS_PAT` | GitHub token from step 4 |
 
-## 6. Run it once manually
+Easiest, and the value never leaves your machine: run this in a terminal
+once per secret and paste the value at the prompt.
+
+```bash
+gh secret set IG_TOKEN_1MCREATIVE -R 1mcreative/personal-site
+```
+
+## 6. Put the workflow file on `main`
+
+GitHub only lets a token with the `workflow` scope add files under
+`.github/workflows/`. Either:
+
+- run `gh auth refresh -s workflow` once, then ask Claude to push
+  `.github/workflows/instagram-feed.yml` (it arrives as a normal PR you
+  merge), or
+- in the GitHub web UI, **Add file → Create new file**, name it
+  `.github/workflows/instagram-feed.yml`, and paste the file's contents.
+
+## 7. Run it once manually
 
 Repository → **Actions → Refresh Instagram feed → Run workflow**. Check
-the run's logs — you should see `<account>: refreshed token, fetched N
-media items` for both accounts, then a commit updating
-`assets/data/instagram-feed.json`. After that, it runs daily on its own.
+the run's logs — you should see `<account>: fetched N media items` for both
+accounts, then a commit updating `assets/data/instagram-feed.json`. After
+that, it runs daily on its own.
+
+On this first run you'll likely see `could not refresh ... using the
+current token`: Meta won't refresh a token under 24 hours old, but a fresh
+one works fine for reading photos. The daily run refreshes it from day two.
+Run it within 60 days of generating the tokens, or they expire.
 
 If something fails, the logs will say which account and why — the most
 likely causes are a typo in a secret name/value, an account that's still

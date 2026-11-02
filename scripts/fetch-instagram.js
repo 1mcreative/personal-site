@@ -65,8 +65,18 @@ async function run() {
     }
 
     try {
-      const newToken = await refreshToken(token);
-      const media = await fetchMedia(igUserId, newToken);
+      // Meta refuses to refresh a token under 24h old, but a token fresh from
+      // the dashboard still works for 60 days, so fall back to it and let the
+      // next daily run do the refresh. A really dead token fails fetchMedia below.
+      let activeToken = token;
+      let refreshed = false;
+      try {
+        activeToken = await refreshToken(token);
+        refreshed = true;
+      } catch (refreshErr) {
+        console.warn(account.name + ": could not refresh (" + refreshErr.message + "), using the current token");
+      }
+      const media = await fetchMedia(igUserId, activeToken);
 
       media.forEach(function (item) {
         const imageUrl = toImageUrl(item);
@@ -84,9 +94,9 @@ async function run() {
       // Only persist the new token once we know it actually worked end to
       // end (refresh + a successful media fetch) — never overwrite a
       // possibly-still-good stored token with one we haven't proven works.
-      refreshedTokens[account.tokenEnv] = newToken;
+      if (refreshed) refreshedTokens[account.tokenEnv] = activeToken;
       anySucceeded = true;
-      console.log(account.name + ": refreshed token, fetched " + media.length + " media items");
+      console.log(account.name + ": " + (refreshed ? "refreshed token" : "kept current token") + ", fetched " + media.length + " media items");
     } catch (err) {
       console.error(account.name + " failed:", err.message);
     }
