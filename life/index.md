@@ -238,35 +238,53 @@ permalink: /life/
        unaffected. -->
   <h2 class="sr-only">Photo album</h2>
 
-  <div class="photo-slider" id="photo-slider">
-    <!-- No loading="lazy" here deliberately: this page makes `body`, not
-         the document, the real scroll container (see personal.css's own
-         html:has() comment), and native lazy-loading has real, documented
-         cross-browser bugs recognizing "near the viewport" inside a
-         non-default scroll root — confirmed as the cause of a real report
-         (photo never loading on a real desktop browser, reproduced with
-         cache and timing both ruled out). With a handful of photos, eager
-         loading is cheap; revisit with a real IntersectionObserver if the
-         album grows large enough that this starts to matter. -->
-    {% if photos.size > 0 %}
-      {% for photo in photos %}
-      <button type="button" class="photo-slide" data-photo-open data-full="{{ photo.src }}" data-caption="{{ photo.caption | default: '' | escape }}" data-location="{{ photo.location | default: '' | escape }}" data-date="{{ photo.date | default: '' | escape }}">
-        <img src="{{ photo.src }}" alt="{{ photo.alt | default: '' }}" decoding="async" width="170" height="170" draggable="false" onerror="this.closest('.photo-slide').classList.add('photo-slide-broken')"{% if photo.offsetY %} style="--offset-y: {{ photo.offsetY }}px"{% endif %}>
-        <span class="photo-slide-scrim" aria-hidden="true"></span>
-        {% if photo.location or photo.date %}
-        <span class="photo-slide-meta" aria-hidden="true">
-          {% if photo.location %}<strong>{{ photo.location }}</strong>{% endif %}
-          {% if photo.date %}{{ photo.date }}{% endif %}
-        </span>
-        {% endif %}
-      </button>
-      {% endfor %}
-    {% else %}
+  {% if photos.size > 0 %}
+    <!-- Grouped by trip (album.yml's own `trip` field) instead of one flat
+         deck — real photos span different places and times, and a single
+         Coverflow mixing all of them together has no way to convey that.
+         group_by preserves each trip's first-appearance order in the data
+         file, which is the only ordering available without real capture
+         dates (see album.yml's own field comment) — list newest trips
+         first in the data. Each row is its own independent
+         photo-coverflow.js instance (assets/js/photo-coverflow.js), not
+         one shared deck, so browsing one trip never shifts another. -->
+    {% assign trips = photos | group_by: "trip" %}
+    {% for trip in trips %}
+    <div class="photo-trip">
+      <p class="photo-trip-label">{{ trip.name }}</p>
+      <div class="photo-slider">
+        <!-- No loading="lazy" here deliberately: this page makes `body`,
+             not the document, the real scroll container (see
+             personal.css's own html:has() comment), and native
+             lazy-loading has real, documented cross-browser bugs
+             recognizing "near the viewport" inside a non-default scroll
+             root — confirmed as the cause of a real report (photo never
+             loading on a real desktop browser, reproduced with cache and
+             timing both ruled out). photo-coverflow.js does its own
+             index-window lazy-loading instead, which doesn't depend on
+             viewport geometry at all. -->
+        {% for photo in trip.items %}
+        <button type="button" class="photo-slide" data-photo-open data-full="{{ photo.src }}" data-caption="{{ photo.caption | default: '' | escape }}" data-location="{{ photo.location | default: '' | escape }}" data-date="{{ photo.date | default: '' | escape }}">
+          <img alt="{{ photo.alt | default: '' }}" decoding="async" width="170" height="170" draggable="false" onerror="this.closest('.photo-slide').classList.add('photo-slide-broken')" data-src="{{ photo.src }}"{% if photo.offsetY %} style="--offset-y: {{ photo.offsetY }}px"{% endif %}>
+          <span class="photo-slide-scrim" aria-hidden="true"></span>
+          {% if photo.location or photo.date %}
+          <span class="photo-slide-meta" aria-hidden="true">
+            {% if photo.location %}<strong>{{ photo.location }}</strong>{% endif %}
+            {% if photo.date %}{{ photo.date }}{% endif %}
+          </span>
+          {% endif %}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="photo-slider">
       {% for n in (0..7) %}
       <div class="photo-slide photo-slide-placeholder" aria-hidden="true" style="--hue: {{ n | times: 47 | plus: 210 | modulo: 360 }}"></div>
       {% endfor %}
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
 </section>
 
 <!-- Photo lightbox — photo only, no surrounding card (direct feedback:

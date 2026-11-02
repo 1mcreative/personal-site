@@ -812,6 +812,34 @@ html:has(body.theme-personal) {
   }
 }
 
+/* One row per trip (life/index.md's group_by: "trip") — real photos span
+   different places and times, so grouping them (Apple Photos' "Moments"
+   idea, scaled to this page) replaced the single flat deck. A plain text
+   label above the row was the obvious choice, but this project already
+   tried that exact pattern for the YouTube rows and reverted it (a label
+   above a hover-growing row ate into its headroom and made the growth
+   asymmetric) — not the same risk here, since .photo-slider's own height
+   already includes fixed padding for the coverflow's scale-up (the
+   "+2.5rem" below), so a label sitting above the stage, not overlapping
+   it, doesn't compete with that headroom the way it did there. */
+.theme-personal .photo-trip {
+  margin-top: var(--space-4);
+}
+
+.theme-personal .photo-trip:first-child {
+  margin-top: 0;
+}
+
+.theme-personal .photo-trip-label {
+  margin: 0 0 var(--space-1);
+  padding-left: var(--nav-clearance);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
 /* Album — a Coverflow carousel (assets/js/photo-coverflow.js): one centered
    photo, the rest tilted away in perspective on either side, drifting
    between photos on its own and pausing on any real interaction. Replaces
