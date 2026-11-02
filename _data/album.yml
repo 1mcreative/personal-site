@@ -11,6 +11,13 @@
 #
 # Fields:
 #   src      - string, required. Image URL or a local /assets/img/... path.
+#   trip     - string, required. Groups photos into one row, e.g.
+#              "Goa — March 2025". Photos share a trip only when this
+#              string matches exactly (case-sensitive). Rows render in the
+#              order their first photo appears below — list newest trips
+#              first, since there's no real capture-date field to sort by
+#              (see the 2026-11-02 tooling-log entry: rough dates only, no
+#              auto-sort). Within a trip, photos render in the order listed.
 #   alt      - string, optional. Real alt text (defaults to empty).
 #   offsetY  - number, optional. Shifts the image's object-position (px)
 #              if a photo needs reframing within its square crop.
@@ -21,6 +28,7 @@
 #
 # Example:
 # - src: /assets/img/life/01.jpg
+#   trip: "Goa — March 2025"
 #   alt: "Sunset in Goa"
 #   offsetY: -20
 #   caption: "Last evening of the Goa trip, right before the flight back."
@@ -28,18 +36,21 @@
 #   date: "March 2025"
 
 - src: /assets/img/life/01.jpg
+  trip: "Gudibanda Lake"
   alt: "Sunset over Gudibanda lake"
   caption: "Lovely sunset view at Gudibanda lake, just outside Bengaluru."
   location: "Gudibanda Lake, near Bengaluru"
   date: "6:22 PM"
 
 - src: /assets/img/life/02.jpg
+  trip: "Goa"
   alt: "Sunset over the waves at Mandrem beach, Goa"
   caption: "Sunset at Mandrem beach, Goa."
   location: "Mandrem Beach, Goa"
   date: ""
 
 - src: /assets/img/life/03.jpg
+  trip: "Paris"
   alt: "The Eiffel Tower lit up at dusk, seen from the Seine"
   caption: "The Eiffel Tower, lit up for the evening."
   location: "Paris, France"
